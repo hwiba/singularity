@@ -3,7 +3,7 @@
 	xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8" />
-<title>{stag}</title>
+<title th:text="${group.groupName}">{stag}</title>
 <link rel="stylesheet" href="/css/mainStyle.css" />
 <link rel="stylesheet" href="/css/datepickr.css" />
 <link rel="stylesheet" href="/css/markdown.css" />
@@ -20,26 +20,25 @@
 
 	<div th:replace="./fragments/_topNav :: #header"></div>
 
-	<input type="hidden" id="sessionUserId" name="sessionUserId"
-		value="${sessionUser.userId}" />
+	<input type="hidden" id="sessionUserId" name="sessionUserId" th:value="${session.sessionUser.id}" />
 	<h1 id="empty-message"
 		style="position: absolute; color: #888; top: 300px; width: 100%; text-align: center;">새
 		노트를 작성해주세요</h1>
 	<div id="group-header" class="content wrap"
 		style="margin-top: 50px; padding: 10px 0;">
-		<a style="display: inline-block" href="/g/${groupId}"><span
-			id="group-name"></span></a>
-		<form id="groupConfig" action="/groups/update/form/${groupId}"
-			method="post">
-			<input type="hidden" name="groupImage" value="${groupImage}" />
-			<!-- 				<c:if test="${group.groupCaptainUserId eq sessionUser.userId}">
-					<i class="fa fa-cog" style="font-size:20px; padding-top:6px;" onclick="groupUpdate();"></i>
-				</c:if> -->
-		</form>
+		<a style="display: inline-block" th:href="@{'/groups/'+${group.groupId}}">
+		<span id="group-name" th:text="${group.groupName}"></span></a>
+		
+		<div id="groupConfig">
+			<input id="group-image" type="hidden" name="groupImage" th:value="${group.groupImage}" />
+			<a th:href="@{'/groups/update/form/'+${group.groupId}}">
+				<i th:if="${admin.id} eq ${session.sessionUser.id}" class="fa fa-cog" style="font-size:20px; padding-top:6px;"></i>
+			</a>
+		</div>
 	</div>
 	<div id="note-list-container" class="content wrap">
 		<div id="create-note">
-			<a href="/notes/editor/g/${groupId}">
+			<a th:href="@{'/notes/editor/groups/'+${group.groupId}}">
 				<button id="create-new-button">
 					<i class="fa fa-plus-circle"></i>
 				</button>
@@ -106,227 +105,12 @@
 	<!-- 노트 모달을 위한 템플릿 -->
 	<!-- <%@ include file="./commons/_note_popup.jspf"%> -->
 
-	<!-- <script>
- 		document.title = "${group.groupName}";
-		var groupName = ("${group.groupName}".replace(/</g, "&lt;")).replace(
-				/>/g, "&gt;");
-		document.querySelector("#group-name").innerHTML = groupName;
-		var bJoinedUser = false;
-		var groupCaptainUserId = "${crowd.adminUser.id}";
-		const
-		groupId = window.location.pathname.split("/")[2];
-		window
-				.addEventListener(
-						"load",
-						function() {
-							document.querySelector(".searchForm").setAttribute(
-									"style", "display: block");
-							var groupImage = "${group.groupImage}";
-							if (groupImage !== "") {
-								window.document.body.querySelector("#backImg").style.backgroundImage = "url('/img/group/"
-										+ groupImage + "')";
-							}
-							document
-									.querySelector("#addMemberForm input[name='groupId']").value = groupId;
-							document.querySelector("#addMemberForm")
-									.addEventListener("submit", function(e) {
-										e.preventDefault();
-										addMember();
-									}, false);
-							document.title = "${group.groupName}";
-							var json = $
-							{
-								noteList
-							}
-							;
-							readMember(groupId);
-							appendNoteList(json);
-							appendMarkList(json);
-							var elCreateBtn = document
-									.querySelector("#create-new-button");
-							getDateExistNotes();
-							if (document.querySelector("#member-template") !== null)
-								memberTemplate = document
-										.querySelector("#member-template").content;
-						}, false);
-
-		window.addEventListener("scroll", function() {
-			infiniteScroll();
-			sideMenuFlow();
-			resizeSideMenu();
-			refreshCalendar();
-		}, false);
-
-		window.addEventListener('resize', function() {
-			resizeSideMenu();
-		}, false);
-
-		$(function() {
-			$("#defaultCalendar").daterangepicker(
-					{
-						singleDatePicker : true,
-						showDropdowns : false
-					},
-					function(start, end, label) {
-						$("#reportrange span").html(
-								start.format("MMMM D, YYYY") + " - "
-										+ end.format("MMMM D, YYYY"));
-					});
-			var allShowButton = guinness.createElement({
-				name : "input",
-				attrs : {
-					id : "allShow",
-					class : "inputBtn",
-					type : "submit",
-					value : "모두보기",
-					onclick : "readNoteList()"
-				}
-			});
-			$("#calendar-container").append(allShowButton);
-		});
-
-		document.querySelector("#calendar-container").addEventListener(
-				"click",
-				function(e) {
-					if (e.target.getAttribute("class") === null
-							|| e.target.getAttribute("class").indexOf(
-									"available") === -1
-							|| e.target.getAttribute("class").indexOf(
-									"existNote") === -1)
-						return;
-					var noteTargetDate = $("#defaultCalendar").data(
-							"daterangepicker").startDate._d.toISOString()
-							.substring(0, 10)
-							+ " 23:59:59";
-					readNoteList(noteTargetDate);
-				}, false);
-
-		function groupUpdate() {
-			document.getElementById("groupConfig").submit();
-		}
-
-		var sideMenuContainers = document
-				.querySelectorAll(".side-menu-container");
-		function sideMenuFlow() {
-			if (window.scrollY > 70) {
-				sideMenuContainers[0].style.top = sideMenuContainers[1].style.top = (window.scrollY - 70)
-						+ "px";
-			} else {
-				sideMenuContainers[0].style.top = sideMenuContainers[1].style.top = "0px";
-			}
-		}
-
-		var prevDay = "";
-		function refreshCalendar() {
-			var noteDates = document.querySelectorAll("div.note-date");
-			var currDay;
-			for (var i = 0; i < noteDates.length; i++) {
-				if (window.scrollY > noteDates[i].parentNode.offsetTop
-						&& window.scrollY < noteDates[i].parentNode.offsetTop
-								+ noteDates[i].parentNode.clientHeight) {
-					currDay = noteDates[i].textContent;
-				}
-			}
-			if (prevDay !== currDay && currDay !== undefined) {
-				var date = currDay.split("-");
-				//yearChange
-				if ($(".calendar.first .yearselect option[selected='selected']")
-						.attr("value") !== date[0]) {
-					$(".calendar.first .yearselect").val(date[0]).trigger(
-							"change");
-				}
-				//monthChange
-				if ($(
-						".calendar.first .monthselect option[selected='selected']")
-						.attr("value") !== date[1] - 1 + "") {
-					$(".calendar.first .monthselect").val(date[1] - 1).trigger(
-							"change");
-				}
-				//dayChange
-				$(".calendar.first table tbody td.active")
-						.removeClass("active");
-				var days = $(".calendar.first table tbody td.existNote");
-				for (var i = 0; i < days.length; i++) {
-					var day = (date[2] < 10) ? date[2].substring(1, 2)
-							: date[2];
-					if (days[i].textContent === day) {
-						days[i].className += " active";
-					}
-				}
-			}
-		}
-
-		var nullCheckMonth;
-		function getDateExistNotes(year, month) { //;; select null exist notes day
-			var noteTargetYear = $("#defaultCalendar").data("daterangepicker").startDate._d
-					.toISOString().substring(0, 4);
-			var noteTargetMonth = $("#defaultCalendar").data("daterangepicker").startDate._d
-					.toISOString().substring(5, 7);
-			if (year !== undefined)
-				noteTargetYear = year;
-			if (month !== undefined)
-				noteTargetMonth = month + 1;
-			var lastDate = (new Date(noteTargetYear, noteTargetMonth, 1))
-					.toISOString().substring(0, 10)
-					+ " 23:59:59";
-			guinness.ajax({
-				method : "get",
-				url : "/notes/getNullDay/" + groupId + "/" + lastDate,
-				success : function(req) {
-					var json = JSON.parse(req.responseText);
-					nullCheckMonth = json.objectValues;
-					if (json.success === true) {
-						setNullCheck(nullCheckMonth);
-					}
-				}
-			});
-		}
-
-		function setNullCheck(nullCheckMonth) {
-			var td = document.querySelectorAll(".available");
-			var flagStart = false;
-			var i = 0;
-			for (t in td) {
-				if (td[t].innerText === "1") {
-					flagStart = true;
-				}
-				if (flagStart === true) {
-					if (nullCheckMonth[i] === true) {
-						td[t].className = td[t].className + " noNote";
-					} else {
-						td[t].className = td[t].className + " existNote";
-					}
-					i++;
-					if (nullCheckMonth.length === i)
-						break;
-				}
-			}
-		}
-
-		function leaveGroup() {
-			guinness.util.alert(groupName, "그룹을 탈퇴하시겠습니까?", function() {
-				var param = "sessionUserId="
-						+ document.querySelector("#sessionUserId").value
-						+ "&groupId=" + groupId;
-				guinness.restAjax({
-					method : "post",
-					url : "/groups/members/leave",
-					param : param,
-					statusCode : {
-						200 : function(res) { // 그룹 탈퇴 성공
-							window.location.href = "/groups/form";
-						},
-						406 : function(res) { // 그룹 탈퇴 실패 
-							guinness.util.alert('경고', res);
-						}
-					}
-				});
-			}, function() {
-			});
-		}
-	</script> -->
+	<script src="/js/notes.js"></script>
+	<scrpit src="/js/note.js"></scrpit>
 	<script src="/js/datepickr.js"></script>
 	<script src="/js/moment.js"></script>
 	<script src="/js/daterangepicker.js"></script>
+	<script src="/js/group.js"></script>
+	<script src="/js/guinness.js"></script>
 </body>
 </html>

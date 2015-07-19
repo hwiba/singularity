@@ -5,6 +5,8 @@ import java.io.IOException;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import singularity.domain.Crowd;
+import singularity.dto.out.SessionUser;
 import singularity.exception.FailedUpdateGroupException;
 import singularity.service.GroupService;
 import singularity.utility.JSONResponseUtil;
@@ -24,6 +27,8 @@ import singularity.utility.ServletRequestUtil;
 @Controller
 @RequestMapping("/groups")
 public class GroupController {
+	private static final Logger logger = LoggerFactory.getLogger(GroupController.class);
+	
 	@Resource
 	private GroupService groupService;
 
@@ -33,9 +38,15 @@ public class GroupController {
 	}
 	
 	@RequestMapping("{groupId}")
-	protected String initReadNoteList(@PathVariable String groupId, HttpSession session, Model model) throws IOException{
+	protected String loadGroupAndNotes(@PathVariable String groupId, HttpSession session, Model model) throws IOException{
 		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
+		//Session이 없는데 공개 그룹일 때의 대응과 비공개 그룹일 때의 대응을 분기하기.
+		//TODO
 		model.addAttribute("group", groupService.readGroup(groupId));
+		SessionUser admin = groupService.readCaptainUser(groupId);
+		logger.warn("\n\nadmin = {}" , admin);
+		
+		model.addAttribute("admin", admin);
 		//model.addAttribute("noteList", new Gson().toJson(previewService.initNotes(sessionUserId, groupId)));
 		return "notes";
 	}

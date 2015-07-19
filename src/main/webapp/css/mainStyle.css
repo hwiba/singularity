@@ -26,6 +26,14 @@ html, body {
 	background-color:rgb(250, 250, 250);
 }
 
+#groupConfig a:link {
+  color: black;
+}
+
+#groupConfig a:visited {
+  color: black;
+}
+
 .question, .attention {
   font-family: FontAwesome;
 }

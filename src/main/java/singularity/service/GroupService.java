@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import singularity.domain.Crowd;
 import singularity.domain.User;
+import singularity.dto.out.SessionUser;
 import singularity.exception.FailedAddingGroupMemberException;
 import singularity.exception.FailedDeleteGroupException;
 import singularity.exception.FailedUpdateGroupException;
@@ -37,6 +38,11 @@ public class GroupService {
 
 	public List<Crowd> readGroups(String userId) {
 		return groupRepository.findAllByUsers(userRepository.findOne(userId));
+	}
+	
+	public SessionUser readCaptainUser(String groupId) {
+		Crowd group = groupRepository.findOne(groupId);
+		return new SessionUser(group.getAdminUser());
 	}
 
 	public Crowd create(String groupName, String adminUserId, String status) {
