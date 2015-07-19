@@ -3,21 +3,18 @@
 	xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
 <title>stagway</title>
-<link rel="stylesheet" href="/css/mainStyle.css" />
-<link rel="stylesheet" type="text/css"
-	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"
-	th:href="@{/webjars/bootstrap/3.3.5/css/bootstrap.min.css}" />
-<link rel="stylesheet" type="text/css"
-	href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.js"
-	th:href="@{/webjars/bootstrap/3.3.5/css/bootstrap-theme.min.css}" />
+
+<link rel="stylesheet" type="text/css" href="/css/mainStyle.css" />
 <link rel="stylesheet" href="/css/markdown.css" />
 
 
 </head>
 <body>
-	<input type="hidden" id="sessionUserId" name="sessionUserId"
-		th:value="${session.sessionUser.id}" />
+	<input type="hidden" id="sessionUserId" name="sessionUserId" th:value="${session.sessionUser.id}" />
 	<div th:replace="./fragments/_topNav :: #header"></div>
 
 	<div class="content wrap" style="margin-top: 100px">
@@ -49,13 +46,6 @@
 		<button class="btn btn-pm">만들기</button>
 	</form>
 	</template>
-
-	<script
-		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"
-		th:src="@{/webjars/jquery/1.11.1/jquery.min.js}"></script>
-	<script
-		src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"
-		th:src="@{/webjars/bootstrap/3.3.5/js/bootstrap.min.js}"></script>
 	
 	<script src="/js/guinness.js"></script>
 	<script src="/js/group.js"></script>

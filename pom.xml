@@ -81,11 +81,11 @@
 		</dependency>
 
 		<!-- Bootstrap -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
 			<version>3.3.5</version>
-		</dependency>
+		</dependency> -->
 		
 		<!-- flyway -->
 		<!-- <dependency>
