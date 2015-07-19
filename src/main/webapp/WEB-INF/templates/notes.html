@@ -21,6 +21,8 @@
 	<div th:replace="./fragments/_topNav :: #header"></div>
 
 	<input type="hidden" id="sessionUserId" name="sessionUserId" th:value="${session.sessionUser.id}" />
+	<input type="hidden" id="adminId" name="adminId" th:value="${admin.id}" />
+	
 	<h1 id="empty-message"
 		style="position: absolute; color: #888; top: 300px; width: 100%; text-align: center;">새
 		노트를 작성해주세요</h1>
@@ -65,10 +67,10 @@
 
 			<form id="addMemberForm">
 				<span class="addMemberTitle" style="font-weight: bold;">멤버추가</span><br />
-				<input type="hidden" name="groupId" /> <input
-					class="inputText" type="text" name="userId" /> <input
-					class="inputBtn" type="submit" value="초대" /> <span
-					class="addMemberAlert" style="visibility: hidden;">멤버추가메세지</span>
+				<input type="hidden" name="groupId" />
+				<input class="inputText" type="text" name="userId" />
+				<input class="inputBtn" type="submit" value="초대" />
+				<span class="addMemberAlert" style="visibility: hidden;">멤버추가메세지</span>
 			</form>
 
 			<div id="group-member-list">
@@ -76,8 +78,7 @@
 				<table id="group-member">
 				</table>
 			</div>
-			<div class="leaveGroup" onclick="leaveGroup()"
-				style="margin: 10px; cursor: pointer;">
+			<div class="leaveGroup" style="margin: 10px; cursor: pointer;">
 				<span>그룹 탈퇴하기</span>
 			</div>
 		</div>
@@ -106,11 +107,10 @@
 	<!-- <%@ include file="./commons/_note_popup.jspf"%> -->
 
 	<script src="/js/notes.js"></script>
-	<scrpit src="/js/note.js"></scrpit>
+	<script src="/js/note.js"></script>
 	<script src="/js/datepickr.js"></script>
 	<script src="/js/moment.js"></script>
 	<script src="/js/daterangepicker.js"></script>
-	<script src="/js/group.js"></script>
 	<script src="/js/guinness.js"></script>
 </body>
 </html>

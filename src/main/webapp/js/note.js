@@ -377,10 +377,9 @@ function createComment(obj) {
 
 function isJoinedUser(member) {
     var sessionUserId = document.getElementById("sessionUserId").value;
-
     var length = member.length;
     for (var i = 0; i < length; i++) {
-        if (member[i].userId === sessionUserId) {
+        if (member[i].id === sessionUserId) {
             return true;
         }
     }
@@ -462,34 +461,36 @@ function readMember(groupId) {
 }
 
 var onOffMemberList = [];
+
 function appendMember(obj) {
 	var userId = document.getElementById("sessionUserId").value;
 	var memberTemplate = memberTemplate = document.querySelector("#member-template").content;
 	var newMember = document.importNode(memberTemplate, true);
+	var groupCaptainUserId = document.querySelector("#adminId").value;
 	if(userId === groupCaptainUserId){
 		newMember.querySelector(".member-delete").style.visibility = "visible";
 	}
-	newMember.querySelector(".member-info").setAttribute("id", obj.userId);
-	newMember.querySelector(".memberChk").value = obj.userId;
-	newMember.querySelector(".member-name").innerHTML = obj.userName;
-	newMember.querySelector(".member-id").innerHTML = obj.userId;
-	newMember.querySelector(".fa-eye").setAttribute("data-id", obj.userId);
+	newMember.querySelector(".member-info").setAttribute("id", obj.id);
+	newMember.querySelector(".memberChk").value = obj.id;
+	newMember.querySelector(".member-name").innerHTML = obj.name;
+	newMember.querySelector(".member-id").innerHTML = obj.id;
+	newMember.querySelector(".fa-eye").setAttribute("data-id", obj.id);
     newMember.querySelector(".fa-eye").addEventListener("click", 
         function(e) {
             if(e.target.className === "fa fa-eye") {
                 e.target.setAttribute("class", "fa fa-eye-slash");
-                onOffMemberNotes("off", obj.userId);
-                onOffMemberList[obj.userId] = "off";
+                onOffMemberNotes("off", obj.id);
+                onOffMemberList[obj.id] = "off";
             } else {
                 e.target.setAttribute("class", "fa fa-eye");
-                onOffMemberNotes("on", obj.userId);
-                onOffMemberList[obj.userId] = "on";
+                onOffMemberNotes("on", obj.id);
+                onOffMemberList[obj.id] = "on";
             }
         }, false);
     newMember.querySelector(".fa-times").addEventListener("click",
 			function(e) {
 				e.preventDefault();
-				guinness.confirmDeleteUser(obj.userId, obj.userName);
+				guinness.confirmDeleteUser(obj.id, obj.name);
 			}, false);
 	document.querySelector("#group-member").appendChild(newMember);
 }

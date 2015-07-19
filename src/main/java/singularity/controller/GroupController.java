@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import singularity.domain.Crowd;
 import singularity.dto.out.SessionUser;
 import singularity.exception.FailedUpdateGroupException;
+import singularity.exception.GroupMemberException;
 import singularity.service.GroupService;
 import singularity.utility.JSONResponseUtil;
 import singularity.utility.ServletRequestUtil;
@@ -94,7 +95,11 @@ public class GroupController {
 
 	@RequestMapping(value = "/members/leave", method = RequestMethod.POST)
 	protected ResponseEntity<Object> leave(@RequestParam String sessionUserId, @RequestParam String groupId) {
-		groupService.leaveGroup(sessionUserId, groupId);
+		try {
+			groupService.leaveGroup(sessionUserId, groupId);
+		} catch(GroupMemberException e) {
+			return JSONResponseUtil.getJSONResponse(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+		}
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
 
