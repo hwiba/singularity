@@ -5,8 +5,6 @@ import java.util.Date;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import singularity.domain.User;
@@ -67,8 +65,6 @@ public class UserService {
 		user.setStatus(UserStatus.DELEATE);
 		userRepository.save(user);
 	}
-	
-	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 	
 	public SessionUser findForLogin(User user) throws FailedLoginException {
 		User dbUser = userRepository.findOne(user.getId());

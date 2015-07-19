@@ -3,8 +3,6 @@ package singularity.controller;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -27,20 +25,17 @@ import singularity.service.UserService;
 @Transactional
 @RequestMapping(value = "/user")
 public class UserController {
-	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 	@Resource
 	UserService userService;
 	@Resource
 	MailService mailService;
-
+	
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	String create(Model model, @Validated User user, BindingResult result) {
 		if (result.hasErrors()) {
 			return "join";
 		}
-		
-		logger.warn("\nuser={}", user);
 		try {
 			mailService.sendMailforSignUp(mailService.create(new Confirm(userService.create(user))));
 		} catch (ExistedUserException e) {
@@ -73,12 +68,12 @@ public class UserController {
 	}
 	
 	@RequestMapping(value="/confirm/{signingKey}", method=RequestMethod.GET)
-	String confirm(Model model, @PathVariable String signingKey) {
+	String confirm(Model model, @PathVariable String signingKey, HttpSession session) {
 		Confirm confirm = mailService.findOneBySigningKey(signingKey);
 		if (null != confirm) {
 			userService.signingUp(confirm.getUser());
 		}
-		return loginForm(model);
+		return loginForm(model, session);
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.PUT)
@@ -97,15 +92,28 @@ public class UserController {
 	 * form
 	 */
 	@RequestMapping(value = "/loginForm", method = RequestMethod.GET)
-	String loginForm(Model model) {
+	String loginForm(Model model, HttpSession session) {
+		if (this.sessionedUser(session)) {
+			return "group";
+		}
 		model.addAttribute("user", new User());
 		return "login";
 	}
 
 	@RequestMapping(value = "/joinForm", method = RequestMethod.GET)
-	String joinForm(Model model) {
+	String joinForm(Model model, HttpSession session) {
+		if (this.sessionedUser(session)) {
+			return "group";
+		}
 		model.addAttribute("user", new User());
 		return "join";
+	}
+	
+	boolean sessionedUser(HttpSession session) {
+		if (null != userService.getSessionUser(session)) {
+			return true;
+		}
+		return false;
 	}
 
 }
