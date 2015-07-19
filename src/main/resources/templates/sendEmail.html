@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org" >
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>환영합니다</title>
+<link rel="stylesheet" href="/css/mainStyle.css" />
+</head>
+<body>
+	<div class="sendmail-content">
+				<h1 th:if="${message}" th:text="${message}">message</h1>
+		<a href="/">홈으로 돌아가기</a><br /><br />
+	</div>
+</body>
+</html>

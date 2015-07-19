@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<title>stagway</title>
+<link rel="stylesheet" href="/css/mainStyle.css" />
+</head>
+<body>
+	<div id="jumbotron-container">
+		<div class="content wrap">
+			<div id="jumbotron">
+				<h1><img src="/img/stagwhitelogo.png" />way와 함께!</h1>
+				<div class="subscribe">
+				나만의 학습 노트를 작성하고, 스터디 멤버들과 함께 그룹을 생성하여 학습 노트를 공유하거나 언제 어디에서나 피드백을 받으세요!
+				</div>
+				<div th:if="${existedUserError}" th:text="${existedUserError}">이미 가입된 유저입니다.</div>
+				<form action="#" th:object="${user}" th:action="@{/user}" method="post">
+					<label for="id">E-mail</label>
+					<input id="id" name="id" th:field="*{id}" required="required" th:errorClass="error-input" value="test@test.com" />
+					<div th:if="${#fields.hasErrors('id')}" th:errors="*{id}" class="error-messages">error!</div>
+					
+					<label for="name">이름</label>
+					<input id="name" name="name" th:field="*{name}" required="required" th:errorClass="error-input" value="testName" />
+					<div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error-messages">error!</div>
+					
+					<label for="password">비밀번호</label>
+					<input id="password" type="password" name="password" th:field="*{password}" required="required" th:errorClass="error-input" value="1234qwer" />
+					<div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error-messages">error!</div>
+					
+					<button class="btn btn-pm" type="submit">회원가입</button>
+				</form>
+				<a class="swith-form" href="/user/loginForm">로그인</a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

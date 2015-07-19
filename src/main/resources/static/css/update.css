@@ -1,0 +1,60 @@
+#editBackgroundImage-photoArea {
+	width: 200px;
+	margin-bottom: 10px;
+	text-align: center;
+}
+
+#editBackgroundImage-photoArea img {
+	width: 200px;
+	height: 125px;
+	position: absolute;
+  	left: 20px;
+  	top: 60px;
+}
+
+#editProfile-photoArea img.avatar  {
+	width: 200px;
+	height: 200px;
+	border-radius: 5px;
+	overflow: hidden;
+	margin-bottom: 10px;
+	position: absolute;
+  	left: 20px;
+  	top: 60px;
+}
+
+.update-form p {
+	margin-top: 0px;
+}
+
+.update-form label {
+	display: block;
+	font-weight: bold;
+}
+
+.update-form input[type="text"],.update-form input[type="password"] {
+	width: 200px;
+	padding: 10px;
+	font-size: 15px;
+	border-radius: 4px;
+	margin-bottom: 4px;
+	transition-property: background-color;
+	transition-duration: .5s;
+	
+}
+
+.update-form span.info {
+	display: block;
+	font-size: 12px;
+	color: #9e9ea6;
+	padding-top: 5px;
+}
+
+.update-form span.info strong {
+	color: #ff5a5a;
+}
+
+#delete-group-btn {
+	background: rgb(255, 128, 128); 
+	margin: 0px;
+}
