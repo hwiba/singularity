@@ -3,13 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>me.stag</groupId>
-	<artifactId>stag</artifactId>
+	<artifactId>singularity</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>stagway</name>
-	<description>stagway project</description>
+	<name>singularity</name>
+	<description>Singularity project</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -134,4 +133,5 @@
 		</resources>
 	</build>
 
+	<groupId>com.singularity</groupId>
 </project>
