@@ -62,7 +62,6 @@ public class GroupService {
 	}
 
 	public void delete(String groupId, String userId) {
-		logger.debug("groupId: {}", groupId);
 		Crowd group = groupRepository.findOne(groupId);
 		if (group == null) {
 			throw new FailedDeleteGroupException("그룹이 존재하지 않습니다.");
@@ -129,6 +128,7 @@ public class GroupService {
 	}
 	
 	public boolean checkGroupMember(Crowd group, User user) {
+		logger.warn("groupdd = {}", group);
 		List<User> users = group.getUsers();
 		for (User userX : users) {
 			if (userX.equals(user)) {

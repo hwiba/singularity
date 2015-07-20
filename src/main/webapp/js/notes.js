@@ -40,13 +40,19 @@ window.addEventListener("load", function() {
 			function() {});
 	}, false);
 	
-//	var json = ${noteList};
-//	
+	guinness.restAjax({
+		method : "get",
+		url : "/groups/"+groupId+"/note/",
+		statusCode : {
+			200 : function (res) {
+				var json = JSON.parse(res);
+				appendNoteList(json);
+				//getDateExistNotes();
+			}
+		}
+	});
 	readMember(groupId);
-//	appendNoteList(json);
-//	appendMarkList(json);
 	var elCreateBtn = document.querySelector("#create-new-button");
-//	getDateExistNotes();
 	if (document.querySelector("#member-template") !== null) {
 		memberTemplate = document.querySelector("#member-template").content;
 	}

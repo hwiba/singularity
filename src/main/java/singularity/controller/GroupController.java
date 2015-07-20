@@ -1,6 +1,7 @@
 package singularity.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -18,58 +19,77 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import singularity.domain.Crowd;
+import singularity.domain.Note;
 import singularity.dto.out.SessionUser;
 import singularity.exception.FailedUpdateGroupException;
 import singularity.exception.GroupMemberException;
 import singularity.service.GroupService;
+import singularity.service.NoteService;
 import singularity.utility.JSONResponseUtil;
+import singularity.utility.Markdown;
 import singularity.utility.ServletRequestUtil;
 
 @Controller
 @RequestMapping("/groups")
 public class GroupController {
 	private static final Logger logger = LoggerFactory.getLogger(GroupController.class);
-	
+
 	@Resource
 	private GroupService groupService;
+	@Resource
+	private NoteService noteService;
 
 	@RequestMapping("/form")
-	public String list() throws IOException {
+	public String list() {
 		return "groups";
 	}
-	
+
 	@RequestMapping("{groupId}")
-	protected String loadGroupAndNotes(@PathVariable String groupId, HttpSession session, Model model) throws IOException{
-		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
-		//Session이 없는데 공개 그룹일 때의 대응과 비공개 그룹일 때의 대응을 분기하기.
-		//TODO
+	protected String loadGroupAndNotes(@PathVariable String groupId, HttpSession session, Model model) {
+		// TODO Session이 없는데 공개 그룹일 때의 대응과 비공개 그룹일 때의 대응을 분기하기.
 		model.addAttribute("group", groupService.readGroup(groupId));
 		SessionUser admin = groupService.readCaptainUser(groupId);
-		logger.warn("\n\nadmin = {}" , admin);
-		
 		model.addAttribute("admin", admin);
-		//model.addAttribute("noteList", new Gson().toJson(previewService.initNotes(sessionUserId, groupId)));
 		return "notes";
 	}
-	
-	@RequestMapping(value="", method = RequestMethod.GET)
-	protected ResponseEntity<Object> list(HttpSession session) throws IOException {
+
+	@RequestMapping("{groupId}/note/")
+	protected ResponseEntity<Object> loadNotes(@PathVariable String groupId, HttpSession session) {
+		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
+		if (null == sessionUserId) {
+			return JSONResponseUtil.getJSONResponse("", HttpStatus.NOT_ACCEPTABLE);
+		}
+		Crowd group = groupService.readGroup(groupId);
+		List<Note> notes = noteService.readByGroupPage(group);
+		for (Note note : notes) {
+			try {
+				note.setNoteText(new Markdown().toHTML(note.getNoteText()));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return JSONResponseUtil.getJSONResponse(notes, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "", method = RequestMethod.GET)
+	protected ResponseEntity<Object> list(HttpSession session) {
 		String userId = ServletRequestUtil.getUserIdFromSession(session);
 		return JSONResponseUtil.getJSONResponse(groupService.readGroups(userId), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	protected ResponseEntity<Object> create(@RequestParam String status, @RequestParam String groupName,
-			HttpSession session, Model model) throws IOException {
-		if(groupName.length() > 15)
-			return JSONResponseUtil.getJSONResponse("그룹명은 15자 이내로 가능합니다" , HttpStatus.PRECONDITION_FAILED);
+			HttpSession session, Model model) {
+		if (groupName.length() > 15)
+			return JSONResponseUtil.getJSONResponse("그룹명은 15자 이내로 가능합니다", HttpStatus.PRECONDITION_FAILED);
 		String groupCaptainUserId = ServletRequestUtil.getUserIdFromSession(session);
 		Crowd group = groupService.create(groupName, groupCaptainUserId, status);
 		return JSONResponseUtil.getJSONResponse(group, HttpStatus.CREATED);
 	}
-	
+
 	@RequestMapping(value = "/{groupId}", method = RequestMethod.DELETE)
-	protected ResponseEntity<Object> delete(@PathVariable String groupId, HttpSession session, Model model) throws IOException {
+	protected ResponseEntity<Object> delete(@PathVariable String groupId, HttpSession session, Model model) {
 		groupService.delete(groupId, ServletRequestUtil.getUserIdFromSession(session));
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
@@ -80,13 +100,13 @@ public class GroupController {
 		groupService.inviteGroupMember(sessionUserId, userId, groupId);
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
-	
+
 	@RequestMapping(value = "/members/accept", method = RequestMethod.POST)
 	protected ResponseEntity<Object> acceptGroupMember(@RequestParam String userId, @RequestParam String groupId) {
 		Crowd group = groupService.addGroupMember(userId, groupId);
 		return JSONResponseUtil.getJSONResponse(group, HttpStatus.ACCEPTED);
 	}
-	
+
 	@RequestMapping(value = "/members/join", method = RequestMethod.POST)
 	protected ResponseEntity<Object> joinGroupMember(@RequestParam String groupId, @RequestParam String sessionUserId) {
 		groupService.joinGroupMember(sessionUserId, groupId);
@@ -97,14 +117,15 @@ public class GroupController {
 	protected ResponseEntity<Object> leave(@RequestParam String sessionUserId, @RequestParam String groupId) {
 		try {
 			groupService.leaveGroup(sessionUserId, groupId);
-		} catch(GroupMemberException e) {
+		} catch (GroupMemberException e) {
 			return JSONResponseUtil.getJSONResponse(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
 		}
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/members/delete", method = RequestMethod.POST)
-	protected ResponseEntity<Object> delete(@RequestParam String sessionUserId, @RequestParam String userId, @RequestParam String groupId) {
+	protected ResponseEntity<Object> delete(@RequestParam String sessionUserId, @RequestParam String userId,
+			@RequestParam String groupId) {
 		groupService.deleteGroupMember(sessionUserId, userId, groupId);
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
@@ -115,7 +136,7 @@ public class GroupController {
 	}
 
 	@RequestMapping("/update/form/{groupId}")
-	protected String updateForm(@PathVariable String groupId, Model model, HttpSession session) throws IOException {
+	protected String updateForm(@PathVariable String groupId, Model model, HttpSession session) {
 		Crowd group = groupService.readGroup(groupId);
 		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
 		if (!sessionUserId.equals(group.getAdminUser().getId())) {
@@ -125,12 +146,12 @@ public class GroupController {
 		model.addAttribute("members", groupService.groupMembers(groupId));
 		return "updateGroup";
 	}
-	
+
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	protected String updateUser(@RequestParam String sessionUserId, @RequestParam("backgroundImage") 
-			MultipartFile backgroundImage , HttpSession session,Crowd group) {
+	protected String updateUser(@RequestParam String sessionUserId,
+			@RequestParam("backgroundImage") MultipartFile backgroundImage, HttpSession session, Crowd group) {
 		if (group.getGroupName().equals("")) {
-			throw new FailedUpdateGroupException("그룹명이 공백입니다.");	// 잘못된 접근
+			throw new FailedUpdateGroupException("그룹명이 공백입니다."); // 잘못된 접근
 		}
 		String rootPath = session.getServletContext().getRealPath("/");
 		groupService.update(sessionUserId, group, rootPath, backgroundImage);

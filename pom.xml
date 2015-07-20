@@ -51,11 +51,7 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.35</version>
-		</dependency>
+
 		<dependency>
 			<groupId>org.apache.tomcat.embed</groupId>
 			<artifactId>tomcat-embed-jasper</artifactId>
@@ -72,6 +68,18 @@
 			<groupId>org.lazyluke</groupId>
 			<artifactId>log4jdbc-remix</artifactId>
 			<version>0.2.7</version>
+		</dependency>
+		
+		<!-- Markdown -->
+		<dependency>
+			<groupId>org.commonjava.googlecode.markdown4j</groupId>
+			<artifactId>markdown4j</artifactId>
+			<version>2.2-cj-1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.8.2</version>
 		</dependency>
 
 		<!-- Java Mail API -->

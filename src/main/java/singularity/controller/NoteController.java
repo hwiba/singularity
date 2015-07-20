@@ -1,159 +1,151 @@
 package singularity.controller;
-//package stag.controller;
-//
-//import java.io.IOException;
-//import java.text.ParseException;
-//import java.util.List;
-//import java.util.Map;
-//
-//import javax.annotation.Resource;
-//import javax.servlet.http.HttpSession;
-//
-//import me.stag.exception.note.UnpermittedAccessNotesException;
-//import me.stag.model.Note;
-//import me.stag.model.Preview;
-//import me.stag.service.GroupService;
-//import me.stag.service.NoteService;
-//import me.stag.service.PCommentService;
-//import me.stag.service.PreviewService;
-//import me.stag.service.TempNoteService;
-//import me.stag.util.DateTimeUtil;
-//import me.stag.util.JSONResponseUtil;
-//import me.stag.util.JsonResult;
-//import me.stag.util.Markdown;
-//import me.stag.util.ReconnectPComments;
-//import me.stag.util.ServletRequestUtil;
-//
-//import org.jsoup.Jsoup;
-//import org.jsoup.nodes.Document;
-//import org.jsoup.nodes.Element;
-//import org.jsoup.select.Elements;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.stereotype.Controller;
-//import org.springframework.ui.Model;
-//import org.springframework.web.bind.annotation.PathVariable;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RequestMethod;
-//import org.springframework.web.bind.annotation.RequestParam;
-//import org.springframework.web.bind.annotation.ResponseBody;
-//
-//import com.google.gson.Gson;
-//
-//@Controller
-//public class NoteController {
-//	private static final Logger logger = LoggerFactory.getLogger(NoteController.class);
-//	@Resource
-//	private NoteService noteService;
-//	@Resource
-//	private GroupService groupService;
+
+import java.io.IOException;
+import java.util.Date;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import singularity.domain.Note;
+import singularity.exception.UnpermittedAccessGroupException;
+import singularity.service.GroupService;
+import singularity.service.NoteService;
+import singularity.utility.DateTimeUtil;
+import singularity.utility.JSONResponseUtil;
+import singularity.utility.JsonResult;
+import singularity.utility.Markdown;
+import singularity.utility.ServletRequestUtil;
+
+
+@Controller
+public class NoteController {
+	private static final Logger logger = LoggerFactory.getLogger(NoteController.class);
+	@Resource
+	private NoteService noteService;
+	@Resource
+	private GroupService groupService;
 //	@Resource
 //	private PreviewService previewService;
 //	@Resource
 //	private PCommentService pCommentService;
 //	@Resource
 //	private TempNoteService tempNoteService;
-//	
-//
+	
+
 //	@RequestMapping("/notes/reload")
 //	protected ResponseEntity<Object> reloadNotes(@RequestParam String groupId, @RequestParam String noteTargetDate) {
 //		if (groupId == null) {
-//			throw new UnpermittedAccessNotesException();
+//			throw new UnpermittedAccessGroupException();
 //		}
-//		if ("undefined".equals(noteTargetDate))
+//		if ("undefined".equals(noteTargetDate)) {
 //			noteTargetDate = null;
-//		return JSONResponseUtil.getJSONResponse(previewService.reloadPreviews(groupId, noteTargetDate), HttpStatus.OK);
-//	}
-//
-//	@RequestMapping("/notes/{noteId}")
-//	protected ResponseEntity<Object> show(@PathVariable String noteId, HttpSession session) throws IOException{
-//		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
-//		Note note = noteService.readNote(sessionUserId, noteId);
-//		note.setNoteText(new Markdown().toHTML(note.getNoteText()));
-//		return JSONResponseUtil.getJSONResponse(note, HttpStatus.OK);
-//	}
-//
-//	@RequestMapping(value = "/notes", method = RequestMethod.POST)
-//	protected String create(@RequestParam String tempNoteId, @RequestParam String noteText, @RequestParam String noteTargetDate, @RequestParam String groupId, HttpSession session, Model model) throws IOException {
-//		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
-//		if (noteText.equals("")) {
-//			return "redirect:/notes/editor/g/" + groupId;
 //		}
-//		noteService.create(sessionUserId, groupId, noteText, DateTimeUtil.addCurrentTime(noteTargetDate), tempNoteId);
-//		return "redirect:/g/" + groupId;
+//		return JSONResponseUtil.getJSONResponse(noteService.reloadPreviews(groupId, noteTargetDate), HttpStatus.OK);
 //	}
-//
-//	@RequestMapping(value = "/notes", method = RequestMethod.PUT)
-//	private String update(@RequestParam String groupId, @RequestParam String noteId, @RequestParam String noteTargetDate, @RequestParam String noteText, HttpSession session) throws Exception {
-//		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
-//		Note note = noteService.readNote(sessionUserId, noteId);
-//		if(!sessionUserId.equals(note.getUser().getUserId())){
-//			throw new Exception("불일치");
-//		}
-//		String editedNoteTextToMarkdown = new Markdown().toHTML(noteText);
-//		String originNoteTextToMarkdown = new Markdown().toHTML(note.getNoteText());
-//
-//		Document editedDoc = Jsoup.parse(editedNoteTextToMarkdown);
-//		Document originDoc = Jsoup.parse(originNoteTextToMarkdown);
-//
-//		Elements editedpTags = editedDoc.getElementsByClass("pCommentText");
-//		Elements originpTags = originDoc.getElementsByClass("pCommentText");
-//
-//		String[] editedTextParagraph = new String[editedpTags.size()];
-//		String[] originTextParagraph = new String[originpTags.size()];
-//
-//		int i = 0, k = 0;
-//		for (Element pTag : editedpTags) {
-//			editedTextParagraph[i++] = pTag.text();
-//		}
-//		for (Element pTag : originpTags) {
-//			originTextParagraph[k++] = pTag.text();
-//		}
-//		List<Map<String, Object>> pCommentList = pCommentService.listByNoteId( noteId);
-//		pCommentList = ReconnectPComments.UpdateParagraphId(originTextParagraph, editedTextParagraph, pCommentList);
-//		noteService.update(noteText, noteId, DateTimeUtil.addCurrentTime(noteTargetDate), pCommentList);
-//		return "redirect:/g/" + groupId;
-//	}
-//
-//	@RequestMapping(value = "/notes/{noteId}", method = RequestMethod.DELETE)
-//	protected ResponseEntity<Object> delete(@PathVariable String noteId) {
-//		logger.debug(" noteId : " + noteId);
-//		if (noteService.delete(noteId) != 1) {
-//			return JSONResponseUtil.getJSONResponse("", HttpStatus.BAD_REQUEST);
-//		}
-//		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
-//	}
-//
-//	@RequestMapping("/notes/editor/g/{groupId}")
-//	private String createForm(@PathVariable String groupId, Model model, HttpSession session) throws IOException {
-//		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
-//		noteService.checkJoinedGroup(groupId, sessionUserId);
-//		model.addAttribute("group", groupService.readGroup(groupId));
-//		model.addAttribute("tempNotes", new Gson().toJson(tempNoteService.read(sessionUserId)));
-//		return "editor";
-//	}
-//
-//	@RequestMapping("/notes/editor/{noteId}")
-//	private String updateEditor(@PathVariable String noteId, Model model, HttpSession session) throws Exception {
-//		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
-//		Note note = noteService.readNote(sessionUserId, noteId);
-//		if(!sessionUserId.equals(note.getUser().getUserId())){
-//			throw new Exception("노트 작성자, 수정자 불일치 예외.");
-//		}
-//		model.addAttribute("note", note);
-//		model.addAttribute("group", groupService.readGroup(note.getGroup().getGroupId()));
-//		model.addAttribute("tempNotes", new Gson().toJson(tempNoteService.read(note.getUser().getUserId())));
-//		return "editor";
-//	}
-//
-//	@RequestMapping(value = "/notes/editor/preview", method = RequestMethod.POST)
-//	private @ResponseBody JsonResult preview(@RequestParam String markdown) throws IOException {
-//		String html = new Markdown().toHTML(markdown);
-//		return new JsonResult().setSuccess(true).setMessage(html);
-//	}
-//	
+
+	@RequestMapping("/notes/{noteId}")
+	protected ResponseEntity<Object> show(@PathVariable long noteId, HttpSession session) throws IOException{
+		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
+		Note note = noteService.read(noteId);
+		note.setNoteText(new Markdown().toHTML(note.getNoteText()));
+		return JSONResponseUtil.getJSONResponse(note, HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/notes", method = RequestMethod.POST)
+	protected String create(@RequestParam String tempNoteId, @RequestParam String noteText, @RequestParam String noteTargetDate, @RequestParam String groupId, HttpSession session, Model model) throws IOException {
+		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
+		if (noteText.equals("")) {
+			return "redirect:/notes/editor/groups/" + groupId;
+		}
+		noteService.create(sessionUserId, groupId, noteText, DateTimeUtil.addCurrentTime(noteTargetDate), tempNoteId);
+		return "redirect:/groups/" + groupId;
+	}
+
+	@RequestMapping(value = "/notes", method = RequestMethod.PUT)
+	private String update(@RequestParam String groupId, @RequestParam long noteId, @RequestParam Date noteTargetDate, @RequestParam String noteText, HttpSession session) throws Exception {
+		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
+		Note note = noteService.read(noteId);
+		if(!sessionUserId.equals(note.getUser().getId())){
+			throw new Exception("불일치");
+		}
+		String editedNoteTextToMarkdown = new Markdown().toHTML(noteText);
+		String originNoteTextToMarkdown = new Markdown().toHTML(note.getNoteText());
+
+		Document editedDoc = Jsoup.parse(editedNoteTextToMarkdown);
+		Document originDoc = Jsoup.parse(originNoteTextToMarkdown);
+
+		Elements editedpTags = editedDoc.getElementsByClass("pCommentText");
+		Elements originpTags = originDoc.getElementsByClass("pCommentText");
+
+		String[] editedTextParagraph = new String[editedpTags.size()];
+		String[] originTextParagraph = new String[originpTags.size()];
+
+		int i = 0, k = 0;
+		for (Element pTag : editedpTags) {
+			editedTextParagraph[i++] = pTag.text();
+		}
+		for (Element pTag : originpTags) {
+			originTextParagraph[k++] = pTag.text();
+		}
+		//List<Map<String, Object>> pCommentList = pCommentService.listByNoteId( noteId);
+		//pCommentList = ReconnectPComments.UpdateParagraphId(originTextParagraph, editedTextParagraph, pCommentList);
+		//noteService.update(noteText, noteId, DateTimeUtil.addCurrentTime(noteTargetDate), pCommentList);
+		return "redirect:/g/" + groupId;
+	}
+
+	@RequestMapping(value = "/notes/{noteId}", method = RequestMethod.DELETE)
+	protected ResponseEntity<Object> delete(@PathVariable long noteId) {
+		if (null == noteService.read(noteId)) {
+			return JSONResponseUtil.getJSONResponse("", HttpStatus.BAD_REQUEST);
+		}
+		noteService.delete(noteId);
+		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
+	}
+
+	@RequestMapping("/notes/editor/groups/{groupId}")
+	private String createForm(@PathVariable String groupId, Model model, HttpSession session) throws IOException {
+		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
+		//noteService.checkJoinedGroup(groupId, sessionUserId);
+		model.addAttribute("group", groupService.readGroup(groupId));
+		//model.addAttribute("tempNotes", new Gson().toJson(tempNoteService.read(sessionUserId)));
+		return "editor";
+	}
+
+	@RequestMapping("/notes/editor/{noteId}")
+	private String updateEditor(@PathVariable long noteId, Model model, HttpSession session) throws Exception {
+		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
+		Note note = noteService.read(noteId);
+		if(!sessionUserId.equals(note.getUser().getId())){
+			throw new Exception("노트 작성자, 수정자 불일치 예외.");
+		}
+		model.addAttribute("note", note);
+		model.addAttribute("group", groupService.readGroup(note.getGroup().getGroupId()));
+		//model.addAttribute("tempNotes", new Gson().toJson(tempNoteService.read(note.getUser().getId())));
+		return "editor";
+	}
+
+	@RequestMapping(value = "/notes/editor/preview", method = RequestMethod.POST)
+	private @ResponseBody JsonResult preview(@RequestParam String markdown) throws IOException {
+		String html = new Markdown().toHTML(markdown);
+		return new JsonResult().setSuccess(true).setMessage(html);
+	}
+	
 //	@RequestMapping(value = "/notes/getNullDay/{groupId}/{lastDate}")
 //	private @ResponseBody JsonResult readNullDay(@PathVariable String groupId, @PathVariable String lastDate) throws IOException, ParseException {
 //		return new JsonResult().setSuccess(true).setObjectValues(noteService.readNullDay(groupId, lastDate));
@@ -194,4 +186,4 @@ package singularity.controller;
 //		}
 //		return new JsonResult().setSuccess(false);
 //	}
-//}
+}

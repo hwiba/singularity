@@ -104,7 +104,8 @@
 	</template>
 
 	<!-- 노트 모달을 위한 템플릿 -->
-	<!-- <%@ include file="./commons/_note_popup.jspf"%> -->
+	<div th:replace="./fragments/_note_popup :: #common-note-popup-template"></div>
+
 
 	<script src="/js/notes.js"></script>
 	<script src="/js/note.js"></script>

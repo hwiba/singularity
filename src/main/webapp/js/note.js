@@ -1,39 +1,10 @@
-function appendMarkList(json) {
-    if (json === null)
-        return;
-    var attentionListElement = document.querySelector("#attention-list");
-    var questionListElement = document.querySelector("#question-list");
-    var attentionList;
-    var questionList;
-    var newEl = undefined;
-    for (var i = 0; i < json.length; i++) {
-        attentionList = json[i].attentionList.replace("[", "").replace("]", "").replace(", ", ",").split(",");
-        for (var j = 0; j < attentionList.length; j++) {
-        	if(attentionList[j] === "")
-        		continue;
-            newEl = document.createElement("li");
-            newEl.setAttribute("class", "mark-list");
-            newEl.setAttribute("value", json[i].note.noteId);
-            newEl.innerHTML = attentionList[j];
-            attentionListElement.appendChild(newEl);
-        }
-        questionList = json[i].questionList.replace("[", "").replace("]", "").replace(", ", ",").split(",");
-        for (var j = 0; j < questionList.length; j++) {
-        	if(questionList[j] === "")
-        		continue;
-            newEl = document.createElement("li");
-            newEl.setAttribute("class", "mark-list");
-            newEl.setAttribute("value", json[i].note.noteId);
-            newEl.innerHTML = questionList[j];
-            questionListElement.appendChild(newEl);
-        }
-    }
-}
-
 function appendNoteList(json) {
-    if (json === null)
+    if (json === null) {
         return;
-    if (json.length !== 0) {
+    }
+    
+    var length = json.length;
+    if (length !== 0) {
     	var el = document.querySelector("#empty-message");
     	el.style.visibility = "hidden";
     }
@@ -41,10 +12,10 @@ function appendNoteList(json) {
     var obj = undefined;
     var out = "";
 
-    var length = json.length;
+    
     for (var i = 0; i < length; i++) {
         obj = json[i];
-        var createDate = obj.note.noteTargetDate;
+        var createDate = obj.noteTargetDate;
         createDate = createDate.split(" ");
         createDate = createDate[0];
         el = document.querySelector("#day-" + createDate); // #day-2015-05-21
@@ -60,46 +31,38 @@ function appendNoteList(json) {
             document.querySelector('#note-list-container').appendChild(el);
         }
 
-        var attention = obj.attentionList.replace("[", "").replace("]", "").replace(", ", ",").split(",");
-        var question = obj.questionList.replace("[", "").replace("]", "").replace(", ", ",").split(",");
-
 		newEl = document.createElement("a");
-		newEl.setAttribute("id", obj.note.noteId);
+		newEl.setAttribute("id", obj.noteId);
 		newEl.setAttribute("href", "#");
         newEl.setAttribute("class", "preview-note");
-        newEl.setAttribute("data-id", obj.user.userId);
-        if(onOffMemberList[obj.user.userId] === "off" && onOffMemberList[obj.user.userId] !== undefined) {
+        newEl.setAttribute("data-id", obj.user.id);
+        if(onOffMemberList[obj.user.id] === "off" && onOffMemberList[obj.user.id] !== undefined) {
             newEl.setAttribute("style", "display: none");
         }
 		out = "";
 		out += "<li><img class='avatar' class='avatar' src='/img/profile/"
-				+ obj.user.userImage + "'>";
+				+ obj.user.image + "'>";
 
         var userId = document.getElementById("sessionUserId").value;
-        if (userId === obj.user.userId) {
+        if (userId === obj.user.id) {
             out += "<div class='note-util'><div><div><span>수정</span><i class='fa fa-pencil'></i></div><span>삭제</span><i class='fa fa-trash'></i></div></div>";
         }
         out += "<div class='content-container'>";
-        out += "<div><span class='userName'>" + obj.user.userName
-            + "</span><span class='userId'>" + obj.user.userId + "</span></div>";
-        out += "<div><span class='note-date'>" + (obj.note.noteTargetDate).substring(0,19)
+        out += "<div><span class='userName'>" + obj.user.name
+            + "</span><span class='userId'>" + obj.user.id + "</span></div>";
+        out += "<div><span class='note-date'>" + (obj.noteTargetDate).substring(0,19)
             + "</span></div>";
-        if (attention.length) {
-            out += "<span class='attention'>" + attention + "</span><br />";
-        }
-        if (question.length) {
-            out += "<span class='question'>" + question + "</span><br />";
-        }
-        out += "<div class='comment-div'><i class='fa fa-comments'></i><span>"+obj.note.commentCount+"</span></div></div></li>";
+        out += "<p>"+ obj.noteText +"</p>"
+        out += "<div class='comment-div'><i class='fa fa-comments'></i><span>"+obj.commentCount+"</span></div></div></li>";
         
         newEl.innerHTML = out;
         el.appendChild(newEl);
         
-        if(obj.note.commentCount === 0){
-        	document.getElementById(obj.note.noteId).querySelector(".comment-div").style.display="none";
+        if(obj.commentCount === 0){
+        	document.getElementById(obj.noteId).querySelector(".comment-div").style.display="none";
         }
         
-        document.getElementById(obj.note.noteId).addEventListener(
+        document.getElementById(obj.noteId).addEventListener(
             "click",
             function (e) {
                 if (e.target.className === "fa fa-trash") {

@@ -10,10 +10,7 @@
 	<div id="jumbotron-container">
 		<div class="content wrap">
 			<div id="jumbotron">
-				<h1><img src="/img/stagwhitelogo.png" />way와 함께!</h1>
-				<div class="subscribe">
-				나만의 학습 노트를 작성하고, 스터디 멤버들과 함께 그룹을 생성하여 학습 노트를 공유하거나 언제 어디에서나 피드백을 받으세요!
-				</div>
+				<h3>회원가입</h3>
 				<div th:if="${existedUserError}" th:text="${existedUserError}">이미 가입된 유저입니다.</div>
 				<form action="#" th:object="${user}" th:action="@{/user}" method="post">
 					<label for="id">E-mail</label>
