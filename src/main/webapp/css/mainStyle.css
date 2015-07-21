@@ -17,6 +17,11 @@
 *	Yellow / Warning: #FFD68B
 *
 */
+
+input#noteTargetDate {
+	width:230px;
+}
+
 html, body {
 	margin:0;
 	padding:0;

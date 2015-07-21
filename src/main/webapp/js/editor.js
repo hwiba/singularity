@@ -5,7 +5,7 @@ window.addEventListener('load', function() {
 	
 	document.querySelector("#noteTargetDate").value = guinness.util.today("-");
 	if(noteTargetDate !== "")
-		document.querySelector("#noteTargetDate").value = noteTargetDate.substring(0,10);
+		document.querySelector("#noteTargetDate").value = noteTargetDate;
 	datepickr('#calendar', {
 		dateFormat : 'Y-m-d',
 		altInput : document.querySelector('#noteTargetDate')

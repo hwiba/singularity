@@ -123,8 +123,8 @@ function readNoteContents(noteId) {
 				var result = JSON.parse(res);
 				showNoteModal(result);
 	            document.body.scrollTop = currScrollTop;
-	            pComment.createPopupPCommentBtn();
-	        	setPopupPCommentBtn();
+	           // pComment.createPopupPCommentBtn();
+	        	// setPopupPCommentBtn();
   			}
         }
 	});
@@ -156,12 +156,12 @@ function showNoteModal(obj) {
     var noteContent = document.querySelector('.note-content');
     var viewContent = document.createElement('DIV');
     viewContent.innerHTML = obj.noteText;
-    pComment.countByP(obj.noteId);
+    // pComment.countByP(obj.noteId);
     
     document.querySelector('.note-content').innerHTML = viewContent.innerHTML;
-    pComment.refresh();
+    // pComment.refresh();
     viewContent.remove();
-    document.querySelector('.hiddenUserId').value = obj.user.userId;
+    document.querySelector('.hiddenUserId').value = obj.user.id;
     document.querySelector('.hiddenNoteId').value = obj.noteId;
     document.querySelector('#commentForm').addEventListener('submit',
         function (e) {
@@ -180,7 +180,7 @@ function readComments(obj) {
             var result = JSON.parse(req.responseText);
             if (result.success !== true)
                 return;
-            appendComment(result.mapValues, noteId);
+            appendComment(result.object, noteId);
             guinness.util.setModalPosition();
         }
     });
@@ -202,15 +202,15 @@ function appendComment(json, noteId) {
         commentList.appendChild(commentTemplate);
         var commentEl = commentList.querySelector('li:last-child');
         commentEl.setAttribute('id', 'cmt-' + obj.commentId);
-        commentEl.querySelector('.comment-user').innerHTML = obj.userName;
+        commentEl.querySelector('.comment-user').innerHTML = obj.user.name;
         commentEl.querySelector('.comment-date').innerHTML = guinness.util
             .koreaDate(obj.commentCreateDate);
         commentEl.querySelector('.comment-date').id = obj.commentCreateDate;
         commentEl.querySelector('.comment').innerHTML = (obj.commentText).replace(/\n/g, '\n<br/>');
         commentEl.querySelector('.avatar').setAttribute("src",
-            "/img/profile/" + obj.userImage);
-        if (userId === obj.userId) {
-            commentEl.querySelector('.comment-util').innerHTML = "<div class='default-utils'><a href='#' onclick='showEditInputBox("+obj.commentId+")'>수정</a><a href='#' onclick='deleteComment("+obj.commentId+", "+noteId+")'>삭제</a></div>"
+            "/img/profile/" + obj.user.image);
+        if (userId === obj.user.id) {
+            commentEl.querySelector('.comment-util').innerHTML = "<div class='default-utils'><a href='#' onclick='showEditInputBox("+obj.commentId+")'>수정</a><a href='#' onclick='deleteComment("+obj.commentId+", "+obj.note.noteId+")'>삭제</a></div>"
         }
     }
 
@@ -325,11 +325,7 @@ function createComment(obj) {
             param: "commentText=" + commentText + "&noteId=" + noteId,
             success: function (req) {
                 var result = JSON.parse(req.responseText);
-                if (result.success !== true) {
-                    document.querySelector('#commentText').value = result.message;
-                    return;
-                }
-                appendComment(result.mapValues, noteId);
+                appendComment(result, noteId);
                 document.querySelector('#commentText').value = "";
                 if(document.getElementById(noteId) !== null){
                 }
