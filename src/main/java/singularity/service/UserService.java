@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import singularity.domain.User;
@@ -35,7 +34,7 @@ public class UserService {
 	
 	public User create(User user) throws ExistedUserException {
 		if (null != userRepository.findOne(user.getId())) {
-			throw new ExistedUserException("이미 가입된 E-mail 주소입니다.", HttpStatus.BAD_REQUEST);
+			throw new ExistedUserException("이미 가입된 E-mail 주소입니다.");
 		}
 		user.setCreateDate(new Date());
 		user.setStatus(UserStatus.READY);

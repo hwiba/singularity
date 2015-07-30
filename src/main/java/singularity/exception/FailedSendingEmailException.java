@@ -23,5 +23,5 @@ public class FailedSendingEmailException extends RuntimeException {
 	public FailedSendingEmailException(Throwable cause) {
 		super(cause);
 	}
-	
+
 }
