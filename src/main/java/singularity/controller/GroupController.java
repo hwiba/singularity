@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import singularity.domain.Crowd;
+import singularity.domain.Group;
 import singularity.domain.Note;
 import singularity.dto.out.SessionUser;
 import singularity.exception.FailedUpdateGroupException;
@@ -59,7 +59,7 @@ public class GroupController {
 		if (null == sessionUserId) {
 			return JSONResponseUtil.getJSONResponse("", HttpStatus.NOT_ACCEPTABLE);
 		}
-		Crowd group = groupService.readGroup(groupId);
+		Group group = groupService.readGroup(groupId);
 		List<Note> notes = noteService.readByGroupPage(group);
 		for (Note note : notes) {
 			try {
@@ -84,7 +84,7 @@ public class GroupController {
 		if (groupName.length() > 15)
 			return JSONResponseUtil.getJSONResponse("그룹명은 15자 이내로 가능합니다", HttpStatus.PRECONDITION_FAILED);
 		String groupCaptainUserId = ServletRequestUtil.getUserIdFromSession(session);
-		Crowd group = groupService.create(groupName, groupCaptainUserId, status);
+		Group group = groupService.create(groupName, groupCaptainUserId, status);
 		return JSONResponseUtil.getJSONResponse(group, HttpStatus.CREATED);
 	}
 
@@ -103,7 +103,7 @@ public class GroupController {
 
 	@RequestMapping(value = "/members/accept", method = RequestMethod.POST)
 	protected ResponseEntity<Object> acceptGroupMember(@RequestParam String userId, @RequestParam String groupId) {
-		Crowd group = groupService.addGroupMember(userId, groupId);
+		Group group = groupService.addGroupMember(userId, groupId);
 		return JSONResponseUtil.getJSONResponse(group, HttpStatus.ACCEPTED);
 	}
 
@@ -137,7 +137,7 @@ public class GroupController {
 
 	@RequestMapping("/update/form/{groupId}")
 	protected String updateForm(@PathVariable String groupId, Model model, HttpSession session) {
-		Crowd group = groupService.readGroup(groupId);
+		Group group = groupService.readGroup(groupId);
 		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
 		if (!sessionUserId.equals(group.getAdminUser().getId())) {
 			throw new FailedUpdateGroupException("그룹장만이 그룹설정이 가능합니다.");
@@ -149,7 +149,7 @@ public class GroupController {
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
 	protected String updateUser(@RequestParam String sessionUserId,
-			@RequestParam("backgroundImage") MultipartFile backgroundImage, HttpSession session, Crowd group) {
+			@RequestParam("backgroundImage") MultipartFile backgroundImage, HttpSession session, Group group) {
 		if (group.getGroupName().equals("")) {
 			throw new FailedUpdateGroupException("그룹명이 공백입니다."); // 잘못된 접근
 		}

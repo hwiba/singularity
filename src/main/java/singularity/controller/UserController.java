@@ -40,8 +40,6 @@ public class UserController {
 			mailService.sendMailforSignUp(mailService.create(new Confirm(userService.create(user))));
 		} catch (ExistedUserException | FailedSendingEmailException e) {
 			model.addAttribute("existedUserError", e.getMessage());
-			//@ResponseStatus(e.getHttpStatus)
-			//TODO 상태 코드를 적절히 내려주는 방법은 토비의 스프링을 뒤져봐야할 듯.
 			return "join";
 		}
 		model.addAttribute("message", "회원가입에 성공하였습니다. 메일 인증 후 사용 가능합니다.");

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import singularity.domain.Comment;
-import singularity.domain.Crowd;
+import singularity.domain.Group;
 import singularity.domain.Note;
 import singularity.domain.User;
 import singularity.dto.out.SessionUser;
@@ -37,7 +37,7 @@ public class CommentService {
 
 	public List<Comment> create(SessionUser sessionUser, Note note, Comment comment) {
 		note = noteRepository.findOne(note.getNoteId());
-		Crowd group = note.getGroup();
+		Group group = note.getGroup();
 		User user = userRepository.findOne(sessionUser.getId());
 		if (!groupService.checkGroupMember(group, user)) {
 			throw new UnpermittedAccessGroupException("권한이 없습니다. 그룹 가입을 요청하세요.");

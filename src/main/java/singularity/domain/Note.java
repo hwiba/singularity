@@ -38,7 +38,7 @@ public class Note {
 	
 	@ManyToOne
 	@JoinColumn(name = "crowd_FK")
-	private Crowd group;
+	private Group group;
 	
 	@Column
 	private int commentCount;

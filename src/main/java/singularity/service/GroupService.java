@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import singularity.domain.Crowd;
+import singularity.domain.Group;
 import singularity.domain.User;
 import singularity.dto.out.SessionUser;
 import singularity.exception.FailedAddingGroupMemberException;
@@ -36,25 +36,25 @@ public class GroupService {
 	//@Resource
 	//private AlarmRepository alarmpRepository;
 
-	public List<Crowd> readGroups(String userId) {
+	public List<Group> readGroups(String userId) {
 		return groupRepository.findAllByUsers(userRepository.findOne(userId));
 	}
 	
 	public SessionUser readCaptainUser(String groupId) {
-		Crowd group = groupRepository.findOne(groupId);
+		Group group = groupRepository.findOne(groupId);
 		return new SessionUser(group.getAdminUser());
 	}
 
-	public Crowd create(String groupName, String adminUserId, String status) {
+	public Group create(String groupName, String adminUserId, String status) {
 		User adminUser = userRepository.findOne(adminUserId);
 		List<User> users = new ArrayList<User>();
 		users.add(adminUser);
-		return groupRepository.save(new Crowd(createGroupId(), groupName, users, adminUser, status));
+		return groupRepository.save(new Group(createGroupId(), groupName, users, adminUser, status));
 	}
 
 	private String createGroupId() {
 		String groupId = RandomFactory.getRandomId(5);
-		Crowd group = groupRepository.findOne(groupId);
+		Group group = groupRepository.findOne(groupId);
 		if (null != group) {
 			return createGroupId();
 		}
@@ -62,7 +62,7 @@ public class GroupService {
 	}
 
 	public void delete(String groupId, String userId) {
-		Crowd group = groupRepository.findOne(groupId);
+		Group group = groupRepository.findOne(groupId);
 		if (group == null) {
 			throw new FailedDeleteGroupException("그룹이 존재하지 않습니다.");
 		}
@@ -92,15 +92,15 @@ public class GroupService {
 		
 //		TODO if (alarmDao.checkJoinedGroupAlarms(sessionUserId, groupId))
 //			throw new FailedAddingGroupMemberException("가입 승인 대기중 입니다!");
-		Crowd group = groupRepository.findOne(groupId);
+		Group group = groupRepository.findOne(groupId);
 		User adminUser = group.getAdminUser();
 		//Alarm alarm = new Alarm(createAlarmId(), "J", (new User(sessionUserId)).createSessionUser(), adminUser, group);
 		//alarmDao.createGroupInvitation(alarm);
 	}
 	
-	public Crowd addGroupMember(String userId, String groupId) {
+	public Group addGroupMember(String userId, String groupId) {
 		User user = userRepository.findOne(userId);
-		Crowd group = groupRepository.findOne(groupId);
+		Group group = groupRepository.findOne(groupId);
 		List<User> users = group.getUsers();
 		users.add(user);
 		group.setUsers(users);
@@ -108,7 +108,7 @@ public class GroupService {
 	}
 
 	public void leaveGroup(String userId, String groupId) {
-		Crowd group = groupRepository.findOne(groupId);
+		Group group = groupRepository.findOne(groupId);
 		User user = userRepository.findOne(userId);
 		if (!checkGroupMember(group, user)) {
 			throw new GroupMemberException("그룹멤버가 아닙니다.");
@@ -120,14 +120,14 @@ public class GroupService {
 		this.deleteGroupUser(user, group);
 	}
 	
-	public void deleteGroupUser(User user, Crowd group) {
+	public void deleteGroupUser(User user, Group group) {
 		List<User> users = group.getUsers();
 		users.remove(user);
 		group.setUsers(users);
 		groupRepository.save(group);
 	}
 	
-	public boolean checkGroupMember(Crowd group, User user) {
+	public boolean checkGroupMember(Group group, User user) {
 		logger.warn("groupdd = {}", group);
 		List<User> users = group.getUsers();
 		for (User userX : users) {
@@ -139,7 +139,7 @@ public class GroupService {
 	}
 
 	public void deleteGroupMember(String sessionUserId, String userId, String groupId) {
-		Crowd group = groupRepository.findOne(groupId);
+		Group group = groupRepository.findOne(groupId);
 		String adminUserId = group.getAdminUser().getId();
 		if (!adminUserId.equals(sessionUserId)) {
 			throw new GroupMemberException("그룹장만이 추방이 가능합니다.");
@@ -154,7 +154,7 @@ public class GroupService {
 		return groupRepository.findOne(groupId).getUsers();
 	}
 
-	public Crowd readGroup(String groupId) {
+	public Group readGroup(String groupId) {
 		return groupRepository.findOne(groupId);
 	}
 
@@ -166,8 +166,8 @@ public class GroupService {
 //		return alarmId;
 //	}
 
-	public void update(String sessionUserId, Crowd group, String rootPath, MultipartFile groupImage) {
-		Crowd dbGroup = this.readGroup(group.getGroupId());
+	public void update(String sessionUserId, Group group, String rootPath, MultipartFile groupImage) {
+		Group dbGroup = this.readGroup(group.getGroupId());
 		if (!sessionUserId.equals(dbGroup.getAdminUser().getId())) {
 			throw new FailedUpdateGroupException("그룹장만이 그룹설정이 가능합니다.");
 		}

@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import singularity.domain.Crowd;
+import singularity.domain.Group;
 import singularity.domain.Note;
 import singularity.dto.out.SessionUser;
 import singularity.exception.UnpermittedAccessGroupException;
@@ -85,7 +85,7 @@ public class NoteService {
 		noteRepository.delete(noteId);
 	}
 	
-	public List<Note> readByGroupPage(Crowd group) {
+	public List<Note> readByGroupPage(Group group) {
 		return noteRepository.findAllByGroup(group);
 	}
 
