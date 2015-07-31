@@ -17,21 +17,34 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
+public class PComment {
+	
 	@Id
 	@GeneratedValue
-	private long commentId;
-	
-	@Lob
-	@Column(nullable=false)
-	private String commentText;
+	private String pCommentId;
 	
 	@Temporal(TemporalType.DATE)
 	private Date createDate;
+	
+	private int pId;
+	
+	@Column
+	private int sameSenCount;
+	
+	@Column
+	private int sameSenIndex;
+	
+	@Lob
+	@Column(nullable=false)
+	private String pCommentText;
+	
+	@Lob
+	@Column(nullable=false)
+	private String selectedText;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="user_FK")
@@ -40,4 +53,5 @@ public class Comment {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="note_FK")
 	private Note note;
+	
 }
