@@ -86,7 +86,7 @@ public class NoteService {
 	}
 	
 	public List<Note> readByGroupPage(Party group) {
-		return noteRepository.findAllByGroup(group);
+		return noteRepository.findAllByParty(group);
 	}
 
 //	public List<Boolean> readNullDay(String groupId, String lastDate) throws ParseException {

@@ -48,14 +48,14 @@ public class NoteController {
 	
 
 //	@RequestMapping("/notes/reload")
-//	protected ResponseEntity<Object> reloadNotes(@RequestParam String groupId, @RequestParam String noteTargetDate) {
-//		if (groupId == null) {
+//	protected ResponseEntity<Object> reloadNotes(@RequestParam String partyId, @RequestParam String noteTargetDate) {
+//		if (partyId == null) {
 //			throw new UnpermittedAccessGroupException();
 //		}
 //		if ("undefined".equals(noteTargetDate)) {
 //			noteTargetDate = null;
 //		}
-//		return JSONResponseUtil.getJSONResponse(noteService.reloadPreviews(groupId, noteTargetDate), HttpStatus.OK);
+//		return JSONResponseUtil.getJSONResponse(noteService.reloadPreviews(partyId, noteTargetDate), HttpStatus.OK);
 //	}
 
 	@RequestMapping("/notes/{noteId}")
@@ -67,17 +67,17 @@ public class NoteController {
 	}
 
 	@RequestMapping(value = "/notes", method = RequestMethod.POST)
-	protected String create(@RequestParam String tempNoteId, @RequestParam String noteText, @RequestParam String noteTargetDate, @RequestParam String groupId, HttpSession session, Model model) throws IOException {
+	protected String create(@RequestParam String tempNoteId, @RequestParam String noteText, @RequestParam String noteTargetDate, @RequestParam String partyId, HttpSession session, Model model) throws IOException {
 		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
 		if (noteText.equals("")) {
-			return "redirect:/notes/editor/groups/" + groupId;
+			return "redirect:/notes/editor/groups/" + partyId;
 		}
-		noteService.create(sessionUserId, groupId, noteText, DateTimeUtil.addCurrentTime(noteTargetDate), tempNoteId);
-		return "redirect:/groups/" + groupId;
+		noteService.create(sessionUserId, partyId, noteText, DateTimeUtil.addCurrentTime(noteTargetDate), tempNoteId);
+		return "redirect:/groups/" + partyId;
 	}
 
 	@RequestMapping(value = "/notes", method = RequestMethod.PUT)
-	private String update(@RequestParam String groupId, @RequestParam long noteId, @RequestParam Date noteTargetDate, @RequestParam String noteText, HttpSession session) throws Exception {
+	private String update(@RequestParam String partyId, @RequestParam long noteId, @RequestParam Date noteTargetDate, @RequestParam String noteText, HttpSession session) throws Exception {
 		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
 		Note note = noteService.read(noteId);
 		if(!sessionUserId.equals(note.getUser().getId())){
@@ -105,7 +105,7 @@ public class NoteController {
 		//List<Map<String, Object>> pCommentList = pCommentService.listByNoteId( noteId);
 		//pCommentList = ReconnectPComments.UpdateParagraphId(originTextParagraph, editedTextParagraph, pCommentList);
 		//noteService.update(noteText, noteId, DateTimeUtil.addCurrentTime(noteTargetDate), pCommentList);
-		return "redirect:/g/" + groupId;
+		return "redirect:/g/" + partyId;
 	}
 
 	@RequestMapping(value = "/notes/{noteId}", method = RequestMethod.DELETE)
@@ -117,11 +117,11 @@ public class NoteController {
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
 
-	@RequestMapping("/notes/editor/groups/{groupId}")
-	private String createForm(@PathVariable String groupId, Model model, HttpSession session) throws IOException {
+	@RequestMapping("/notes/editor/groups/{partyId}")
+	private String createForm(@PathVariable String partyId, Model model, HttpSession session) throws IOException {
 		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
-		//noteService.checkJoinedGroup(groupId, sessionUserId);
-		model.addAttribute("group", partyService.findOne(groupId));
+		//noteService.checkJoinedGroup(partyId, sessionUserId);
+		model.addAttribute("party", partyService.findOne(partyId));
 		//model.addAttribute("tempNotes", new Gson().toJson(tempNoteService.read(sessionUserId)));
 		return "editor";
 	}
@@ -134,7 +134,7 @@ public class NoteController {
 			throw new Exception("노트 작성자, 수정자 불일치 예외.");
 		}
 		model.addAttribute("note", note);
-		model.addAttribute("group", partyService.findOne(note.getParty().getPartyId()));
+		model.addAttribute("party", partyService.findOne(note.getParty().getPartyId()));
 		//model.addAttribute("tempNotes", new Gson().toJson(tempNoteService.read(note.getUser().getId())));
 		return "editor";
 	}
@@ -145,9 +145,9 @@ public class NoteController {
 		return new JsonResult().setSuccess(true).setMessage(html);
 	}
 	
-//	@RequestMapping(value = "/notes/getNullDay/{groupId}/{lastDate}")
-//	private @ResponseBody JsonResult readNullDay(@PathVariable String groupId, @PathVariable String lastDate) throws IOException, ParseException {
-//		return new JsonResult().setSuccess(true).setObjectValues(noteService.readNullDay(groupId, lastDate));
+//	@RequestMapping(value = "/notes/getNullDay/{partyId}/{lastDate}")
+//	private @ResponseBody JsonResult readNullDay(@PathVariable String partyId, @PathVariable String lastDate) throws IOException, ParseException {
+//		return new JsonResult().setSuccess(true).setObjectValues(noteService.readNullDay(partyId, lastDate));
 //	}
 //	
 //	@RequestMapping(value = "/notes/temp", method = RequestMethod.POST)

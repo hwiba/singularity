@@ -2,16 +2,16 @@
  * notes.html에서 가져온 내용. 정리 필요.
  */
 
-const groupId = window.location.pathname.split("/")[2];
+const partyId = window.location.pathname.split("/")[2];
 
 window.addEventListener("load", function() {
 	document.querySelector(".searchForm").setAttribute("style", "display: block");
-	var groupImage = document.body.querySelector("#group-image").value;
-	if (groupImage !== "") {
-		window.document.body.querySelector("#backImg").style.backgroundImage = "url('/img/group/" + groupImage + "')";
+	var partyImage = document.body.querySelector("#group-image").value;
+	if (partyImage !== "") {
+		window.document.body.querySelector("#backImg").style.backgroundImage = "url('/img/group/" + partyImage + "')";
 	}
 
-	document.querySelector("#addMemberForm input[name='groupId']").value = groupId;
+	document.querySelector("#addMemberForm input[name='partyId']").value = partyId;
 	document.querySelector("#addMemberForm").addEventListener("submit", function(e) {
 		e.preventDefault();
 		addMember();
@@ -20,9 +20,9 @@ window.addEventListener("load", function() {
 	var leaveGroupBtn = document.body.querySelector(".leaveGroup > span");
 	leaveGroupBtn.addEventListener('click', function(){
 		console.log('ccddd')
-		var groupName = document.body.querySelector("#group-name");
-		guinness.util.alert(groupName, "그룹을 탈퇴하시겠습니까?", function() {
-			var param = "sessionUserId="+ document.querySelector("#sessionUserId").value + "&groupId="+ groupId;
+		var partyName = document.body.querySelector("#group-name");
+		guinness.util.alert(partyName, "그룹을 탈퇴하시겠습니까?", function() {
+			var param = "sessionUserId="+ document.querySelector("#sessionUserId").value + "&partyId="+ partyId;
 			
 			guinness.restAjax({
 				method : "post",
@@ -42,7 +42,7 @@ window.addEventListener("load", function() {
 	
 	guinness.restAjax({
 		method : "get",
-		url : "/groups/"+groupId+"/note/",
+		url : "/groups/"+partyId+"/note/",
 		statusCode : {
 			200 : function (res) {
 				var json = JSON.parse(res);
@@ -51,7 +51,7 @@ window.addEventListener("load", function() {
 			}
 		}
 	});
-	readMember(groupId);
+	readMember(partyId);
 	var elCreateBtn = document.querySelector("#create-new-button");
 	if (document.querySelector("#member-template") !== null) {
 		memberTemplate = document.querySelector("#member-template").content;
@@ -168,7 +168,7 @@ function getDateExistNotes(year, month) { // ;; select null exist notes day
 			+ " 23:59:59";
 	guinness.ajax({
 		method : "get",
-		url : "/notes/getNullDay/" + groupId + "/" + lastDate,
+		url : "/notes/getNullDay/" + partyId + "/" + lastDate,
 		success : function(req) {
 			var json = JSON.parse(req.responseText);
 			nullCheckMonth = json.objectValues;

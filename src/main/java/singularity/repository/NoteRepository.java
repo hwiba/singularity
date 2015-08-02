@@ -8,5 +8,5 @@ import singularity.domain.Party;
 import singularity.domain.Note;
 
 public interface NoteRepository extends JpaRepository<Note, Long>{
-	List<Note> findAllByGroup(Party group);
+	List<Note> findAllByParty(Party party);
 }

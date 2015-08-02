@@ -51,7 +51,8 @@ public class PCommentController {
 	
 	@RequestMapping(value = "/readCountByP", method = RequestMethod.GET)
 	protected ResponseEntity<Object> readCountByP(@RequestParam long noteId) {
-		return JSONResponseUtil.getJSONResponse(pCommentService.countAllByNoteByP(noteId), HttpStatus.OK);
+		//pCommentService.countAllByNoteByP(noteId);
+		return JSONResponseUtil.getJSONResponse("{pId-1:1}", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{pCommentId}", method = RequestMethod.PUT)

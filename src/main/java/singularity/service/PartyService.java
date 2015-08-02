@@ -36,7 +36,7 @@ public class PartyService {
 	//@Resource
 	//private AlarmRepository alarmpRepository;
 
-	public List<Party> readGroups(String userId) {
+	public List<Party> findAllByUserId(String userId) {
 		return partyRepository.findAllByUsers(userRepository.findOne(userId));
 	}
 	
@@ -78,7 +78,7 @@ public class PartyService {
 		//throw new UnpermittedAccessGroupException();
 		if (null == userRepository.findOne(userId))
 			throw new FailedAddingGroupMemberException("사용자를 찾을 수 없습니다!");
-		if (null != partyRepository.findOneByGroupIdAndUsers(userRepository.findOne(userId), groupId))
+		if (null != partyRepository.findOneByPartyIdAndUsers(userRepository.findOne(userId), groupId))
 			throw new FailedAddingGroupMemberException("이미 가입되어 있습니다!");
 //		TODO if (alarmDao.checkGroupAlarms(userId, groupId))
 //			throw new FailedAddingGroupMemberException("가입 요청 대기중 입니다!");

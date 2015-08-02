@@ -1,6 +1,5 @@
 package singularity.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -9,17 +8,17 @@ import javax.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import singularity.domain.Party;
 import singularity.domain.Note;
 import singularity.domain.PComment;
+import singularity.domain.Party;
 import singularity.domain.User;
 import singularity.dto.out.PCommentCountByP;
 import singularity.dto.out.SessionUser;
 import singularity.exception.UnpermittedAccessGroupException;
 import singularity.exception.UnpermittedAccessPCommentException;
-import singularity.repository.PartyRepository;
 import singularity.repository.NoteRepository;
 import singularity.repository.PCommentRepository;
+import singularity.repository.PartyRepository;
 import singularity.repository.UserRepository;
 
 
@@ -44,8 +43,8 @@ public class PCommentService {
 	public PComment create(PComment pComment) {
 		Note note = noteRepository.findOne(pComment.getNote().getNoteId());
 		User user = userRepository.findOne(pComment.getUser().getId());
-		Party group = groupRepository.findOneByNote(note);
-		if (!groupService.checkMember(group, user)) {
+		Party party = note.getParty();
+		if (!groupService.checkMember(party, user)) {
 			throw new UnpermittedAccessGroupException("권한이 없습니다. 그룹 가입을 요청하세요.");
 		}
 		User noteWriter = note.getUser();
@@ -74,9 +73,9 @@ public class PCommentService {
 		return pCommentRepository.findAllByNote(noteRepository.findOne(noteId));
 	}
 	
-	public List<PCommentCountByP> countAllByNoteByP(long noteId) {
-		return pCommentRepository.countAllByNoteByP(noteId);
-	}
+//	public List<PCommentCountByP> countAllByNoteByP(long noteId) {
+//		return pCommentRepository.countAllByNoteByP(noteId);
+//	}
 
 	//TODO delete와의 공용 로직 메서드 분리할 것.
 	public PComment update(String pCommentId, String pCommentText, SessionUser sessionUser) {

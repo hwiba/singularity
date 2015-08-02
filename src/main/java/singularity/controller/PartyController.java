@@ -31,7 +31,7 @@ import singularity.utility.ServletRequestUtil;
 @RequestMapping("/groups")
 public class PartyController {
 	@Resource
-	private PartyService groupService;
+	private PartyService partyService;
 	@Resource
 	private NoteService noteService;
 
@@ -40,29 +40,28 @@ public class PartyController {
 		return "groups";
 	}
 
-	@RequestMapping("{groupId}")
-	protected String loadGroupAndNotes(@PathVariable String groupId, HttpSession session, Model model) {
+	@RequestMapping("{partyId}")
+	protected String loadGroupAndNotes(@PathVariable String partyId, HttpSession session, Model model) {
 		// TODO Session이 없는데 공개 그룹일 때의 대응과 비공개 그룹일 때의 대응을 분기하기.
-		model.addAttribute("group", groupService.findOne(groupId));
-		SessionUser admin = groupService.readCaptainUser(groupId);
+		model.addAttribute("party", partyService.findOne(partyId));
+		SessionUser admin = partyService.readCaptainUser(partyId);
 		model.addAttribute("admin", admin);
 		return "notes";
 	}
 
-	@RequestMapping("{groupId}/note/")
-	protected ResponseEntity<Object> loadNotes(@PathVariable String groupId, HttpSession session) {
+	@RequestMapping("{partyId}/note/")
+	protected ResponseEntity<Object> loadNotes(@PathVariable String partyId, HttpSession session) {
 		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
 		if (null == sessionUserId) {
 			return JSONResponseUtil.getJSONResponse("", HttpStatus.NOT_ACCEPTABLE);
 		}
-		Party group = groupService.findOne(groupId);
+		Party group = partyService.findOne(partyId);
 		List<Note> notes = noteService.readByGroupPage(group);
 		for (Note note : notes) {
 			try {
 				note.setNoteText(new Markdown().toHTML(note.getNoteText()));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				return JSONResponseUtil.getJSONResponse("", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		return JSONResponseUtil.getJSONResponse(notes, HttpStatus.OK);
@@ -71,48 +70,48 @@ public class PartyController {
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	protected ResponseEntity<Object> list(HttpSession session) {
 		String userId = ServletRequestUtil.getUserIdFromSession(session);
-		return JSONResponseUtil.getJSONResponse(groupService.readGroups(userId), HttpStatus.OK);
+		return JSONResponseUtil.getJSONResponse(partyService.findAllByUserId(userId), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
-	protected ResponseEntity<Object> create(@RequestParam String status, @RequestParam String groupName,
+	protected ResponseEntity<Object> create(@RequestParam String status, @RequestParam String partyName,
 			HttpSession session, Model model) {
-		if (groupName.length() > 15)
+		if (partyName.length() > 15)
 			return JSONResponseUtil.getJSONResponse("그룹명은 15자 이내로 가능합니다", HttpStatus.PRECONDITION_FAILED);
 		String groupCaptainUserId = ServletRequestUtil.getUserIdFromSession(session);
-		Party group = groupService.create(groupName, groupCaptainUserId, status);
-		return JSONResponseUtil.getJSONResponse(group, HttpStatus.CREATED);
+		Party party = partyService.create(partyName, groupCaptainUserId, status);
+		return JSONResponseUtil.getJSONResponse(party, HttpStatus.CREATED);
 	}
 
-	@RequestMapping(value = "/{groupId}", method = RequestMethod.DELETE)
-	protected ResponseEntity<Object> delete(@PathVariable String groupId, HttpSession session, Model model) {
-		groupService.delete(groupId, ServletRequestUtil.getUserIdFromSession(session));
+	@RequestMapping(value = "/{partyId}", method = RequestMethod.DELETE)
+	protected ResponseEntity<Object> delete(@PathVariable String partyId, HttpSession session, Model model) {
+		partyService.delete(partyId, ServletRequestUtil.getUserIdFromSession(session));
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/members/invite", method = RequestMethod.POST)
-	protected ResponseEntity<Object> inviteGroupMember(@RequestParam String userId, @RequestParam String groupId,
+	protected ResponseEntity<Object> inviteGroupMember(@RequestParam String userId, @RequestParam String partyId,
 			@RequestParam String sessionUserId) {
-		groupService.inviteGroupMember(sessionUserId, userId, groupId);
+		partyService.inviteGroupMember(sessionUserId, userId, partyId);
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/members/accept", method = RequestMethod.POST)
-	protected ResponseEntity<Object> acceptGroupMember(@RequestParam String userId, @RequestParam String groupId) {
-		Party group = groupService.addMember(userId, groupId);
-		return JSONResponseUtil.getJSONResponse(group, HttpStatus.ACCEPTED);
+	protected ResponseEntity<Object> acceptGroupMember(@RequestParam String userId, @RequestParam String partyId) {
+		Party party = partyService.addMember(userId, partyId);
+		return JSONResponseUtil.getJSONResponse(party, HttpStatus.ACCEPTED);
 	}
 
 	@RequestMapping(value = "/members/join", method = RequestMethod.POST)
-	protected ResponseEntity<Object> joinGroupMember(@RequestParam String groupId, @RequestParam String sessionUserId) {
-		groupService.joinGroupMember(sessionUserId, groupId);
+	protected ResponseEntity<Object> joinGroupMember(@RequestParam String partyId, @RequestParam String sessionUserId) {
+		partyService.joinGroupMember(sessionUserId, partyId);
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/members/leave", method = RequestMethod.POST)
-	protected ResponseEntity<Object> leave(@RequestParam String sessionUserId, @RequestParam String groupId) {
+	protected ResponseEntity<Object> leave(@RequestParam String sessionUserId, @RequestParam String parytId) {
 		try {
-			groupService.leaveParty(sessionUserId, groupId);
+			partyService.leaveParty(sessionUserId, parytId);
 		} catch (GroupMemberException e) {
 			return JSONResponseUtil.getJSONResponse(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
 		}
@@ -121,36 +120,36 @@ public class PartyController {
 
 	@RequestMapping(value = "/members/delete", method = RequestMethod.POST)
 	protected ResponseEntity<Object> delete(@RequestParam String sessionUserId, @RequestParam String userId,
-			@RequestParam String groupId) {
-		groupService.deleteMember(sessionUserId, userId, groupId);
+			@RequestParam String partyId) {
+		partyService.deleteMember(sessionUserId, userId, partyId);
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
 
-	@RequestMapping("/members/{groupId}")
-	protected ResponseEntity<Object> listGroupMember(@PathVariable String groupId) {
-		return JSONResponseUtil.getJSONResponse(groupService.readMembers(groupId), HttpStatus.OK);
+	@RequestMapping("/members/{partyId}")
+	protected ResponseEntity<Object> listGroupMember(@PathVariable String partyId) {
+		return JSONResponseUtil.getJSONResponse(partyService.readMembers(partyId), HttpStatus.OK);
 	}
 
-	@RequestMapping("/update/form/{groupId}")
-	protected String updateForm(@PathVariable String groupId, Model model, HttpSession session) {
-		Party group = groupService.findOne(groupId);
+	@RequestMapping("/update/form/{partyId}")
+	protected String updateForm(@PathVariable String partyId, Model model, HttpSession session) {
+		Party party = partyService.findOne(partyId);
 		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
-		if (!sessionUserId.equals(group.getAdminUser().getId())) {
+		if (!sessionUserId.equals(party.getAdminUser().getId())) {
 			throw new FailedUpdatePartyException("그룹장만이 그룹설정이 가능합니다.");
 		}
-		model.addAttribute("group", group);
-		model.addAttribute("members", groupService.readMembers(groupId));
+		model.addAttribute("party", party);
+		model.addAttribute("members", partyService.readMembers(partyId));
 		return "updateGroup";
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
 	protected String updateUser(@RequestParam String sessionUserId,
-			@RequestParam("backgroundImage") MultipartFile backgroundImage, HttpSession session, Party group) {
-		if (group.getPartyName().equals("")) {
+			@RequestParam("backgroundImage") MultipartFile backgroundImage, HttpSession session, Party party) {
+		if (party.getPartyName().equals("")) {
 			throw new FailedUpdatePartyException("그룹명이 공백입니다."); // 잘못된 접근
 		}
 		String rootPath = session.getServletContext().getRealPath("/");
-		groupService.update(sessionUserId, group, rootPath, backgroundImage);
-		return "redirect:/g/" + group.getPartyId();
+		partyService.update(sessionUserId, party, rootPath, backgroundImage);
+		return "redirect:/g/" + party.getPartyId();
 	}
 }

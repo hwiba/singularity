@@ -12,8 +12,8 @@ public interface PartyRepository extends JpaRepository<Party, String>{
 	
 	List<Party> findAllByUsers(User user);
 	
-	Party findOneByNote(Note note);
+	//Party findOneByNote(Note note);
 
-	Party findOneByGroupIdAndUsers(User user, String partyId);
+	Party findOneByPartyIdAndUsers(User user, String partyId);
 	
 }

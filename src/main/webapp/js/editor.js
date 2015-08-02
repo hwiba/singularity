@@ -1,7 +1,8 @@
 window.addEventListener('load', function() {
 	document.querySelector(".searchForm").setAttribute("style","display: block");
-	document.title = groupName;
-	document.querySelector('#group-name').innerHTML = groupName;
+	var partyName = document.querySelector('#group-name').textContent;
+	document.title = partyName;
+	document.querySelector('#group-name').innerHTML = partyName;
 	
 	document.querySelector("#noteTargetDate").value = guinness.util.today("-");
 	if(noteTargetDate !== "")

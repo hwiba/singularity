@@ -37,7 +37,7 @@ public class Note {
 	private User user;
 	
 	@ManyToOne
-	@JoinColumn(name = "crowd_FK")
+	@JoinColumn(name = "party_FK")
 	private Party party;
 	
 	@Column

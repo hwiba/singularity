@@ -19,5 +19,5 @@ public interface PCommentRepository extends JpaRepository<PComment, String>{
 	List<PComment> findAllByPIdAndNote(int pId, Note note);
 	
 	//@Query("select pId, count(1) from pcomment, user where pcomment.user_FK = user.id AND noteId = ? GROUP BY pId")
-	List<PCommentCountByP> countAllByNoteByP(long noteId);
+	//List<PCommentCountByP> countAllByNoteByP(long noteId);
 }

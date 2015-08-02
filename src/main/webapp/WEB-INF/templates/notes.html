@@ -3,7 +3,7 @@
 	xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="utf-8" />
-<title th:text="${group.groupName}">{stag}</title>
+<title th:text="${party.partyName}">{stag}</title>
 <link rel="stylesheet" href="/css/mainStyle.css" />
 <link rel="stylesheet" href="/css/datepickr.css" />
 <link rel="stylesheet" href="/css/markdown.css" />
@@ -28,19 +28,19 @@
 		노트를 작성해주세요</h1>
 	<div id="group-header" class="content wrap"
 		style="margin-top: 50px; padding: 10px 0;">
-		<a style="display: inline-block" th:href="@{'/groups/'+${group.groupId}}">
-		<span id="group-name" th:text="${group.groupName}"></span></a>
+		<a style="display: inline-block" th:href="@{'/groups/'+${party.partyId}}">
+		<span id="group-name" th:text="${party.partyName}"></span></a>
 		
 		<div id="groupConfig">
-			<input id="group-image" type="hidden" name="groupImage" th:value="${group.groupImage}" />
-			<a th:href="@{'/groups/update/form/'+${group.groupId}}">
+			<input id="group-image" type="hidden" name="partyImage" th:value="${party.partyImage}" />
+			<a th:href="@{'/groups/update/form/'+${party.partyId}}">
 				<i th:if="${admin.id} eq ${session.sessionUser.id}" class="fa fa-cog" style="font-size:20px; padding-top:6px;"></i>
 			</a>
 		</div>
 	</div>
 	<div id="note-list-container" class="content wrap">
 		<div id="create-note">
-			<a th:href="@{'/notes/editor/groups/'+${group.groupId}}">
+			<a th:href="@{'/notes/editor/groups/'+${party.partyId}}">
 				<button id="create-new-button">
 					<i class="fa fa-plus-circle"></i>
 				</button>
@@ -67,7 +67,7 @@
 
 			<form id="addMemberForm">
 				<span class="addMemberTitle" style="font-weight: bold;">멤버추가</span><br />
-				<input type="hidden" name="groupId" />
+				<input type="hidden" name="partyId" />
 				<input class="inputText" type="text" name="userId" />
 				<input class="inputBtn" type="submit" value="초대" />
 				<span class="addMemberAlert" style="visibility: hidden;">멤버추가메세지</span>

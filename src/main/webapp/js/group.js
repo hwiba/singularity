@@ -28,7 +28,7 @@ function setGroupAlarm(json) {
     var js = json.mapValues;
     for (var i in group) {
         for (var j in js) {
-            if( group[i].value === js[j].groupId) {
+            if( group[i].value === js[j].partyId) {
                 var elCount = document.createElement("div");
                 elCount.className="alarm-count";
                 elCount.style.display="block"
@@ -70,9 +70,9 @@ function createGroup() {
 		e.preventDefault();
 		var form = document.querySelector('#create-group-form');
 
-		if(document.querySelector('.modal-cover input[name="groupName"]').value != ""){
+		if(document.querySelector('.modal-cover input[name="partyName"]').value != ""){
 			var status = document.querySelector('input[name=status]:checked');
-			var param = "groupName="+form.groupName.value+"&status="+status.value;
+			var param = "partyName="+form.partyName.value+"&status="+status.value;
 			guinness.restAjax({
 				method : "post",
 				url : "/groups",
@@ -102,23 +102,23 @@ function appendGroup(obj) {
 	var el = document.querySelector('#group-container');
 	var template = document.querySelector("#group-card-template").content;
 	var newEl;
-	var groupName = (obj.groupName.replace(/</g, "&lt;")).replace(/>/g, "&gt;");
-	document.cookie = obj.groupId + "=" + encodeURI(obj.groupName);
+	var partyName = (obj.partyName.replace(/</g, "&lt;")).replace(/>/g, "&gt;");
+	document.cookie = obj.partyId + "=" + encodeURI(obj.partyName);
 	newEl = document.importNode(template, true);
-	newEl.querySelector(".group-card").setAttribute("id", obj.groupId);
-	newEl.querySelector(".group-card").setAttribute("href", "/groups/" + obj.groupId);
-	newEl.querySelector(".group-name").innerHTML = groupName;
+	newEl.querySelector(".group-card").setAttribute("id", obj.partyId);
+	newEl.querySelector(".group-card").setAttribute("href", "/groups/" + obj.partyId);
+	newEl.querySelector(".group-name").innerHTML = partyName;
 	newEl.querySelector('.leaveGroup-btn').addEventListener("click",
 		function(e) {
 			e.preventDefault();
-			var groupId = e.currentTarget.parentElement.parentElement.getAttribute("href").split("/")[2];
-			var groupName = e.currentTarget.parentElement.querySelector(".group-name").innerHTML;
-			guinness.confirmLeave(groupId, groupName);
+			var partyId = e.currentTarget.parentElement.parentElement.getAttribute("href").split("/")[2];
+			var partyName = e.currentTarget.parentElement.querySelector(".group-name").innerHTML;
+			guinness.confirmLeave(partyId, partyName);
 		}, false);
 	if (obj.status === 'T') {
 		newEl.querySelector('.fa-lock').setAttribute('class','fa fa-unlock');
 	}
-	newEl.querySelector('input').setAttribute("value", obj.groupId);
+	newEl.querySelector('input').setAttribute("value", obj.partyId);
 	el.appendChild(newEl);
 }
 
