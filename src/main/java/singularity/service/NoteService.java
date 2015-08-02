@@ -11,11 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import singularity.domain.Group;
+import singularity.domain.Party;
 import singularity.domain.Note;
 import singularity.dto.out.SessionUser;
 import singularity.exception.UnpermittedAccessGroupException;
-import singularity.repository.GroupRepository;
+import singularity.repository.PartyRepository;
 import singularity.repository.NoteRepository;
 import singularity.repository.UserRepository;
 
@@ -23,9 +23,9 @@ import singularity.repository.UserRepository;
 @Transactional
 public class NoteService {
 	@Resource
-	private GroupRepository groupRepository;
+	private PartyRepository groupRepository;
 	@Resource
-	private GroupService groupService;
+	private PartyService groupService;
 	@Resource
 	private NoteRepository noteRepository;
 	@Resource
@@ -42,12 +42,12 @@ public class NoteService {
 	}
 
 	public void create(String sessionUserId, String groupId, String noteText, Date noteTargetDate, String tempNoteId) {
-		if (!groupService.checkGroupMember(groupRepository.findOne(groupId), userRepository.findOne(sessionUserId))) {
+		if (!groupService.checkMember(groupRepository.findOne(groupId), userRepository.findOne(sessionUserId))) {
 			throw new UnpermittedAccessGroupException("권한이 없습니다. 그룹 가입을 요청하세요.");
 		}
 		Note note = new Note();
 		note.setUser(userRepository.findOne(sessionUserId));
-		note.setGroup(groupRepository.findOne(groupId));
+		note.setParty(groupRepository.findOne(groupId));
 		note.setCommentCount(0);
 		note.setNoteTargetDate(noteTargetDate);
 		note.setNoteText(noteText);
@@ -85,7 +85,7 @@ public class NoteService {
 		noteRepository.delete(noteId);
 	}
 	
-	public List<Note> readByGroupPage(Group group) {
+	public List<Note> readByGroupPage(Party group) {
 		return noteRepository.findAllByGroup(group);
 	}
 

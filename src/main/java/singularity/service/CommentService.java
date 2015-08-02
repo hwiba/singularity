@@ -9,13 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import singularity.domain.Comment;
-import singularity.domain.Group;
+import singularity.domain.Party;
 import singularity.domain.Note;
 import singularity.domain.User;
 import singularity.dto.out.SessionUser;
 import singularity.exception.UnpermittedAccessGroupException;
 import singularity.repository.CommentRepository;
-import singularity.repository.GroupRepository;
 import singularity.repository.NoteRepository;
 import singularity.repository.UserRepository;
 
@@ -29,17 +28,15 @@ public class CommentService {
 //	@Resource
 //	private AlarmDao alarmDao;
 	@Resource
-	private GroupRepository groupRepository;
-	@Resource
-	private GroupService groupService;
+	private PartyService groupService;
 	@Resource
 	private UserRepository userRepository;
 
 	public List<Comment> create(SessionUser sessionUser, Note note, Comment comment) {
 		note = noteRepository.findOne(note.getNoteId());
-		Group group = note.getGroup();
+		Party group = note.getParty();
 		User user = userRepository.findOne(sessionUser.getId());
-		if (!groupService.checkGroupMember(group, user)) {
+		if (!groupService.checkMember(group, user)) {
 			throw new UnpermittedAccessGroupException("권한이 없습니다. 그룹 가입을 요청하세요.");
 		}
 		comment.setCreateDate(new Date());

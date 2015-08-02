@@ -31,24 +31,27 @@ public class PCommentController {
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	protected ResponseEntity<Object> create(HttpSession session, @RequestParam int pId,
 			@RequestParam int sameSenCount, @RequestParam int sameSenIndex, @RequestParam String pCommentText,
-			@RequestParam String selectedText, @RequestParam String noteId) throws IOException{
+			@RequestParam String selectedText, @RequestParam long noteId) throws IOException{
 		String userId = ((SessionUser) session.getAttribute("sessionUser")).getId();
 		if (pCommentText.equals("")) {
 			return JSONResponseUtil.getJSONResponse("잘못된 요청입니다.", HttpStatus.PRECONDITION_FAILED);
 		}
-		//TODO UserId랑 NoteId만 가지는 생성자 만들기. 
-		PComment pComment = new PComment("", new Date(), pId, sameSenCount, sameSenIndex, pCommentText, selectedText, new User(userId), new Note(noteId));
+		User user = new User();
+		user.setId(userId);
+		Note note = new Note();
+		note.setNoteId(noteId);
+		PComment pComment = new PComment("", new Date(), pId, sameSenCount, sameSenIndex, pCommentText, selectedText, user, note);
 		return JSONResponseUtil.getJSONResponse(pCommentService.create(pComment), HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
-	protected ResponseEntity<Object> list(@RequestParam String pId, @RequestParam String noteId) {
-		return JSONResponseUtil.getJSONResponse(pCommentService.list(pId.replace("pId-", ""), noteId), HttpStatus.OK);
+	protected ResponseEntity<Object> list(@RequestParam String pId, @RequestParam long noteId) {
+		return JSONResponseUtil.getJSONResponse(pCommentService.listByPAndNote(Integer.parseInt(pId.replace("pId-", "")), noteId), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/readCountByP", method = RequestMethod.GET)
-	protected ResponseEntity<Object> readCountByP(@RequestParam String noteId) {
-		return JSONResponseUtil.getJSONResponse(pCommentService.countByPGroupPCommnent(noteId), HttpStatus.OK);
+	protected ResponseEntity<Object> readCountByP(@RequestParam long noteId) {
+		return JSONResponseUtil.getJSONResponse(pCommentService.countAllByNoteByP(noteId), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{pCommentId}", method = RequestMethod.PUT)

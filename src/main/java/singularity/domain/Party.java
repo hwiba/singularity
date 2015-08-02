@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
@@ -23,18 +22,17 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="CROWD")
-public class Group {
+public class Party {
 	@Id
 	@Size(max = 5)
-	private String groupId;
+	private String partyId;
 	
 	@Temporal(TemporalType.DATE)
 	private	Date createDate;
 	
 	@Size(min = 1, max = 50)
-	@Column(name = "groupName", length=25, nullable = false)
-	private String groupName;
+	@Column(name = "partyName", length=25, nullable = false)
+	private String partyName;
 	
 	@ManyToMany(fetch=FetchType.EAGER)
 	private List<User> users;
@@ -47,10 +45,10 @@ public class Group {
 	private String status;
 	
 	@Column(name = "image", length=200, nullable = true)
-	private String groupImage;
+	private String partyImage;
 	
-	public Group(String groupId, String groupName, List<User> users, User adminUser, String status) {
-		this(groupId, null, groupName, users, adminUser, status, "background-default.png");
+	public Party(String partyId, String partyName, List<User> users, User adminUser, String status) {
+		this(partyId, null, partyName, users, adminUser, status, "background-default.png");
 	}
 
 	public boolean checkCaptain(String userId) {

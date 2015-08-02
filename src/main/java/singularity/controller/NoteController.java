@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import singularity.domain.Note;
 import singularity.exception.UnpermittedAccessGroupException;
-import singularity.service.GroupService;
+import singularity.service.PartyService;
 import singularity.service.NoteService;
 import singularity.utility.DateTimeUtil;
 import singularity.utility.JSONResponseUtil;
@@ -35,11 +35,10 @@ import singularity.utility.ServletRequestUtil;
 
 @Controller
 public class NoteController {
-	private static final Logger logger = LoggerFactory.getLogger(NoteController.class);
 	@Resource
 	private NoteService noteService;
 	@Resource
-	private GroupService groupService;
+	private PartyService partyService;
 //	@Resource
 //	private PreviewService previewService;
 //	@Resource
@@ -122,7 +121,7 @@ public class NoteController {
 	private String createForm(@PathVariable String groupId, Model model, HttpSession session) throws IOException {
 		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
 		//noteService.checkJoinedGroup(groupId, sessionUserId);
-		model.addAttribute("group", groupService.readGroup(groupId));
+		model.addAttribute("group", partyService.findOne(groupId));
 		//model.addAttribute("tempNotes", new Gson().toJson(tempNoteService.read(sessionUserId)));
 		return "editor";
 	}
@@ -135,7 +134,7 @@ public class NoteController {
 			throw new Exception("노트 작성자, 수정자 불일치 예외.");
 		}
 		model.addAttribute("note", note);
-		model.addAttribute("group", groupService.readGroup(note.getGroup().getGroupId()));
+		model.addAttribute("group", partyService.findOne(note.getParty().getPartyId()));
 		//model.addAttribute("tempNotes", new Gson().toJson(tempNoteService.read(note.getUser().getId())));
 		return "editor";
 	}
