@@ -24,7 +24,7 @@ import singularity.exception.GroupMemberException;
 import singularity.service.NoteService;
 import singularity.service.PartyService;
 import singularity.utility.JSONResponseUtil;
-import singularity.utility.Markdown;
+import singularity.utility.NashornEngine;
 import singularity.utility.ServletRequestUtil;
 
 @Controller
@@ -50,7 +50,7 @@ public class PartyController {
 	}
 
 	@RequestMapping("{partyId}/note/")
-	protected ResponseEntity<Object> loadNotes(@PathVariable String partyId, HttpSession session) {
+	protected ResponseEntity<Object> loadNotes(@PathVariable String partyId, HttpSession session) throws Throwable {
 		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
 		if (null == sessionUserId) {
 			return JSONResponseUtil.getJSONResponse("", HttpStatus.NOT_ACCEPTABLE);
@@ -59,7 +59,7 @@ public class PartyController {
 		List<Note> notes = noteService.readByGroupPage(group);
 		for (Note note : notes) {
 			try {
-				note.setNoteText(new Markdown().toHTML(note.getNoteText()));
+				note.setNoteText((String) new NashornEngine().markdownToHtml(note.getNoteText()));
 			} catch (IOException e) {
 				return JSONResponseUtil.getJSONResponse("", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
