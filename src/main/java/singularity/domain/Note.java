@@ -29,7 +29,7 @@ public class Note {
 	@Column(nullable = false, columnDefinition="text")
 	private String noteText;
 	
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date noteTargetDate;
 	
 	@ManyToOne

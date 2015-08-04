@@ -27,7 +27,7 @@ public class PComment {
 	@GeneratedValue
 	private String pCommentId;
 	
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDate;
 	
 	private int pId;

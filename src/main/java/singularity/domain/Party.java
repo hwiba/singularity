@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Size;
@@ -28,14 +27,14 @@ public class Party {
 	@Size(max = 5)
 	private String partyId;
 	
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	private	Date createDate;
 	
 	@Size(min = 1, max = 50)
 	@Column(name = "partyName", length=25, nullable = false)
 	private String partyName;
 	
-	@ManyToMany(fetch=FetchType.EAGER)
+	@ManyToMany(fetch=FetchType.LAZY)
 	private List<User> users;
 	
 	@ManyToOne(fetch=FetchType.LAZY)
