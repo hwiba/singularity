@@ -530,7 +530,7 @@ var reloadWithoutDeleteNoteList = function (noteTargetDate) {
     var objs = document.querySelectorAll(".memberChk");
     guinness.restAjax({
 		 method: "get",
-		 url: '/notes/reload/?groupId=' + groupId + '&noteTargetDate=' + noteTargetDate,
+		 url: '/notes/reload/?groupId=' + partyId + '&noteTargetDate=' + noteTargetDate,
 	        statusCode: {
 	  			200: function(res) {	// 멤버 추가 실패 
 	  				var result = JSON.parse(res);

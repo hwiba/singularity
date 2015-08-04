@@ -10,8 +10,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -23,13 +21,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import singularity.domain.Note;
-import singularity.exception.UnpermittedAccessGroupException;
-import singularity.service.PartyService;
 import singularity.service.NoteService;
+import singularity.service.PartyService;
 import singularity.utility.DateTimeUtil;
 import singularity.utility.JSONResponseUtil;
 import singularity.utility.JsonResult;
-import singularity.utility.Markdown;
+import singularity.utility.NashornEngine;
 import singularity.utility.ServletRequestUtil;
 
 
@@ -59,10 +56,10 @@ public class NoteController {
 //	}
 
 	@RequestMapping("/notes/{noteId}")
-	protected ResponseEntity<Object> show(@PathVariable long noteId, HttpSession session) throws IOException{
+	protected ResponseEntity<Object> show(@PathVariable long noteId, HttpSession session) throws IOException, Throwable{
 		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
 		Note note = noteService.read(noteId);
-		note.setNoteText(new Markdown().toHTML(note.getNoteText()));
+		note.setNoteText((String) new NashornEngine().markdownToHtml(note.getNoteText()));
 		return JSONResponseUtil.getJSONResponse(note, HttpStatus.OK);
 	}
 
@@ -77,14 +74,14 @@ public class NoteController {
 	}
 
 	@RequestMapping(value = "/notes", method = RequestMethod.PUT)
-	private String update(@RequestParam String partyId, @RequestParam long noteId, @RequestParam Date noteTargetDate, @RequestParam String noteText, HttpSession session) throws Exception {
+	private String update(@RequestParam String partyId, @RequestParam long noteId, @RequestParam Date noteTargetDate, @RequestParam String noteText, HttpSession session) throws Exception, Throwable {
 		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
 		Note note = noteService.read(noteId);
 		if(!sessionUserId.equals(note.getUser().getId())){
 			throw new Exception("불일치");
 		}
-		String editedNoteTextToMarkdown = new Markdown().toHTML(noteText);
-		String originNoteTextToMarkdown = new Markdown().toHTML(note.getNoteText());
+		String editedNoteTextToMarkdown = (String) new NashornEngine().markdownToHtml(noteText);
+		String originNoteTextToMarkdown = (String) new NashornEngine().markdownToHtml(note.getNoteText());
 
 		Document editedDoc = Jsoup.parse(editedNoteTextToMarkdown);
 		Document originDoc = Jsoup.parse(originNoteTextToMarkdown);
@@ -140,8 +137,9 @@ public class NoteController {
 	}
 
 	@RequestMapping(value = "/notes/editor/preview", method = RequestMethod.POST)
-	private @ResponseBody JsonResult preview(@RequestParam String markdown) throws IOException {
-		String html = new Markdown().toHTML(markdown);
+	private @ResponseBody JsonResult preview(@RequestParam String markdown) throws IOException, Throwable {
+		Object oHtml = new NashornEngine().markdownToHtml(markdown);
+		String html = oHtml.toString();
 		return new JsonResult().setSuccess(true).setMessage(html);
 	}
 	
