@@ -40,25 +40,25 @@ public class PartyService {
 		return partyRepository.findAllByUsers(userRepository.findOne(userId));
 	}
 	
-	public SessionUser readCaptainUser(String groupId) {
-		Party group = partyRepository.findOne(groupId);
-		return new SessionUser(group.getAdminUser());
+	public SessionUser readCaptainUser(String partyId) {
+		Party party = partyRepository.findOne(partyId);
+		return new SessionUser(party.getAdminUser());
 	}
 
-	public Party create(String groupName, String adminUserId, String status) {
+	public Party create(String partyName, String adminUserId, String status) {
 		User adminUser = userRepository.findOne(adminUserId);
 		List<User> users = new ArrayList<User>();
 		users.add(adminUser);
-		return partyRepository.save(new Party(createGroupId(), groupName, users, adminUser, status));
+		return partyRepository.save(new Party(createGroupId(), partyName, users, adminUser, status));
 	}
 
 	private String createGroupId() {
-		String groupId = RandomFactory.getRandomId(5);
-		Party group = partyRepository.findOne(groupId);
-		if (null != group) {
+		String partyId = RandomFactory.getRandomId(5);
+		Party party = partyRepository.findOne(partyId);
+		if (null != party) {
 			return createGroupId();
 		}
-		return groupId;
+		return partyId;
 	}
 
 	public void delete(String partyId, String userId) {

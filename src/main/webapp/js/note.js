@@ -1,3 +1,8 @@
+var timestampNomalize = function (timestamp) {
+	var date = new Date(timestamp);
+	return date.getFullYear()+"-"+date.getMonth()+"-"+date.getDay();
+}
+
 function appendNoteList(json) {
     if (json === null) {
         return;
@@ -15,9 +20,7 @@ function appendNoteList(json) {
     
     for (var i = 0; i < length; i++) {
         obj = json[i];
-        var createDate = obj.noteTargetDate;
-        createDate = createDate.split(" ");
-        createDate = createDate[0];
+        var createDate = timestampNomalize(obj.noteTargetDate);
         el = document.querySelector("#day-" + createDate); // #day-2015-05-21
 
         if (el == undefined) {
@@ -50,7 +53,7 @@ function appendNoteList(json) {
         out += "<div class='content-container'>";
         out += "<div><span class='userName'>" + obj.user.name
             + "</span><span class='userId'>" + obj.user.id + "</span></div>";
-        out += "<div><span class='note-date'>" + (obj.noteTargetDate).substring(0,19)
+        out += "<div><span class='note-date'>" + timestampNomalize(obj.noteTargetDate).substring(0,19)
             + "</span></div>";
         out += "<p>"+ obj.noteText +"</p>"
         out += "<div class='comment-div'><i class='fa fa-comments'></i><span>"+obj.commentCount+"</span></div></div></li>";

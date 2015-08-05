@@ -34,10 +34,10 @@ public class Party {
 	@Column(name = "partyName", length=25, nullable = false)
 	private String partyName;
 	
-	@ManyToMany(fetch=FetchType.LAZY)
+	@ManyToMany(fetch=FetchType.EAGER)
 	private List<User> users;
 	
-	@ManyToOne(fetch=FetchType.LAZY)
+	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name = "user_FK")
 	private User adminUser;
 	

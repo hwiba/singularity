@@ -6,6 +6,8 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import singularity.domain.Note;
 import singularity.domain.Party;
+import singularity.domain.User;
 import singularity.dto.out.SessionUser;
 import singularity.exception.FailedUpdatePartyException;
 import singularity.exception.GroupMemberException;
@@ -125,9 +128,12 @@ public class PartyController {
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
 
+	private static final Logger logger = LoggerFactory.getLogger(PartyController.class);
 	@RequestMapping("/members/{partyId}")
 	protected ResponseEntity<Object> listGroupMember(@PathVariable String partyId) {
-		return JSONResponseUtil.getJSONResponse(partyService.readMembers(partyId), HttpStatus.OK);
+		List<User> members = partyService.readMembers(partyId);
+		logger.warn("\n\nparty members = {}", members);
+		return JSONResponseUtil.getJSONResponse(members, HttpStatus.OK);
 	}
 
 	@RequestMapping("/update/form/{partyId}")
