@@ -3,12 +3,10 @@ package singularity.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import singularity.domain.Note;
 import singularity.domain.PComment;
 import singularity.domain.User;
-import singularity.dto.out.PCommentCountByP;
 
 public interface PCommentRepository extends JpaRepository<PComment, String>{
 	

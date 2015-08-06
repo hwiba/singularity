@@ -51,8 +51,11 @@ public class Party {
 		this(partyId, null, partyName, users, adminUser, status, "background-default.png");
 	}
 
-	public boolean checkCaptain(String userId) {
+	public boolean isAdmin(String userId) {
 		return this.adminUser.getId().equals(userId);
 	}
-
+	
+	public boolean hasUser(User user) {
+		return this.users.contains(user);
+	}
 }

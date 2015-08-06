@@ -47,7 +47,7 @@ public class PartyController {
 	protected String loadGroupAndNotes(@PathVariable String partyId, HttpSession session, Model model) {
 		// TODO Session이 없는데 공개 그룹일 때의 대응과 비공개 그룹일 때의 대응을 분기하기.
 		model.addAttribute("party", partyService.findOne(partyId));
-		SessionUser admin = partyService.readCaptainUser(partyId);
+		SessionUser admin = partyService.findAdminUser(partyId);
 		model.addAttribute("admin", admin);
 		return "notes";
 	}

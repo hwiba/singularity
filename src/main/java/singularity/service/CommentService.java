@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import singularity.domain.Comment;
-import singularity.domain.Party;
 import singularity.domain.Note;
+import singularity.domain.Party;
 import singularity.domain.User;
 import singularity.dto.out.SessionUser;
 import singularity.exception.UnpermittedAccessGroupException;
@@ -25,18 +25,14 @@ public class CommentService {
 	private CommentRepository commentRepository;
 	@Resource
 	private NoteRepository noteRepository;
-//	@Resource
-//	private AlarmDao alarmDao;
-	@Resource
-	private PartyService groupService;
 	@Resource
 	private UserRepository userRepository;
 
 	public List<Comment> create(SessionUser sessionUser, Note note, Comment comment) {
 		note = noteRepository.findOne(note.getNoteId());
-		Party group = note.getParty();
+		Party party = note.getParty();
 		User user = userRepository.findOne(sessionUser.getId());
-		if (!groupService.checkMember(group, user)) {
+		if (!party.hasUser(user)) {
 			throw new UnpermittedAccessGroupException("권한이 없습니다. 그룹 가입을 요청하세요.");
 		}
 		comment.setCreateDate(new Date());
@@ -45,25 +41,8 @@ public class CommentService {
 		comment = commentRepository.save(comment);
 		note.setCommentCount(note.getCommentCount() + 1);
 		noteRepository.save(note);
-		//createAlarm(comment);
 		return commentRepository.findAllByNote(comment.getNote());
 	}
-
-//	private void createAlarm(Comment comment) {
-//		Note note = comment.getNote();
-//		User noteWriter = noteDao.readNote(note.getNoteId()).getUser();
-//		if (!comment.checkWriter(noteWriter)) {
-//			alarmDao.createNewComments(new Alarm(createAlarmId(), "C", comment.getUser(), noteWriter, note, comment));
-//		}
-//	}
-
-//	private String createAlarmId() {
-//		String alarmId = RandomFactory.getRandomId(10);
-//		if(alarmDao.isExistAlarmId(alarmId)) {
-//			return createAlarmId();
-//		}
-//		return alarmId;
-//	}
 
 	public List<Comment> list(long noteId) {
 		Note note = noteRepository.findOne(noteId);

@@ -6,26 +6,24 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import singularity.domain.Party;
 import singularity.domain.Note;
+import singularity.domain.Party;
 import singularity.dto.out.SessionUser;
 import singularity.exception.UnpermittedAccessGroupException;
-import singularity.repository.PartyRepository;
 import singularity.repository.NoteRepository;
+import singularity.repository.PartyRepository;
 import singularity.repository.UserRepository;
 
 @Service
 @Transactional
 public class NoteService {
 	@Resource
-	private PartyRepository groupRepository;
+	private PartyRepository partyRepository;
 	@Resource
-	private PartyService groupService;
+	private PartyService partyService;
 	@Resource
 	private NoteRepository noteRepository;
 	@Resource
@@ -41,13 +39,14 @@ public class NoteService {
 		return noteRepository.findOne(noteId);
 	}
 
-	public void create(String sessionUserId, String groupId, String noteText, Date noteTargetDate, String tempNoteId) {
-		if (!groupService.checkMember(groupRepository.findOne(groupId), userRepository.findOne(sessionUserId))) {
+	public void create(String sessionUserId, String partyId, String noteText, Date noteTargetDate, String tempNoteId) {
+		Party party = partyRepository.findOne(partyId);
+		if (!party.hasUser(userRepository.findOne(sessionUserId))) {
 			throw new UnpermittedAccessGroupException("권한이 없습니다. 그룹 가입을 요청하세요.");
 		}
 		Note note = new Note();
 		note.setUser(userRepository.findOne(sessionUserId));
-		note.setParty(groupRepository.findOne(groupId));
+		note.setParty(party);
 		note.setCommentCount(0);
 		note.setNoteTargetDate(noteTargetDate);
 		note.setNoteText(noteText);
