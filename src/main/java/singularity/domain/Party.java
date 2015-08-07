@@ -3,6 +3,7 @@ package singularity.domain;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -34,10 +35,10 @@ public class Party {
 	@Column(name = "partyName", length=25, nullable = false)
 	private String partyName;
 	
-	@ManyToMany(fetch=FetchType.EAGER)
+	@ManyToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	private List<User> users;
 	
-	@ManyToOne(fetch=FetchType.EAGER)
+	@ManyToOne(fetch=FetchType.EAGER, cascade=CascadeType.ALL)
 	@JoinColumn(name = "user_FK")
 	private User adminUser;
 	
@@ -51,11 +52,19 @@ public class Party {
 		this(partyId, null, partyName, users, adminUser, status, "background-default.png");
 	}
 
-	public boolean isAdmin(String userId) {
-		return this.adminUser.getId().equals(userId);
+	public boolean isAdmin(User user) {
+		return this.adminUser.equals(user);
 	}
 	
 	public boolean hasUser(User user) {
 		return this.users.contains(user);
+	}
+
+	public boolean addUser(User user) {
+		return this.users.add(user);
+	}
+	
+	public boolean deleteUser(User user) {
+		return this.users.remove(user);
 	}
 }

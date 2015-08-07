@@ -381,7 +381,7 @@ function addMember() {
     guinness.restAjax({
         method: "post",
         url: url,
-        param: "userId=" + userId + "&groupId=" + groupId + "&sessionUserId=" + sessionUserId,
+        param: "userId=" + userId + "&partyId=" + partyId + "&sessionUserId=" + sessionUserId,
         statusCode: {
   			406: function(res) {	// 멤버 추가 실패 
   				alert.style.visibility = "visible";

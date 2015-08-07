@@ -19,20 +19,17 @@ window.addEventListener("load", function() {
 	
 	var leaveGroupBtn = document.body.querySelector(".leaveGroup > span");
 	leaveGroupBtn.addEventListener('click', function(){
-		console.log('ccddd')
-		var partyName = document.body.querySelector("#group-name");
+		var partyName = document.body.querySelector("#group-name").textContent;
 		guinness.util.alert(partyName, "그룹을 탈퇴하시겠습니까?", function() {
-			var param = "sessionUserId="+ document.querySelector("#sessionUserId").value + "&partyId="+ partyId;
-			
+			var sessionUserId = document.querySelector("#sessionUserId").value;
 			guinness.restAjax({
-				method : "post",
-				url : "/groups/members/leave",
-				param : param,
+				method : "put",
+				url : "/groups/"+partyId+"/members/"+sessionUserId+"/leave",
 				statusCode : {
-					200 : function(res) { // 그룹 탈퇴 성공
-						window.location.href = "/groups/form";
+					200 : function(res) {
+						window.location.href = "/";
 					},
-					406 : function(res) { // 그룹 탈퇴 실패
+					406 : function(res) {
 						guinness.util.alert('경고', res);
 					}
 				}

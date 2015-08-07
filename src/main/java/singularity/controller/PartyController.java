@@ -6,8 +6,6 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -95,7 +93,7 @@ public class PartyController {
 	@RequestMapping(value = "/members/invite", method = RequestMethod.POST)
 	protected ResponseEntity<Object> inviteGroupMember(@RequestParam String userId, @RequestParam String partyId,
 			@RequestParam String sessionUserId) {
-		partyService.inviteGroupMember(sessionUserId, userId, partyId);
+		partyService.inviteMember(sessionUserId, userId, partyId);
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
 
@@ -107,12 +105,12 @@ public class PartyController {
 
 	@RequestMapping(value = "/members/join", method = RequestMethod.POST)
 	protected ResponseEntity<Object> joinGroupMember(@RequestParam String partyId, @RequestParam String sessionUserId) {
-		partyService.joinGroupMember(sessionUserId, partyId);
+		partyService.joinMember(sessionUserId, partyId);
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/members/leave", method = RequestMethod.POST)
-	protected ResponseEntity<Object> leave(@RequestParam String sessionUserId, @RequestParam String parytId) {
+	@RequestMapping(value = "/{parytId}/members/{sessionUserId}/leave", method = RequestMethod.PUT)
+	protected ResponseEntity<Object> leave(@PathVariable String sessionUserId, @PathVariable String parytId) {
 		try {
 			partyService.leaveParty(sessionUserId, parytId);
 		} catch (GroupMemberException e) {
@@ -124,15 +122,14 @@ public class PartyController {
 	@RequestMapping(value = "/members/delete", method = RequestMethod.POST)
 	protected ResponseEntity<Object> delete(@RequestParam String sessionUserId, @RequestParam String userId,
 			@RequestParam String partyId) {
+		//TODO 삭제 실패 익셉션 처리하기.
 		partyService.deleteMember(sessionUserId, userId, partyId);
 		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
 	}
 
-	private static final Logger logger = LoggerFactory.getLogger(PartyController.class);
 	@RequestMapping("/members/{partyId}")
 	protected ResponseEntity<Object> listGroupMember(@PathVariable String partyId) {
 		List<User> members = partyService.readMembers(partyId);
-		logger.warn("\n\nparty members = {}", members);
 		return JSONResponseUtil.getJSONResponse(members, HttpStatus.OK);
 	}
 
@@ -152,7 +149,7 @@ public class PartyController {
 	protected String updateUser(@RequestParam String sessionUserId,
 			@RequestParam("backgroundImage") MultipartFile backgroundImage, HttpSession session, Party party) {
 		if (party.getPartyName().equals("")) {
-			throw new FailedUpdatePartyException("그룹명이 공백입니다."); // 잘못된 접근
+			throw new FailedUpdatePartyException("그룹명이 공백입니다.");
 		}
 		String rootPath = session.getServletContext().getRealPath("/");
 		partyService.update(sessionUserId, party, rootPath, backgroundImage);

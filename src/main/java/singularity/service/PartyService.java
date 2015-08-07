@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import singularity.domain.Party;
@@ -18,6 +18,7 @@ import singularity.exception.FailedAddingGroupMemberException;
 import singularity.exception.FailedDeleteGroupException;
 import singularity.exception.FailedUpdatePartyException;
 import singularity.exception.GroupMemberException;
+import singularity.exception.UnpermittedAccessGroupException;
 import singularity.repository.PartyRepository;
 import singularity.repository.UserRepository;
 import singularity.utility.RandomFactory;
@@ -55,45 +56,53 @@ public class PartyService {
 		return partyId;
 	}
 
-	public void delete(String partyId, String userId) {
+	public void delete(String partyId, String userId) throws FailedDeleteGroupException {
+		User user = userRepository.findOne(userId);
 		if (!partyRepository.exists(partyId)) {
 			throw new FailedDeleteGroupException("그룹이 존재하지 않습니다.");
 		}
 		Party party = partyRepository.findOne(partyId);
-		if (!party.isAdmin(userId)) {
+		if (!party.isAdmin(user)) {
 			throw new FailedDeleteGroupException("그룹장만 그룹을 삭제할 수 있습니다.");
 		}
 		partyRepository.delete(partyId);
 	}
 
-	public void inviteGroupMember(String sessionUserId, String userId, String groupId) {
-		// TODO sessionUserId가 groupId에 가입이 되어있지 않을경우
-		// throw new UnpermittedAccessGroupException();
-		if (null == userRepository.findOne(userId)) {
+	public void inviteMember(String sessionUserId, String userId, String partyId)
+			throws UnpermittedAccessGroupException, FailedAddingGroupMemberException {
+		Party party = partyRepository.findOne(partyId);
+		User user = userRepository.findOne(userId);
+		User sessionUser = userRepository.findOne(sessionUserId);
+		if (party.hasUser(sessionUser)) {
+			throw new UnpermittedAccessGroupException("회원을 초대할 권한이 없습니다!");
+		}
+		if (null == user) {
 			throw new FailedAddingGroupMemberException("사용자를 찾을 수 없습니다!");
 		}
-		if (null != partyRepository.findOneByPartyIdAndUsers(userRepository.findOne(userId), groupId)) {
+		if (party.hasUser(user)) {
 			throw new FailedAddingGroupMemberException("이미 가입되어 있습니다!");
 		}
+		// TODO 알람을 만들어 요청 당한 user에게 알려주기.
 	}
 
-	
-	public void joinGroupMember(String sessionUserId, String partyId) {
-		// TODO partyId가 공개 그룹이 아닐경우
-		// throw new UnpermittedAccessGroupException();
-		// TODO if (이미 가입 요청을 했을 경우에 대한 처리) {
-			// throw new FailedAddingGroupMemberException("가입 승인 대기중 입니다!");
+	public void joinMember(String sessionUserId, String partyId) {
+		Party party = partyRepository.findOne(partyId);
+		if ("F" == party.getStatus()) {
+			throw new UnpermittedAccessGroupException();
+		}
+		// TODO if (알람을 확인하여 이미 가입 요청을 했을 경우에 대한 처리) {
+		// 알람은 어드민 유저가 가지고 있다.
+		// throw new FailedAddingGroupMemberException("가입 승인 대기중 입니다!");
 		// }
-		//Party party = partyRepository.findOne(partyId);
+		
+		// TODO 가입 요청에 해당하는 유저를 추가한다.
 	}
 
 	public Party addMember(String userId, String partyId) {
 		User user = userRepository.findOne(userId);
 		Party party = partyRepository.findOne(partyId);
-		List<User> users = party.getUsers();
-		users.add(user);
-		party.setUsers(users);
-		return partyRepository.save(party);
+		party.addUser(user);
+		return party;
 	}
 
 	public void leaveParty(String userId, String partyId) {
@@ -105,10 +114,10 @@ public class PartyService {
 		if (userId.equals(party.getAdminUser().getId())) {
 			throw new GroupMemberException("그룹장은 탈퇴가 불가능합니다.");
 		}
-		this.deleteUser(user, party);
+		party.deleteUser(user);
 	}
 
-	public void deleteMember(String sessionUserId, String userId, String partyId) {
+	public void deleteMember(String sessionUserId, String userId, String partyId) throws GroupMemberException {
 		Party party = partyRepository.findOne(partyId);
 		String adminUserId = party.getAdminUser().getId();
 		if (!adminUserId.equals(sessionUserId)) {
@@ -117,22 +126,15 @@ public class PartyService {
 		if (userId.equals(adminUserId)) {
 			throw new GroupMemberException("그룹장은 탈퇴가 불가능합니다.");
 		}
-		this.deleteUser(userRepository.findOne(userId), party);
+		party.deleteUser(userRepository.findOne(userId));
 	}
 
-	private void deleteUser(User user, Party group) {
-		List<User> users = group.getUsers();
-		users.remove(user);
-		group.setUsers(users);
-		partyRepository.save(group);
+	public List<User> readMembers(String partyId) {
+		return partyRepository.findOne(partyId).getUsers();
 	}
 
-	public List<User> readMembers(String groupId) {
-		return partyRepository.findOne(groupId).getUsers();
-	}
-
-	public Party findOne(String groupId) {
-		return partyRepository.findOne(groupId);
+	public Party findOne(String partyId) {
+		return partyRepository.findOne(partyId);
 	}
 
 	public void update(String sessionUserId, Party party, String rootPath, MultipartFile partyImage) {
