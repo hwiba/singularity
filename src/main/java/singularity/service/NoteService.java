@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import singularity.domain.Note;
+import singularity.domain.Notification;
 import singularity.domain.Party;
-import singularity.dto.out.SessionUser;
+import singularity.domain.User;
+import singularity.enums.NotificationStatus;
 import singularity.exception.UnpermittedAccessGroupException;
 import singularity.repository.NoteRepository;
 import singularity.repository.PartyRepository;
@@ -28,12 +30,8 @@ public class NoteService {
 	private NoteRepository noteRepository;
 	@Resource
 	private UserRepository userRepository;
-//	@Resource
-//	private AlarmDao alarmDao;
-//	@Resource
-//	private TempNoteService tempNoteService;
-//	@Resource
-//	private PCommentService pCommentService;
+	@Resource
+	private PCommentService pCommentService;
 
 	public Note read(long noteId) {
 		return noteRepository.findOne(noteId);
@@ -41,34 +39,18 @@ public class NoteService {
 
 	public void create(String sessionUserId, String partyId, String noteText, Date noteTargetDate, String tempNoteId) {
 		Party party = partyRepository.findOne(partyId);
-		if (!party.hasUser(userRepository.findOne(sessionUserId))) {
+		User user = userRepository.findOne(sessionUserId);
+		if (!party.hasUser(user)) {
 			throw new UnpermittedAccessGroupException("권한이 없습니다. 그룹 가입을 요청하세요.");
 		}
 		Note note = new Note();
-		note.setUser(userRepository.findOne(sessionUserId));
+		note.setUser(user);
 		note.setParty(party);
 		note.setCommentCount(0);
 		note.setNoteTargetDate(noteTargetDate);
 		note.setNoteText(noteText);
-		note = noteRepository.save(note);
-		SessionUser sessionUser = new SessionUser(note.getUser());
-		//String alarmId = null;
-		//Alarm alarm = null;
-//		List<User> groupMembers = groupRepository.findOne(groupId).getUsers();
-//		for (User reader : groupMembers) {
-//			if (reader.getUserId().equals(sessionUserId)) {
-//				continue;
-//			}
-//			while (true) {
-//				alarmId = RandomFactory.getRandomId(10);
-//				if (!alarmDao.isExistAlarmId(alarmId)) {
-//					alarm = new Alarm(alarmId, "N", sessionUser, reader, new Note(noteId));
-//					break;
-//				}
-//			}
-//			alarmDao.createNewNotes(alarm);
-//		}
-		//tempNoteService.delete(Long.parseLong(tempNoteId));
+		noteRepository.save(note);
+		party.sendNotification(new Notification(user, party, NotificationStatus.NEW_POST));
 	}
 
 	public void update(String noteText, long noteId, Date noteTargetDate, List<Map<String, Object>> pCommentList) {
@@ -80,7 +62,6 @@ public class NoteService {
 	}
 
 	public void delete(long noteId) {
-		//alarmRepository.deleteByNote(noteRepository.findOne(noteId));
 		noteRepository.delete(noteId);
 	}
 	

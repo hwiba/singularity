@@ -15,7 +15,6 @@ import javax.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import singularity.enums.NotificationStatus;;
 
 

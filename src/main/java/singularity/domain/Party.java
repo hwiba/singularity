@@ -2,7 +2,6 @@ package singularity.domain;
 
 import java.util.Date;
 import java.util.List;
-import java.util.function.Predicate;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -75,7 +74,6 @@ public class Party {
 	}
 
 	public boolean isAlreadyRequest(User user) {
-		//TODO lambda로 바꿔볼 것.
 		List<Notification> notifications = this.adminUser.getNotification();
 		for (Notification notification : notifications) {
 			if (notification.getCaller().equals(user) && notification.getParty().equals(this)
@@ -85,4 +83,14 @@ public class Party {
 		}
 		return false;
 	}
+	
+	public void sendNotification(Notification notification) {
+		for (User user : users) {
+			if(!user.equals(notification.getCaller())) {
+				user.getNotification().add(notification);
+			}
+		}
+	}
+	
+	
 }
