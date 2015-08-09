@@ -89,15 +89,17 @@ public class PartyService {
 
 	public void joinMember(String sessionUserId, String partyId) {
 		Party party = partyRepository.findOne(partyId);
+		User user = userRepository.findOne(sessionUserId);
 		if ("F" == party.getStatus()) {
 			throw new UnpermittedAccessGroupException();
 		}
-		// TODO if (알람을 확인하여 이미 가입 요청을 했을 경우에 대한 처리) {
-		// 알람은 어드민 유저가 가지고 있다.
-		// throw new FailedAddingGroupMemberException("가입 승인 대기중 입니다!");
-		// }
-		
-		// TODO 가입 요청에 해당하는 유저를 추가한다.
+		if (party.hasUser(user)) {
+			throw new FailedAddingGroupMemberException("이미 가입한 유저입니다!");
+		}
+		if (party.isAlreadyRequest(user)) {
+			throw new FailedAddingGroupMemberException("가입 승인 대기중 입니다!");
+		}
+		party.SingUpRequest(user);
 	}
 
 	public Party addMember(String userId, String partyId) {
