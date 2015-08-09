@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import singularity.domain.Note;
 import singularity.service.NoteService;
 import singularity.service.PartyService;
+import singularity.service.UserService;
 import singularity.utility.DateTimeUtil;
 import singularity.utility.JSONResponseUtil;
 import singularity.utility.JsonResult;
@@ -36,28 +37,11 @@ public class NoteController {
 	private NoteService noteService;
 	@Resource
 	private PartyService partyService;
-//	@Resource
-//	private PreviewService previewService;
-//	@Resource
-//	private PCommentService pCommentService;
-//	@Resource
-//	private TempNoteService tempNoteService;
+	@Resource
+	private UserService userService;
 	
-
-//	@RequestMapping("/notes/reload")
-//	protected ResponseEntity<Object> reloadNotes(@RequestParam String partyId, @RequestParam String noteTargetDate) {
-//		if (partyId == null) {
-//			throw new UnpermittedAccessGroupException();
-//		}
-//		if ("undefined".equals(noteTargetDate)) {
-//			noteTargetDate = null;
-//		}
-//		return JSONResponseUtil.getJSONResponse(noteService.reloadPreviews(partyId, noteTargetDate), HttpStatus.OK);
-//	}
-
 	@RequestMapping("/notes/{noteId}")
-	protected ResponseEntity<Object> show(@PathVariable long noteId, HttpSession session) throws IOException, Throwable{
-		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
+	protected ResponseEntity<Object> show(@PathVariable long noteId) throws IOException, Throwable{
 		Note note = noteService.read(noteId);
 		note.setNoteText((String) new NashornEngine().markdownToHtml(note.getNoteText()));
 		return JSONResponseUtil.getJSONResponse(note, HttpStatus.OK);
@@ -183,4 +167,16 @@ public class NoteController {
 //		}
 //		return new JsonResult().setSuccess(false);
 //	}
+	
+//	@RequestMapping("/notes/reload")
+//	protected ResponseEntity<Object> reloadNotes(@RequestParam String partyId, @RequestParam String noteTargetDate) {
+//		if (partyId == null) {
+//			throw new UnpermittedAccessGroupException();
+//		}
+//		if ("undefined".equals(noteTargetDate)) {
+//			noteTargetDate = null;
+//		}
+//		return JSONResponseUtil.getJSONResponse(noteService.reloadPreviews(partyId, noteTargetDate), HttpStatus.OK);
+//	}
+	
 }

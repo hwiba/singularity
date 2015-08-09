@@ -11,9 +11,11 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import singularity.domain.Notification;
 import singularity.domain.Party;
 import singularity.domain.User;
 import singularity.dto.out.SessionUser;
+import singularity.enums.NotificationStatus;
 import singularity.exception.FailedAddingGroupMemberException;
 import singularity.exception.FailedDeleteGroupException;
 import singularity.exception.FailedUpdatePartyException;
@@ -73,7 +75,7 @@ public class PartyService {
 		Party party = partyRepository.findOne(partyId);
 		User user = userRepository.findOne(userId);
 		User sessionUser = userRepository.findOne(sessionUserId);
-		if (party.hasUser(sessionUser)) {
+		if (!party.hasUser(sessionUser)) {
 			throw new UnpermittedAccessGroupException("회원을 초대할 권한이 없습니다!");
 		}
 		if (null == user) {
@@ -82,7 +84,7 @@ public class PartyService {
 		if (party.hasUser(user)) {
 			throw new FailedAddingGroupMemberException("이미 가입되어 있습니다!");
 		}
-		// TODO 알람을 만들어 요청 당한 user에게 알려주기.
+		user.getNotification().add(new Notification(user, party, NotificationStatus.INVITE));
 	}
 
 	public void joinMember(String sessionUserId, String partyId) {

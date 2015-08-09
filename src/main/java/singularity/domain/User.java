@@ -1,10 +1,15 @@
 package singularity.domain;
 
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.Pattern;
@@ -49,9 +54,16 @@ public class User {
 	
 	@Column(name = "image", length=200, nullable = true)
 	private String image;
+	
+	@OneToMany(fetch=FetchType.LAZY, cascade=CascadeType.ALL)
+	private List<Notification> notification;
 
 	public User(String id, String name, String password) {
-		this(id, null, name, password, UserStatus.READY, null);
+		this(id, null, name, password, UserStatus.READY, null, null);
+	}
+	
+	public User(String userId) {
+		this(userId, null, null);
 	}
 	
 }
