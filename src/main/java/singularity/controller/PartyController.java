@@ -21,6 +21,7 @@ import singularity.domain.Note;
 import singularity.domain.Party;
 import singularity.domain.User;
 import singularity.dto.out.SessionUser;
+import singularity.enums.Openness;
 import singularity.exception.FailedAddingGroupMemberException;
 import singularity.exception.FailedUpdatePartyException;
 import singularity.exception.GroupMemberException;
@@ -63,7 +64,6 @@ public class PartyController {
 		List<Note> notes = noteService.readByGroupPage(party);
 		for (Note note : notes) {
 			try {
-				// XXX pComment 등을 반영시키기.
 				note.setNoteText((String) new NashornEngine().markdownToHtml(note.getNoteText()));
 			} catch (IOException e) {
 				return ResponseUtil.getJSON("", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -85,10 +85,13 @@ public class PartyController {
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	protected ResponseEntity<Object> create(@RequestParam String status, @RequestParam String partyName,
 			HttpSession session, Model model) {
-		if (partyName.length() > 15)
+		if (partyName.length() > 15) {
 			return ResponseUtil.getJSON("그룹명은 15자 이내로 가능합니다", HttpStatus.PRECONDITION_FAILED);
-		String groupCaptainUserId = ServletRequestUtil.getUserIdFromSession(session);
-		Party party = partyService.create(partyName, groupCaptainUserId, status);
+		}
+		String adminId = ServletRequestUtil.getUserIdFromSession(session);
+		Openness openness = "F" == status ? Openness.CLOSE : Openness.OPEN;
+		
+		Party party = partyService.create(partyName, adminId, openness);
 		return ResponseUtil.getJSON(party, HttpStatus.CREATED);
 	}
 

@@ -45,22 +45,21 @@ public class MailService {
 		return signingKey;
 	}
 
-	// XXX 메일 내용 바꾸기
 	public void sendMailforSignUp(Confirm confirm) throws FailedSendingEmailException {
 		try {
 			MimeMessage message = javaMailSender.createMimeMessage();
 			MimeMessageHelper messageHelper = new MimeMessageHelper(message, false, "utf-8");
-			String htmlMsg = "<h3>페이퍼민트에 가입해주셔서 감사합니다.</h3>"
+			String htmlMsg = "<h3>Welcome to the Singularity</h3>"
 					+ "<a href='http://localhost:8080/user/confirm/" + confirm.getSigningKey() + "' style='font-size: 15px;"
 					+ "color: white; text-decoration:none'>"
 					+ "<div style='padding: 10px; border: 0px; width: 150px;"
-					+ "margin: 15px 5px; background-color: #74afad; "
-					+ "text-align:center'>페이퍼민트 시작하기</div></a>"
-					+ "<p>Copyright &copy; by link413. All rights reserved.</p>";
+					+ "margin: 15px 5px; background-color: red; "
+					+ "text-align:center'>find Singularity for Me</div></a>"
+					+ "<p>Copyright &copy; by hyvä. All rights reserved.</p>";
 			
 			messageHelper.setTo(confirm.getUser().getId());
-			messageHelper.setFrom("hakimaru@naver.com","페이퍼민트");
-			messageHelper.setSubject("환영합니다. " + confirm.getUser().getName() + "님! 페이퍼민트 가입 인증 메일입니다.");
+			messageHelper.setFrom("hakimaru@naver.com","singularityfor.me");
+			messageHelper.setSubject("환영합니다. " + confirm.getUser().getName() + "님! Singularity 가입 인증 메일입니다.");
 			messageHelper.setText(htmlMsg, true);
 			javaMailSender.send(message);
 		} catch (MessagingException | NullPointerException | MailAuthenticationException | UnsupportedEncodingException e) {
@@ -73,16 +72,16 @@ public class MailService {
 			MimeMessage message = javaMailSender.createMimeMessage();
 			MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
 			messageHelper.setTo(userId);
-			messageHelper.setFrom("hakimaru@naver.com","페이퍼민트");
-			messageHelper.setSubject("페이퍼민트 임시 비밀번호를 보내드립니다.");
+			messageHelper.setFrom("hakimaru@naver.com","Singularityfor.me");
+			messageHelper.setSubject("Singularity의 임시 비밀번호를 보내드립니다.");
 			messageHelper.setText(
 					"임시 비밀번호는 " + tempPassword + " 입니다."
 					+"<a href='http://localhost:8080/' style='font-size: 15px;"
 		    		+ "color: white; text-decoration:none'>"
 		    		+ "<div style='padding: 10px; border: 0px; width: 120px;"
-		    		+ "margin: 15px 5px; background-color: #74afad; "
-		    		+ "text-align:center'>페이퍼민트로 가기</div></a>"
-		    		+ "<p>Copyright &copy; by link413. All rights reserved.</p>"
+		    		+ "margin: 15px 5px; background-color: red; "
+		    		+ "text-align:center'>Singularity 가기</div></a>"
+		    		+ "<p>Copyright &copy; by hyvä. All rights reserved.</p>"
 		    		, true);
 			javaMailSender.send(message);
 		} catch (MessagingException | NullPointerException | MailAuthenticationException | UnsupportedEncodingException e) {

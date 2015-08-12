@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import singularity.enums.NotificationStatus;
+import singularity.enums.Openness;
 
 @Data
 @Entity
@@ -43,14 +44,14 @@ public class Party {
 	@JoinColumn(name = "user_FK")
 	private User adminUser;
 
-	@Column(name = "status", length = 3, nullable = false)
-	private String status;
+	@Column(name = "openness", length = 3, nullable = false)
+	private Openness openness;
 
 	@Column(name = "image", length = 200, nullable = true)
 	private String partyImage;
 
-	public Party(String partyId, String partyName, List<User> users, User adminUser, String status) {
-		this(partyId, null, partyName, users, adminUser, status, "background-default.png");
+	public Party(String partyId, String partyName, List<User> users, User adminUser, Openness openness) {
+		this(partyId, null, partyName, users, adminUser, openness, "background-default.png");
 	}
 
 	public boolean isAdmin(User user) {

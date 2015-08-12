@@ -16,6 +16,7 @@ import singularity.domain.Party;
 import singularity.domain.User;
 import singularity.dto.out.SessionUser;
 import singularity.enums.NotificationStatus;
+import singularity.enums.Openness;
 import singularity.exception.FailedAddingGroupMemberException;
 import singularity.exception.FailedDeleteGroupException;
 import singularity.exception.FailedUpdatePartyException;
@@ -42,11 +43,11 @@ public class PartyService {
 		return new SessionUser(party.getAdminUser());
 	}
 
-	public Party create(String partyName, String adminUserId, String status) {
+	public Party create(String partyName, String adminUserId, Openness openness) {
 		User adminUser = userRepository.findOne(adminUserId);
 		List<User> users = new ArrayList<User>();
 		users.add(adminUser);
-		return partyRepository.save(new Party(createPartyId(), partyName, users, adminUser, status));
+		return partyRepository.save(new Party(createPartyId(), partyName, users, adminUser, openness));
 	}
 
 	private String createPartyId() {
@@ -86,11 +87,10 @@ public class PartyService {
 		user.getNotification().add(new Notification(user, party, NotificationStatus.INVITE));
 	}
 
-	// XXX 파티 스테이터스를 enum으로 바꾸기
 	public void joinMember(String sessionUserId, String partyId) {
 		Party party = partyRepository.findOne(partyId);
 		User user = userRepository.findOne(sessionUserId);
-		if ("F" == party.getStatus()) {
+		if (Openness.CLOSE == party.getOpenness()) {
 			throw new UnpermittedAccessGroupException();
 		}
 		if (party.hasUser(user)) {
