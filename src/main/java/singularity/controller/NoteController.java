@@ -14,14 +14,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import singularity.domain.Note;
 import singularity.domain.Party;
 import singularity.service.NoteService;
 import singularity.service.PartyService;
 import singularity.service.UserService;
-import singularity.utility.JsonResult;
 import singularity.utility.NashornEngine;
 import singularity.utility.ResponseUtil;
 import singularity.utility.ServletRequestUtil;
@@ -95,13 +93,6 @@ public class NoteController {
 		model.addAttribute("note", note);
 		model.addAttribute("party", partyService.findOne(note.getParty().getPartyId()));
 		return "editor";
-	}
-
-	@RequestMapping(value = "/notes/editor/preview", method = RequestMethod.POST)
-	private @ResponseBody JsonResult preview(@RequestParam String markdown) throws IOException, Throwable {
-		Object oHtml = new NashornEngine().markdownToHtml(markdown);
-		String html = oHtml.toString();
-		return new JsonResult().setSuccess(true).setMessage(html);
 	}
 
 }

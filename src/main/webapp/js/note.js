@@ -176,15 +176,17 @@ function showNoteModal(obj) {
 
 function readComments(obj) {
     var noteId = obj.noteId;
-    guinness.ajax({
+    guinness.restAjax({
         method: "get",
         url: "/comments/" + noteId,
-        success: function (req) {
-            var result = JSON.parse(req.responseText);
-            if (result.success !== true)
-                return;
-            appendComment(result.object, noteId);
-            guinness.util.setModalPosition();
+        statusCode: {
+        	200 : function (res) {
+        		var result = JSON.parse(res);
+        		if (result.length > 0) {
+        			appendComment(result, noteId);
+        		}
+        		guinness.util.setModalPosition();
+        	}
         }
     });
 }
@@ -226,39 +228,43 @@ function appendComment(json, noteId) {
 }
 
 function updateComment(commentId, commentText) {
-    guinness
-        .ajax({
-            method: "put",
-            url: "/comments/" + commentId,
-            param: "commentText=" + commentText,
-            success: function (req) {
-                var result = JSON.parse(req.responseText);
-                if (result.success !== true)
+    guinness.restAjax({
+    	method: "put",
+    	url: "/comments/" + commentId,
+    	param: "commentText=" + commentText,
+    	statusCode : {
+    		200 : function (res) {
+    			var result = JSON.parse(res);
+                if (result.length > 0) {
                     return;
-                var json = result.object;
+                }
                 var el = document.querySelector("#cmt-" + commentId);
-                el.querySelector('.comment').innerHTML = json.commentText.replace(/\n/g, '<br/>');
-                el.querySelector('.comment-date').innerHTML = json.commentCreateDate;
-                el.querySelector('.comment-date').id = Number(new Date(json.commentCreateDate));
+                el.querySelector('.comment').innerHTML = result.commentText.replace(/\n/g, '<br/>');
+                el.querySelector('.comment-date').innerHTML = result.commentCreateDate;
+                el.querySelector('.comment-date').id = Number(new Date(result.commentCreateDate));
                 el.querySelector('.comment').setAttribute(
                     'contentEditable', false);
                 el.querySelectorAll('.comment-update').remove();
                 el.querySelector('.default-utils').show();
             }
-        });
+        }
+    });
 }
 
 function deleteComment(commentId, noteId) {
     guinness.ajax({
         method: "delete",
         url: "/comments/" + commentId,
-        success: function (req) {
-            if (JSON.parse(req.responseText).success === true) {
-            	document.querySelector('#cmt-' + commentId).remove();
-            	var noteEl = document.getElementById(noteId);
-            	if(noteEl === null)
-            		return;
-            }
+        200: function (res) {
+        	var result = JSON.parse(res);
+        	if (result.length == 0) {
+        		return;
+        	}
+        	document.querySelector('#cmt-' + commentId).remove();
+        	var noteEl = document.getElementById(noteId);
+        	if(noteEl === null) {
+        		return;
+        	}
         }
     });
 }
@@ -322,16 +328,22 @@ function createComment(obj) {
     if (commentText !== "") {
         var userId = document.getElementById("sessionUserId").value;
         var noteId = obj.noteId;
-        guinness.ajax({
+        guinness.restAjax({
             method: "post",
             url: "/comments/",
             param: "commentText=" + commentText + "&noteId=" + noteId,
-            success: function (req) {
-                var result = JSON.parse(req.responseText);
-                appendComment(result, noteId);
-                document.querySelector('#commentText').value = "";
-                if(document.getElementById(noteId) !== null){
-                }
+            statusCode : {
+            	200 : function (res) {
+            		var result = JSON.parse(res);
+            		appendComment(result, noteId);
+            		document.querySelector('#commentText').value = "";
+            		if(document.getElementById(noteId) !== null){
+            			//TODO
+            		}
+            	},
+            	400 : function (res) {
+            		//TODO
+            	}
             }
         });
     }
@@ -383,7 +395,7 @@ function addMember() {
         url: url,
         param: "userId=" + userId + "&partyId=" + partyId + "&sessionUserId=" + sessionUserId,
         statusCode: {
-  			406: function(res) {	// 멤버 추가 실패 
+  			406: function(res) {	// 멤버 추가 실패
   				alert.style.visibility = "visible";
                 alert.style.color = "#ff5a5a";
                 alert.style.fontSize = "11px";
@@ -393,7 +405,7 @@ function addMember() {
                 }
                 return;
   			}, 
-  			200: function(res) {	// 멤버 추가 성공  
+  			200: function(res) {	// 멤버 추가 성공
   				alert.style.visibility = "visible";
                 alert.style.color = "#86E57F";
                 alert.style.fontSize = "11px";
@@ -413,7 +425,7 @@ function readMember(groupId) {
         method: "get",
         url: "/groups/members/" + groupId,
         statusCode: {
-  			200: function(res) {	// 멤버 추가 실패 
+  			200: function(res) {	// 멤버 추가 실패
   				var member = JSON.parse(res);
                 bJoinedUser = isJoinedUser(member);
                 appendMembers(member);
@@ -497,7 +509,7 @@ function readNoteList(noteTargetDate) {
 		 method: "get",
 		 url: '/notes/reload/?groupId=' + groupId + '&noteTargetDate=' + noteTargetDate,
 	        statusCode: {
-	  			200: function(res) {	// 멤버 추가 실패 
+	  			200: function(res) {	// 멤버 추가 실패
 	  				var result = JSON.parse(res);
 	  				if (result.length !== 0) {
 	  					deleteNoteList();
@@ -535,7 +547,7 @@ var reloadWithoutDeleteNoteList = function (noteTargetDate) {
 		 method: "get",
 		 url: '/notes/reload/?groupId=' + partyId + '&noteTargetDate=' + noteTargetDate,
 	        statusCode: {
-	  			200: function(res) {	// 멤버 추가 실패 
+	  			200: function(res) {	// 멤버 추가 실패
 	  				var result = JSON.parse(res);
 	  				if (result.length !== 0) {
 	  	                appendNoteList(result);

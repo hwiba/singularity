@@ -31,8 +31,6 @@ public class NoteService {
 	@Resource
 	private PartyRepository partyRepository;
 	@Resource
-	private PartyService partyService;
-	@Resource
 	private NoteRepository noteRepository;
 	@Resource
 	private UserRepository userRepository;
