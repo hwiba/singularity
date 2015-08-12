@@ -1,6 +1,7 @@
 package singularity.controller;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -58,15 +59,20 @@ public class PartyController {
 		if (null == sessionUserId) {
 			return ResponseUtil.getJSON("", HttpStatus.NOT_ACCEPTABLE);
 		}
-		Party group = partyService.findOne(partyId);
-		List<Note> notes = noteService.readByGroupPage(group);
+		Party party = partyService.findOne(partyId);
+		List<Note> notes = noteService.readByGroupPage(party);
 		for (Note note : notes) {
 			try {
+				// XXX pComment 등을 반영시키기.
 				note.setNoteText((String) new NashornEngine().markdownToHtml(note.getNoteText()));
 			} catch (IOException e) {
 				return ResponseUtil.getJSON("", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
+		// XXX repository에서 가져올 때 노트의 순서를 역순으로 수정하기. 
+		Collections.reverse(notes);
+		
+		// XXX comment count 를 가진 dto를 만들 것인가 note가 카운트를 가지게 할 것인가 결정하기.
 		return ResponseUtil.getJSON(notes, HttpStatus.OK);
 	}
 
