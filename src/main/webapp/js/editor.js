@@ -1,3 +1,32 @@
+var noteTargetDate = getTargetDate();
+var groupName = document.body.querySelector("#hiddenGroupName").value;
+window.addEventListener("load", function() {
+	document.body.querySelector('#noteTargetDate').value = noteTargetDate;
+});
+
+var el = document.querySelector("#temp-note-list");
+var button = el.querySelector("a[data-toggle='dropdown']");
+var menu = el.querySelector(".dropdown-menu");
+var arrow = el.querySelector(".fa-sort-desc");
+
+button.onclick = function(event) {
+	if(arrow.className === "fa fa-sort-desc") {
+		menu.setAttribute("style", "display: ");
+		arrow.setAttribute("class", "fa fa-sort-up");
+	} else {
+		menu.setAttribute("style", "display: none");
+		arrow.setAttribute("class", "fa fa-sort-desc");
+	}
+};
+
+function getTargetDate() {
+	var elTargetDate = document.body.querySelector("#hiddeNoteTargetDate");
+	if (null === elTargetDate) {
+		return "";
+	}
+	return new Date(elTargetDate.value);
+}
+
 window.addEventListener('load', function() {
 	document.querySelector(".searchForm").setAttribute("style","display: block");
 	var partyName = document.querySelector('#group-name').textContent;
@@ -16,25 +45,15 @@ window.addEventListener('load', function() {
 	textBox.addEventListener('keyup', loadPreviewText, false);
 
     function loadPreviewText() {
-        var markdown = document.querySelector('#noteTextBox').value;
-        guinness.ajax({
-            method:"post",
-            url:"/notes/editor/preview",
-            param:"markdown="+markdown,
-            success : function(req) {
-                var json = JSON.parse(req.responseText);
-                if (json.length != 0) {
-                    previewText(json);
-                }
-            }
-        });
+        var md = document.querySelector('#noteTextBox').value;
+        previewText(markdown.toHTML(md, 'Maruku'));
     }
 
-    loadPreviewText(); // editor.jsp가 로드 되었을 때, preview 텍스트 최초 로드
+    loadPreviewText();
     
-    function previewText(json) {
+    function previewText(markdown) {
         var previewBox = document.querySelector('#previewBox');
-		previewBox.innerHTML = json.message;
+		previewBox.innerHTML = markdown;
     }
 
     textBox.addEventListener('keydown', tabKeyHandler, false);
@@ -75,4 +94,4 @@ function insertAtCaret(target, text) {
         target.focus();
     }
     target.scrollTop = scrollPos;
-} 
+}

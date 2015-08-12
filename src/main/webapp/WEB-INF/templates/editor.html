@@ -58,38 +58,9 @@
 	<!-- 노트 모달을 위한 템플릿 -->
 	<!-- <%@ include file="./commons/_note_popup.jspf"%> -->
 
-	<script>
-		var noteTargetDate = getTargetDate();
-		var groupName = document.body.querySelector("#hiddenGroupName").value;
-		window.addEventListener("load", function() {
-			document.body.querySelector('#noteTargetDate').value = noteTargetDate;
-		});
-
-		var el = document.querySelector("#temp-note-list");
-		var button = el.querySelector("a[data-toggle='dropdown']");
-		var menu = el.querySelector(".dropdown-menu");
-		var arrow = el.querySelector(".fa-sort-desc");
-
-		button.onclick = function(event) {
-			if(arrow.className === "fa fa-sort-desc") {
-				menu.setAttribute("style", "display: ");
-				arrow.setAttribute("class", "fa fa-sort-up");
-			} else {
-				menu.setAttribute("style", "display: none");
-				arrow.setAttribute("class", "fa fa-sort-desc");
-			}
-		};
-		
-		function getTargetDate() {
-			var elTargetDate = document.body.querySelector("#hiddeNoteTargetDate");
-			if (null === elTargetDate) {
-				return "";
-			}
-			return new Date(elTargetDate.value);
-		}
-	</script>
 	<script src="/js/datepickr.js"></script>
 	<script src="/js/editor.js"></script>
 	<script src="/js/guinness.js"></script>
+	<script src="/js/markdown.js"></script>
 </body>
 </html>
