@@ -25,7 +25,7 @@ input#noteTargetDate {
 html, body {
 	margin:0;
 	padding:0;
-	font-family:'Nanum Gothic';
+	font-family:serif;
 	color:#454545;
 	height:100%;
 	background-color:rgb(250, 250, 250);

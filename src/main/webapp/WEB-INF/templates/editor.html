@@ -55,8 +55,7 @@
 	<input id="hiddenGroupName" type="hidden" th:value="${party.partyName}" />
 	<input id="hiddeNoteTargetDate" type="hidden" th:if="${note}" th:value="${note.noteTargetDate}" />
 
-	<!-- 노트 모달을 위한 템플릿 -->
-	<!-- <%@ include file="./commons/_note_popup.jspf"%> -->
+	<div th:replace="./fragments/_note_popup :: #common-note-popup-template"></div>
 
 	<script src="/js/datepickr.js"></script>
 	<script src="/js/editor.js"></script>
