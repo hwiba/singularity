@@ -3,6 +3,7 @@ package singularity.utility;
 import java.util.List;
 import java.util.Map;
 
+// XXX 제거할 것.
 public class JsonResult<T> {
 	private boolean success;
 	private String message;

@@ -1,7 +1,6 @@
 package singularity.controller;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
@@ -14,13 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import singularity.domain.Note;
 import singularity.domain.PComment;
-import singularity.domain.User;
 import singularity.dto.out.SessionUser;
 import singularity.exception.UnpermittedAccessPCommentException;
 import singularity.service.PCommentService;
-import singularity.utility.JSONResponseUtil;
+import singularity.utility.ResponseUtil;
 
 @Controller
 @RequestMapping("/pComments")
@@ -29,39 +26,30 @@ public class PCommentController {
 	private PCommentService pCommentService;
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
-	protected ResponseEntity<Object> create(HttpSession session, @RequestParam int pId,
-			@RequestParam int sameSenCount, @RequestParam int sameSenIndex, @RequestParam String pCommentText,
-			@RequestParam String selectedText, @RequestParam long noteId) throws IOException{
-		String userId = ((SessionUser) session.getAttribute("sessionUser")).getId();
-		if (pCommentText.equals("")) {
-			return JSONResponseUtil.getJSONResponse("잘못된 요청입니다.", HttpStatus.PRECONDITION_FAILED);
+	protected ResponseEntity<Object> create(HttpSession session, PComment pComment, @RequestParam long noteId)
+			throws IOException {
+		if (pComment.getPCommentText().equals("")) {
+			return ResponseUtil.getJSON("잘못된 요청입니다.", HttpStatus.PRECONDITION_FAILED);
 		}
-		User user = new User();
-		user.setId(userId);
-		Note note = new Note();
-		note.setNoteId(noteId);
-		PComment pComment = new PComment("", new Date(), pId, sameSenCount, sameSenIndex, pCommentText, selectedText, user, note);
-		return JSONResponseUtil.getJSONResponse(pCommentService.create(pComment), HttpStatus.CREATED);
+		pComment = pCommentService.create(pComment, noteId, (SessionUser) session.getAttribute("sessionUser"));
+		return ResponseUtil.getJSON(pComment, HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
-	protected ResponseEntity<Object> list(@RequestParam String pId, @RequestParam long noteId) {
-		return JSONResponseUtil.getJSONResponse(pCommentService.listByPAndNote(Integer.parseInt(pId.replace("pId-", "")), noteId), HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/readCountByP", method = RequestMethod.GET)
-	protected ResponseEntity<Object> readCountByP(@RequestParam long noteId) {
-		//pCommentService.countAllByNoteByP(noteId);
-		return JSONResponseUtil.getJSONResponse("{pId-1:1}", HttpStatus.OK);
+	protected ResponseEntity<Object> read(@RequestParam String pId, @RequestParam long noteId) {
+		int paragraphId = Integer.parseInt(pId.replace("pId-", ""));
+		return ResponseUtil.getJSON(pCommentService.findAllByPId(paragraphId, noteId), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{pCommentId}", method = RequestMethod.PUT)
-	protected ResponseEntity<Object> update(HttpSession session, @PathVariable String pCommentId, @RequestParam String commentText) {
+	protected ResponseEntity<Object> update(HttpSession session, @PathVariable String pCommentId,
+			@RequestParam String commentText) {
 		SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
 		try {
-			return JSONResponseUtil.getJSONResponse((PComment) pCommentService.update(pCommentId, commentText, sessionUser), HttpStatus.CREATED);
+			PComment pComment = pCommentService.update(pCommentId, commentText, sessionUser);
+			return ResponseUtil.getJSON(pComment, HttpStatus.CREATED);
 		} catch (UnpermittedAccessPCommentException e) {
-			return JSONResponseUtil.getJSONResponse("수정할 권한이 없습니다.", HttpStatus.PRECONDITION_FAILED);
+			return ResponseUtil.getJSON("수정할 권한이 없습니다.", HttpStatus.PRECONDITION_FAILED);
 		}
 	}
 
@@ -70,9 +58,16 @@ public class PCommentController {
 		SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
 		try {
 			pCommentService.delete(pCommentId, sessionUser);
-			return JSONResponseUtil.getJSONResponse("코멘트가 삭제되었습니다.", HttpStatus.NO_CONTENT);
+			return ResponseUtil.getJSON("코멘트가 삭제되었습니다.", HttpStatus.NO_CONTENT);
 		} catch (UnpermittedAccessPCommentException e) {
-			return JSONResponseUtil.getJSONResponse(e.getMessage(), HttpStatus.PRECONDITION_FAILED);
+			return ResponseUtil.getJSON(e.getMessage(), HttpStatus.PRECONDITION_FAILED);
 		}
+	}
+
+	@RequestMapping(value = "/readCountByP", method = RequestMethod.GET)
+	protected ResponseEntity<Object> readCountByP(@RequestParam long noteId) {
+		//XXX pc 카운트 쿼리 만들기
+		//pCommentService.countAllByNoteByP(noteId);
+		return ResponseUtil.getJSON("{pId-1:1}", HttpStatus.OK);
 	}
 }

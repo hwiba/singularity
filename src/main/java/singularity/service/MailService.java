@@ -45,6 +45,7 @@ public class MailService {
 		return signingKey;
 	}
 
+	// XXX 메일 내용 바꾸기
 	public void sendMailforSignUp(Confirm confirm) throws FailedSendingEmailException {
 		try {
 			MimeMessage message = javaMailSender.createMimeMessage();

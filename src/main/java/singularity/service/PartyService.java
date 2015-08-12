@@ -70,8 +70,7 @@ public class PartyService {
 		partyRepository.delete(partyId);
 	}
 
-	public void inviteMember(String sessionUserId, String userId, String partyId)
-			throws UnpermittedAccessGroupException, FailedAddingGroupMemberException {
+	public void inviteMember(String sessionUserId, String userId, String partyId) throws UnpermittedAccessGroupException, FailedAddingGroupMemberException {
 		Party party = partyRepository.findOne(partyId);
 		User user = userRepository.findOne(userId);
 		User sessionUser = userRepository.findOne(sessionUserId);
@@ -87,6 +86,7 @@ public class PartyService {
 		user.getNotification().add(new Notification(user, party, NotificationStatus.INVITE));
 	}
 
+	// XXX 파티 스테이터스를 enum으로 바꾸기
 	public void joinMember(String sessionUserId, String partyId) {
 		Party party = partyRepository.findOne(partyId);
 		User user = userRepository.findOne(sessionUserId);
@@ -141,9 +141,12 @@ public class PartyService {
 		return partyRepository.findOne(partyId);
 	}
 
+	//XXX 메서드가 비대하므로 분리할 것.
 	public void update(String sessionUserId, Party party, String rootPath, MultipartFile partyImage) {
 		Party dbParty = this.findOne(party.getPartyId());
-		if (!sessionUserId.equals(dbParty.getAdminUser().getId())) {
+		User user = userRepository.findOne(sessionUserId);
+		
+		if (!dbParty.isAdmin(user)) {
 			throw new FailedUpdatePartyException("그룹장만이 그룹설정이 가능합니다.");
 		}
 		if (userRepository.findOne(party.getAdminUser().getId()) == null) {
@@ -163,6 +166,5 @@ public class PartyService {
 				throw new FailedUpdatePartyException("잘못된 형식입니다.");
 			}
 		}
-		partyRepository.save(party);
 	}
 }

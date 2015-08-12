@@ -2,6 +2,7 @@ package singularity.domain;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -25,11 +26,12 @@ public class PComment {
 	
 	@Id
 	@GeneratedValue
-	private String pCommentId;
+	private long pCommentId;
 	
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDate;
 	
+	@Column
 	private int pId;
 	
 	@Column
@@ -46,12 +48,11 @@ public class PComment {
 	@Column(nullable=false)
 	private String selectedText;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
 	@JoinColumn(name="user_FK")
 	private User user;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="note_FK")
-	private Note note;
-	
+	public boolean isOwner(User user) {
+		return this.user.equals(user);
+	}
 }

@@ -20,11 +20,13 @@ import singularity.domain.Note;
 import singularity.domain.Party;
 import singularity.domain.User;
 import singularity.dto.out.SessionUser;
+import singularity.exception.FailedAddingGroupMemberException;
 import singularity.exception.FailedUpdatePartyException;
 import singularity.exception.GroupMemberException;
+import singularity.exception.UnpermittedAccessGroupException;
 import singularity.service.NoteService;
 import singularity.service.PartyService;
-import singularity.utility.JSONResponseUtil;
+import singularity.utility.ResponseUtil;
 import singularity.utility.NashornEngine;
 import singularity.utility.ServletRequestUtil;
 
@@ -41,20 +43,20 @@ public class PartyController {
 		return "groups";
 	}
 
-	@RequestMapping("{partyId}")
+	@RequestMapping(value="{partyId}")
 	protected String loadGroupAndNotes(@PathVariable String partyId, HttpSession session, Model model) {
-		// TODO Session이 없는데 공개 그룹일 때의 대응과 비공개 그룹일 때의 대응을 분기하기.
+		// XXX Session이 없는데 공개 그룹일 때의 대응과 비공개 그룹일 때의 대응을 분기하기. 이것은 시큐리티의 문제인가 아닌가
 		model.addAttribute("party", partyService.findOne(partyId));
 		SessionUser admin = partyService.findAdminUser(partyId);
 		model.addAttribute("admin", admin);
 		return "notes";
 	}
 
-	@RequestMapping("{partyId}/note/")
+	@RequestMapping(value="{partyId}/note/", method=RequestMethod.GET)
 	protected ResponseEntity<Object> loadNotes(@PathVariable String partyId, HttpSession session) throws Throwable {
 		String sessionUserId = ServletRequestUtil.getUserIdFromSession(session);
 		if (null == sessionUserId) {
-			return JSONResponseUtil.getJSONResponse("", HttpStatus.NOT_ACCEPTABLE);
+			return ResponseUtil.getJSON("", HttpStatus.NOT_ACCEPTABLE);
 		}
 		Party group = partyService.findOne(partyId);
 		List<Note> notes = noteService.readByGroupPage(group);
@@ -62,51 +64,55 @@ public class PartyController {
 			try {
 				note.setNoteText((String) new NashornEngine().markdownToHtml(note.getNoteText()));
 			} catch (IOException e) {
-				return JSONResponseUtil.getJSONResponse("", HttpStatus.INTERNAL_SERVER_ERROR);
+				return ResponseUtil.getJSON("", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
-		return JSONResponseUtil.getJSONResponse(notes, HttpStatus.OK);
+		return ResponseUtil.getJSON(notes, HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	protected ResponseEntity<Object> list(HttpSession session) {
 		String userId = ServletRequestUtil.getUserIdFromSession(session);
-		return JSONResponseUtil.getJSONResponse(partyService.findAllByUserId(userId), HttpStatus.OK);
+		return ResponseUtil.getJSON(partyService.findAllByUserId(userId), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	protected ResponseEntity<Object> create(@RequestParam String status, @RequestParam String partyName,
 			HttpSession session, Model model) {
 		if (partyName.length() > 15)
-			return JSONResponseUtil.getJSONResponse("그룹명은 15자 이내로 가능합니다", HttpStatus.PRECONDITION_FAILED);
+			return ResponseUtil.getJSON("그룹명은 15자 이내로 가능합니다", HttpStatus.PRECONDITION_FAILED);
 		String groupCaptainUserId = ServletRequestUtil.getUserIdFromSession(session);
 		Party party = partyService.create(partyName, groupCaptainUserId, status);
-		return JSONResponseUtil.getJSONResponse(party, HttpStatus.CREATED);
+		return ResponseUtil.getJSON(party, HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/{partyId}", method = RequestMethod.DELETE)
 	protected ResponseEntity<Object> delete(@PathVariable String partyId, HttpSession session, Model model) {
 		partyService.delete(partyId, ServletRequestUtil.getUserIdFromSession(session));
-		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
+		return ResponseUtil.getJSON("", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/members/invite", method = RequestMethod.POST)
 	protected ResponseEntity<Object> inviteGroupMember(@RequestParam String userId, @RequestParam String partyId,
 			@RequestParam String sessionUserId) {
-		partyService.inviteMember(sessionUserId, userId, partyId);
-		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
+		try {
+			partyService.inviteMember(sessionUserId, userId, partyId);
+		} catch(UnpermittedAccessGroupException | FailedAddingGroupMemberException e) {
+			return ResponseUtil.getJSON(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+		return ResponseUtil.getJSON("", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/members/accept", method = RequestMethod.POST)
 	protected ResponseEntity<Object> acceptGroupMember(@RequestParam String userId, @RequestParam String partyId) {
 		Party party = partyService.addMember(userId, partyId);
-		return JSONResponseUtil.getJSONResponse(party, HttpStatus.ACCEPTED);
+		return ResponseUtil.getJSON(party, HttpStatus.ACCEPTED);
 	}
 
 	@RequestMapping(value = "/members/join", method = RequestMethod.POST)
 	protected ResponseEntity<Object> joinGroupMember(@RequestParam String partyId, @RequestParam String sessionUserId) {
 		partyService.joinMember(sessionUserId, partyId);
-		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
+		return ResponseUtil.getJSON("", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{parytId}/members/{sessionUserId}/leave", method = RequestMethod.PUT)
@@ -114,23 +120,23 @@ public class PartyController {
 		try {
 			partyService.leaveParty(sessionUserId, parytId);
 		} catch (GroupMemberException e) {
-			return JSONResponseUtil.getJSONResponse(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+			return ResponseUtil.getJSON(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
 		}
-		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
+		return ResponseUtil.getJSON("", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/members/delete", method = RequestMethod.POST)
 	protected ResponseEntity<Object> delete(@RequestParam String sessionUserId, @RequestParam String userId,
 			@RequestParam String partyId) {
-		//TODO 삭제 실패 익셉션 처리하기.
+		//XXX 삭제 실패 익셉션 처리하기.
 		partyService.deleteMember(sessionUserId, userId, partyId);
-		return JSONResponseUtil.getJSONResponse("", HttpStatus.OK);
+		return ResponseUtil.getJSON("", HttpStatus.OK);
 	}
 
 	@RequestMapping("/members/{partyId}")
 	protected ResponseEntity<Object> listGroupMember(@PathVariable String partyId) {
 		List<User> members = partyService.readMembers(partyId);
-		return JSONResponseUtil.getJSONResponse(members, HttpStatus.OK);
+		return ResponseUtil.getJSON(members, HttpStatus.OK);
 	}
 
 	@RequestMapping("/update/form/{partyId}")

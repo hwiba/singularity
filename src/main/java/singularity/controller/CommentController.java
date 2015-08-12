@@ -19,7 +19,7 @@ import singularity.domain.Note;
 import singularity.dto.out.SessionUser;
 import singularity.exception.UnpermittedAccessGroupException;
 import singularity.service.CommentService;
-import singularity.utility.JSONResponseUtil;
+import singularity.utility.ResponseUtil;
 import singularity.utility.JsonResult;
 
 @Controller
@@ -35,28 +35,31 @@ public class CommentController {
 		Note note = new Note();
 		note.setNoteId(noteId);
 		if (commentText.equals(""))
-			return JSONResponseUtil.getJSONResponse("", HttpStatus.BAD_REQUEST);
+			return ResponseUtil.getJSON("", HttpStatus.BAD_REQUEST);
 		Comment comment = new Comment();
 		comment.setCommentText(commentText);
 		try {
-			return JSONResponseUtil.getJSONResponse(commentService.create(sessionUser, note, comment), HttpStatus.OK);
+			return ResponseUtil.getJSON(commentService.create(sessionUser, note, comment), HttpStatus.OK);
 		} catch (UnpermittedAccessGroupException e) {
-			return JSONResponseUtil.getJSONResponse("", HttpStatus.BAD_REQUEST);
+			return ResponseUtil.getJSON("", HttpStatus.BAD_REQUEST);
 		}
 	}
 
+	@ResponseBody
 	@RequestMapping("/{noteId}")
-	protected @ResponseBody JsonResult list(@PathVariable long noteId) {
-		return new JsonResult().setSuccess(true).setObject(commentService.list(noteId));
+	protected JsonResult list(@PathVariable long noteId) {
+		return new JsonResult().setSuccess(true).setObject(commentService.findAll(noteId));
 	}
 
+	@ResponseBody
 	@RequestMapping(value = "/{commentId}", method = RequestMethod.PUT)
-	protected @ResponseBody JsonResult update(@PathVariable long commentId, @RequestParam String commentText) {
+	protected JsonResult update(@PathVariable long commentId, @RequestParam String commentText) {
 		return new JsonResult().setSuccess(true).setObject(commentService.update(commentId, commentText));
 	}
 
+	@ResponseBody
 	@RequestMapping(value = "/{commentId}", method = RequestMethod.DELETE)
-	protected @ResponseBody JsonResult delete(@PathVariable long commentId) {
+	protected JsonResult delete(@PathVariable long commentId) {
 		commentService.delete(commentId);
 		return new JsonResult().setSuccess(true);
 	}

@@ -36,17 +36,14 @@ public class CommentService {
 			throw new UnpermittedAccessGroupException("권한이 없습니다. 그룹 가입을 요청하세요.");
 		}
 		comment.setCreateDate(new Date());
-		comment.setNote(note);
 		comment.setUser(user);
 		comment = commentRepository.save(comment);
-		note.setCommentCount(note.getCommentCount() + 1);
 		noteRepository.save(note);
-		return commentRepository.findAllByNote(comment.getNote());
+		return note.getComments();
 	}
 
-	public List<Comment> list(long noteId) {
-		Note note = noteRepository.findOne(noteId);
-		return commentRepository.findAllByNote(note);
+	public List<Comment> findAll(long noteId) {
+		return noteRepository.findOne(noteId).getComments(); 
 	}
 
 	public Comment update(long commentId, String commentText) {
@@ -57,8 +54,6 @@ public class CommentService {
 	}
 
 	public void delete(long commentId) {
-		Note note = noteRepository.findOne(commentRepository.findOne(commentId).getNote().getNoteId());
-		note.setCommentCount(note.getCommentCount() -1);
 		commentRepository.delete(commentId);
 	}
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import singularity.domain.Confirm;
 import singularity.domain.User;
+import singularity.dto.out.SessionUser;
 import singularity.exception.ExistedUserException;
 import singularity.exception.FailedLoginException;
 import singularity.exception.FailedSendingEmailException;
@@ -49,8 +50,9 @@ public class UserController {
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	String login(Model model, User user, HttpSession session) {
 		try {
-			session.setAttribute("sessionUser", userService.findForLogin(user));
-			model.addAttribute("user", userService.findOne(user));
+			SessionUser sessionUser = new SessionUser(userService.findForLogin(user));
+			session.setAttribute("sessionUser", sessionUser);
+			model.addAttribute("user", sessionUser);
 		} catch (FailedLoginException e) {
 			model.addAttribute("loginFailedError", e.getMessage());
 			model.addAttribute("user", user);

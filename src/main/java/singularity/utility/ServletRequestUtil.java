@@ -4,9 +4,10 @@ import javax.servlet.http.HttpSession;
 
 import singularity.dto.out.SessionUser;
 
+// XXX 제거할 것.
 public class ServletRequestUtil {
-	private ServletRequestUtil() {
-	}
+	
+	private ServletRequestUtil() {}
 	
 	public static boolean existedUserIdFromSession(HttpSession session) {
 		if (session.getAttribute("sessionUser") == null) {

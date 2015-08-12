@@ -37,7 +37,4 @@ public class Comment {
 	@JoinColumn(name="user_FK")
 	private User user;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="note_FK")
-	private Note note;
 }

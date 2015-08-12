@@ -4,7 +4,7 @@ window.addEventListener('load', function() {
 	document.title = partyName;
 	document.querySelector('#group-name').innerHTML = partyName;
 	
-	document.querySelector("#noteTargetDate").value = guinness.util.today("-");
+	document.querySelector("#noteTargetDate").value = new Date();
 	if(noteTargetDate !== "")
 		document.querySelector("#noteTargetDate").value = noteTargetDate;
 	datepickr('#calendar', {

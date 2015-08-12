@@ -38,8 +38,7 @@ public class UserService {
 		}
 		user.setCreateDate(new Date());
 		user.setStatus(UserStatus.READY);
-		userRepository.save(user);
-		return userRepository.findOne(user.getId());
+		return userRepository.save(user);
 	}
 	
 	public User signingUp(User user) {
@@ -47,18 +46,19 @@ public class UserService {
 		return userRepository.save(user);
 	}
 	
-	public SessionUser findOne(User user) {
-		return new SessionUser(userRepository.findOne(user.getId()));
+	public User findOne(String userId) {
+		return userRepository.findOne(userId);
 	}
 	
-	public SessionUser update(User user, HttpSession session) throws SessionUserMismatchException{
+	// XXX jpa 로직이 좋지 못함.
+	public User update(User user, HttpSession session) throws SessionUserMismatchException{
 		if (!checkSessionUser(session, user.getId())) {
 			throw new SessionUserMismatchException("권한이 없는 요청입니다.");
 		}
 		User dbUser = userRepository.findOne(user.getId());
 		user.setCreateDate(dbUser.getCreateDate());
 		user.setStatus(dbUser.getStatus());
-		return new SessionUser(userRepository.save(user));
+		return userRepository.save(user);
 	}
 	
 	public void delete(User user) {
@@ -66,7 +66,7 @@ public class UserService {
 		userRepository.save(user);
 	}
 	
-	public SessionUser findForLogin(User user) throws FailedLoginException {
+	public User findForLogin(User user) throws FailedLoginException {
 		User dbUser = userRepository.findOne(user.getId());
 		if (null == dbUser) {
 			throw new FailedLoginException("가입하지 않은 메일 주소입니다.");
@@ -74,6 +74,6 @@ public class UserService {
 		if (!dbUser.getPassword().equals(user.getPassword())) {
 			throw new FailedLoginException("잘못된 비밀번호입니다.");
 		}
-		return new SessionUser(dbUser);
+		return dbUser;
 	}
 }
