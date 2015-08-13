@@ -51,11 +51,11 @@ function getAlarms(){
 				var onclickFunction = "";
 				if(alarm.alarmStatus === "I") {
 					alarmContent = "<a href='#'>"+alarm.userName+"님이 \""+ alarm.groupName + "\"그룹에 초대하였습니다."+ "</a>";
-					onclickFunction = "groupAlarmSelect(this, \""+alarm.calleeId+"\", \""+alarm.groupId+"\", \""+alarm.alarmStatus+"\")";
+					onclickFunction = "groupAlarmSelect(this, \""+alarm.calleeId+"\", \""+alarm.partyId+"\", \""+alarm.alarmStatus+"\")";
 				}
 				if(alarm.alarmStatus === "J") {
 					alarmContent = "<a href='#'>"+alarm.userName+"님이 \""+ alarm.groupName + "\"그룹에 가입 요청하였습니다."+ "</a>";
-					onclickFunction = "groupAlarmSelect(this, \""+alarm.callerId+"\", \""+alarm.groupId+"\", \""+alarm.alarmStatus+"\", \""+alarm.groupName+"\")";
+					onclickFunction = "groupAlarmSelect(this, \""+alarm.callerId+"\", \""+alarm.partyId+"\", \""+alarm.alarmStatus+"\", \""+alarm.groupName+"\")";
 				}
 				alarmListContainer.appendChild(
 						guinness.createElement({
@@ -154,11 +154,11 @@ function appendGroupCard(groupId){
 	});
 }
 
-function joinGroupMember(userId, groupId, alarmStatus) {
+function joinGroupMember(userId, partyId, alarmStatus) {
 	guinness.restAjax({
 			method : "post",
-			url : "/groups/members/accept",
-			param : "userId=" + userId + "&groupId=" + groupId,
+			url : "/party/" +partyId+ "/members/accept",
+			param : "userId=" + userId,
 			 statusCode: {
 		  			202: function(res) {	// 그룹 초대 승인
 		  				if(alarmStatus === 'I'){

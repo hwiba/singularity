@@ -20,7 +20,7 @@ import singularity.enums.Openness;
 import singularity.exception.FailedAddingGroupMemberException;
 import singularity.exception.FailedDeleteGroupException;
 import singularity.exception.FailedUpdatePartyException;
-import singularity.exception.GroupMemberException;
+import singularity.exception.PartyLeaveFailedException;
 import singularity.exception.UnpermittedAccessGroupException;
 import singularity.repository.PartyRepository;
 import singularity.repository.UserRepository;
@@ -102,9 +102,13 @@ public class PartyService {
 		party.SingUpRequest(user);
 	}
 
-	public Party addMember(String userId, String partyId) {
+	public Party addMember(String userId, String partyId, String sessionUserId) {
 		User user = userRepository.findOne(userId);
+		User sessionUser = userRepository.findOne(sessionUserId);
 		Party party = partyRepository.findOne(partyId);
+		if (!party.isAdmin(sessionUser)) {
+			return null;
+		}
 		party.addUser(user);
 		return party;
 	}
@@ -113,22 +117,22 @@ public class PartyService {
 		Party party = partyRepository.findOne(partyId);
 		User user = userRepository.findOne(userId);
 		if (!party.hasUser(user)) {
-			throw new GroupMemberException("그룹멤버가 아닙니다.");
+			throw new PartyLeaveFailedException("그룹멤버가 아닙니다.");
 		}
 		if (userId.equals(party.getAdminUser().getId())) {
-			throw new GroupMemberException("그룹장은 탈퇴가 불가능합니다.");
+			throw new PartyLeaveFailedException("그룹장은 탈퇴가 불가능합니다.");
 		}
 		party.deleteUser(user);
 	}
 
-	public void deleteMember(String sessionUserId, String userId, String partyId) throws GroupMemberException {
+	public void deleteMember(String sessionUserId, String userId, String partyId) throws PartyLeaveFailedException {
 		Party party = partyRepository.findOne(partyId);
 		String adminUserId = party.getAdminUser().getId();
 		if (!adminUserId.equals(sessionUserId)) {
-			throw new GroupMemberException("그룹장만이 추방이 가능합니다.");
+			throw new PartyLeaveFailedException("그룹장만이 추방이 가능합니다.");
 		}
 		if (userId.equals(adminUserId)) {
-			throw new GroupMemberException("그룹장은 탈퇴가 불가능합니다.");
+			throw new PartyLeaveFailedException("그룹장은 탈퇴가 불가능합니다.");
 		}
 		party.deleteUser(userRepository.findOne(userId));
 	}

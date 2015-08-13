@@ -369,7 +369,6 @@ function isJoinedUser(member) {
 }
 
 function addMember() {
-	var sessionUserId = document.getElementById("sessionUserId").value;
 	var userId = document.querySelector('#addMemberForm input[name="userId"]').value;
     var alert = document.querySelector(".addMemberAlert");
     alert.style.visibility = "hidden";
@@ -382,18 +381,18 @@ function addMember() {
     }
 
     if(!bJoinedUser){
-    	var url = "/groups/members/join";
+    	var url = "/party/"+partyId +"/members/join";
     	var message = "가입 요청을 보냈습니다.";
     }
     else{
-    	var url = "/groups/members/invite";
+    	var url = "/party/"+partyId +"/members/invite";
     	var message = "초대 요청을 보냈습니다.";
     }
     
     guinness.restAjax({
         method: "post",
         url: url,
-        param: "userId=" + userId + "&partyId=" + partyId + "&sessionUserId=" + sessionUserId,
+        param: "userId=" + userId,
         statusCode: {
   			406: function(res) {	// 멤버 추가 실패
   				alert.style.visibility = "visible";
@@ -423,7 +422,7 @@ function addMember() {
 function readMember(groupId) {
     guinness.restAjax({
         method: "get",
-        url: "/groups/members/" + groupId,
+        url: "/party/members/" + groupId,
         statusCode: {
   			200: function(res) {	// 멤버 추가 실패
   				var member = JSON.parse(res);

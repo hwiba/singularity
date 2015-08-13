@@ -24,7 +24,7 @@ window.addEventListener("load", function() {
 			var sessionUserId = document.querySelector("#sessionUserId").value;
 			guinness.restAjax({
 				method : "put",
-				url : "/groups/"+partyId+"/members/"+sessionUserId+"/leave",
+				url : "/party/"+partyId+"/members/"+sessionUserId+"/leave",
 				statusCode : {
 					200 : function(res) {
 						window.location.href = "/";
@@ -39,7 +39,7 @@ window.addEventListener("load", function() {
 	
 	guinness.restAjax({
 		method : "get",
-		url : "/groups/"+partyId+"/note/",
+		url : "/party/"+partyId+"/note/",
 		statusCode : {
 			200 : function (res) {
 				var json = JSON.parse(res);

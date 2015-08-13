@@ -58,7 +58,7 @@ public class UserController {
 			model.addAttribute("user", user);
 			return "login";
 		}
-		return "group";
+		return "party";
 	}
 	
 	@RequestMapping("/logout")
@@ -94,7 +94,7 @@ public class UserController {
 	@RequestMapping(value = "/loginForm", method = RequestMethod.GET)
 	String loginForm(Model model, HttpSession session) {
 		if (this.sessionedUser(session)) {
-			return "group";
+			return "party";
 		}
 		model.addAttribute("user", new User());
 		return "login";
@@ -103,7 +103,7 @@ public class UserController {
 	@RequestMapping(value = "/joinForm", method = RequestMethod.GET)
 	String joinForm(Model model, HttpSession session) {
 		if (this.sessionedUser(session)) {
-			return "group";
+			return "party";
 		}
 		model.addAttribute("user", new User());
 		return "join";
