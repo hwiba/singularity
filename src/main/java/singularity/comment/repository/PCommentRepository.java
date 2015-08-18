@@ -1,13 +1,11 @@
 package singularity.comment.repository;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
+import singularity.comment.domain.PComment;
 
-public interface PCommentRepository extends JpaRepository<PComment, String>{
-	
-	List<PComment> findAllByUser(User user);
-	
-	//@Query("select pId, count(1) from pcomment, user where pcomment.user_FK = user.id AND noteId = ? GROUP BY pId")
-	//List<PCommentCountByP> countAllByNoteByP(long noteId);
+/**
+ * Created by scala on 2015. 8. 19..
+ */
+public interface PCommentRepository extends JpaRepository<PComment, Long> {
+
 }

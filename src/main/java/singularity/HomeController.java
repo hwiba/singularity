@@ -1,12 +1,12 @@
-package singularity.app;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
+package singularity;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import singularity.user.controller.UserController;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 @Controller
 public class HomeController {

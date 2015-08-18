@@ -1,38 +1,108 @@
 package singularity.party.domain;
 
-
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import singularity.user.domain.User;
 
-public interface Party {
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+import java.util.Date;
+import java.util.List;
 
-	void changeName(String name);
+@Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Party {
 	
-	void changeBackgroundImage(String backgroundImage);
+	private enum Openness {
+		PUBLIC, PARTY, PRIVATE, CLOSE
+	}
 
-	void addMember(User user);
+    @Id
+    @GeneratedValue
+	private Long id;
 
-	void deleteMember(User user);
+    @Temporal(TemporalType.TIMESTAMP)
+	private Date createDate;
 
-	void hasMember(User user);
+    @Size(min = 1, max = 50)
+    @Column(name = "name", length = 25, nullable = false)
+	private String name;
 
-	boolean isAdmin(User user);
+    @Column(name = "image", length = 200, nullable = true)
+	private String backgroundImage;
 
-	void changeAdmin(User user);
+    @ManyToOne(fetch = FetchType.EAGER)
+	private User admin;
 
-	void classSetPublic();
+    @ManyToMany(fetch = FetchType.EAGER)
+	private List<User> members;
+
+    @Column(name = "openness", nullable = false)
+	private Openness openness;
+
+	public void changeName(String name) {
+		this.name = name;
+	}
 	
-	void classSetParty();
-	
-	void classSetPrivate();
-	
-	void classSetClose();
+	public void changeBackgroundImage(String backgroundImage) {
+		this.backgroundImage = backgroundImage;
+	}
 
-	boolean isPrivateClass();
+	public void addMember(User user) {
+		this.members.add(user);
+		
+	}
 	
-	boolean isPartyClass();
+	public void deleteMember(User user) {
+		this.members.remove(user);
+		
+	}
 
-	boolean isPublicClass();
-	
-	boolean isCloseClass();
+	public void hasMember(User user) {
+		this.members.contains(user);
+	}
+
+	public boolean isAdmin(User user) {
+		return this.admin.equals(user);
+	}
+
+	public void changeAdmin(User user) {
+		this.admin = user;
+	}
+
+	public boolean isPrivateClass() {
+		return this.openness.equals(Openness.PRIVATE);
+	}
+
+	public boolean isPartyClass() {
+		return this.openness.equals(Openness.PARTY);
+	}
+
+	public boolean isPublicClass() {
+		return this.openness.equals(Openness.PUBLIC);
+	}
+
+	public boolean isCloseClass() {
+		return this.openness.equals(Openness.CLOSE);
+	}
+
+	public void classSetPublic() {
+		this.openness = Openness.PUBLIC;
+	}
+
+	public void classSetParty() {
+		this.openness = Openness.PARTY;
+	}
+
+	public void classSetPrivate() {
+		this.openness = Openness.PRIVATE;
+	}
+
+	public void classSetClose() {
+		this.openness = Openness.CLOSE;
+	}
 
 }

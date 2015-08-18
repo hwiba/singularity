@@ -13,9 +13,9 @@
 		</encoder>
 	</appender>
 	
-	<logger name="stag" level="DEBUG" />
+	<logger name="singularity" level="WARN" />
 	
-	<root level="DEBUG">
+	<root level="WARN">
 		<appender-ref ref="STDOUT" />
 	</root>
 </configuration>

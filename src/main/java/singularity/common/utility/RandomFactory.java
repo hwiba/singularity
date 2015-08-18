@@ -3,8 +3,7 @@ package singularity.common.utility;
 import java.util.Random;
 
 public class RandomFactory {
-	private RandomFactory() {
-	}
+	private RandomFactory() {}
 
 	public static String getRandomId(int lengthOfReturnString) {
 		String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

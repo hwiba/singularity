@@ -1,10 +1,10 @@
-package singularity.app;
+package singularity;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
-@Import(AppConfig.class)
+@Import(BootConfig.class)
 @SpringBootApplication
 public class SingularityApplication {
 

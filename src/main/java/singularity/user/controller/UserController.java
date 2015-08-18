@@ -12,11 +12,9 @@ import singularity.exception.FailedLoginException;
 import singularity.exception.FailedSendingEmailException;
 import singularity.exception.SessionUserMismatchException;
 import singularity.user.domain.Confirm;
-import singularity.user.domain.ConfirmDefault;
-import singularity.user.domain.UserDefault;
+import singularity.user.domain.User;
 import singularity.user.dto.SessionUser;
 import singularity.user.service.ConfirmService;
-import singularity.user.domain.User;
 import singularity.user.service.UserService;
 
 import javax.annotation.Resource;
@@ -37,11 +35,9 @@ public class UserController {
 			return "join";
 		}
 		try {
-            Confirm confirm = new ConfirmDefault();
-
-            userService.create(user);
-
-			confirmService.sendMailforSignUp(confirmService.create());
+            // TODO service로 내리기.
+            User dbUser = userService.create(user);
+			confirmService.sendMailforSignUp(confirmService.create(dbUser));
 		} catch (ExistedUserException | FailedSendingEmailException e) {
 			model.addAttribute("existedUserError", e.getMessage());
 			return "join";
@@ -65,7 +61,7 @@ public class UserController {
 	}
 	
 	@RequestMapping("/logout")
-	protected String logout(HttpSession session) {
+    String logout(HttpSession session) {
 		session.invalidate();
 		return "redirect:/";
 	}
@@ -73,7 +69,7 @@ public class UserController {
 	@RequestMapping(value="/confirm/{signingKey}", method=RequestMethod.GET)
 	String confirm(Model model, @PathVariable String signingKey, HttpSession session) {
         // TODO 서비스 레이어로 내리기
-		Confirm confirm = confirmService.findOneBySigningKey(signingKey);
+		Confirm confirm = confirmService.findOneByIdentificationKey(signingKey);
         if (null != confirm) {
 			userService.signingUp(confirm.getUser());
 		}
@@ -100,7 +96,7 @@ public class UserController {
 		if (this.sessionedUser(session)) {
 			return "party";
 		}
-		model.addAttribute("user", new UserDefault());
+		model.addAttribute("user", new User());
 		return "login";
 	}
 
@@ -109,11 +105,11 @@ public class UserController {
 		if (this.sessionedUser(session)) {
 			return "party";
 		}
-		model.addAttribute("user", new UserDefault());
+		model.addAttribute("user", new User());
 		return "join";
 	}
 	
-	boolean sessionedUser(HttpSession session) {
+	private boolean sessionedUser(HttpSession session) {
 		if (null != userService.getSessionUser(session)) {
 			return true;
 		}

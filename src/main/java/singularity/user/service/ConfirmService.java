@@ -1,23 +1,20 @@
 package singularity.user.service;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
-
-import javax.annotation.Resource;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-
+import singularity.common.utility.RandomFactory;
 import singularity.exception.FailedSendingEmailException;
 import singularity.user.domain.Confirm;
-import singularity.user.domain.ConfirmDefault;
 import singularity.user.domain.User;
 import singularity.user.repository.ConfirmRepository;
-import singularity.common.utility.RandomFactory;
+
+import javax.annotation.Resource;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
+import java.util.Date;
 
 @Service
 public class ConfirmService {
@@ -29,14 +26,14 @@ public class ConfirmService {
 
     private String createIdentificationKey() {
         String identificationKey = RandomFactory.getRandomId(10);
-        if(null != this.findOneBySigningKey(identificationKey)) {
+        if(null != this.findOneByIdentificationKey(identificationKey)) {
             return createIdentificationKey();
         }
         return identificationKey;
     }
 
 	public Confirm create(User user) {
-        Confirm confirm = new ConfirmDefault(new Date(), user, this.createIdentificationKey());
+        Confirm confirm = new Confirm(new Date(), user, this.createIdentificationKey());
 		return confirmRepository.save(confirm);
 	}
 	
@@ -44,8 +41,8 @@ public class ConfirmService {
 		return confirmRepository.findOne(confirmId);
 	}
 	
-	public Confirm findOneBySigningKey(String signingKey) {
-		return confirmRepository.findOneBySigningKey(signingKey);
+	public Confirm findOneByIdentificationKey(String signingKey) {
+		return confirmRepository.findOneByIdentificationKey(signingKey);
 	}
 	
 	public void sendMailforSignUp(Confirm confirm) throws FailedSendingEmailException {
