@@ -240,14 +240,14 @@ guinness.util.alert.choose = function(c) {
 	c();
 };
 
-guinness.confirmLeave = function(groupId, groupName, location) {
-	groupName = (groupName.replace(/</g, "&lt;")).replace(/>/g, "&gt;");
+guinness.confirmLeave = function(partyId, partyName, location) {
+	partyName = (partyName.replace(/</g, "&lt;")).replace(/>/g, "&gt;");
 	var message = "그룹을 탈퇴하시겠습니까?";
-	guinness.util.alert(groupName + " 탈퇴 확인", message,
+	guinness.util.alert(partyName + " 탈퇴 확인", message,
 		function() {
 			document.body.style.overflow = "auto";
 			var sessionUserId = document.getElementById("sessionUserId").value;
-			guinness.leaveGroup(sessionUserId, groupId, location);
+			guinness.leaveGroup(sessionUserId, partyId, location);
 		},
 		function() {
 			document.body.style.overflow = "auto";
@@ -256,8 +256,8 @@ guinness.confirmLeave = function(groupId, groupName, location) {
 	);
 }
 
-guinness.leaveGroup = function(sessionUserId, groupId, location) {
-	var param = "sessionUserId="+sessionUserId+"&groupId="+groupId;
+guinness.leaveGroup = function(sessionUserId, partyId, location) {
+	var param = "sessionUserId="+sessionUserId+"&partyId="+partyId;
 	guinness.restAjax({
 		method:"post",
 		url:"/groups/members/leave",
@@ -267,7 +267,7 @@ guinness.leaveGroup = function(sessionUserId, groupId, location) {
 				if(location !== undefined){
 					window.location.href = "/groups/form";
 				}
-				var groupCard = document.querySelector('#' + groupId);
+				var groupCard = document.querySelector('#' + partyId);
 				if(groupCard === null) { 
 					window.location.href = "/";
 					return;
@@ -287,7 +287,7 @@ guinness.confirmDeleteUser = function(userId, userName) {
 		function() {
 			document.body.style.overflow = "auto";
 			var sessionUserId = document.getElementById("sessionUserId").value;
-			guinness.deleteMember(sessionUserId, userId, groupId);
+			guinness.deleteMember(sessionUserId, userId, partyId);
 		},
 		function() {
 			document.body.style.overflow = "auto";
@@ -296,8 +296,8 @@ guinness.confirmDeleteUser = function(userId, userName) {
 	);
 }
 
-guinness.deleteMember = function(sessionUserId, userId, groupId) {
-	var param = "sessionUserId="+sessionUserId+"&userId="+userId+"&groupId="+groupId;
+guinness.deleteMember = function(sessionUserId, userId, partyId) {
+	var param = "sessionUserId="+sessionUserId+"&userId="+userId+"&partyId="+partyId;
 	guinness.restAjax({
 		method:"post",
 		url:"/groups/members/delete",

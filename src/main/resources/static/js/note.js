@@ -1,39 +1,15 @@
-function appendMarkList(json) {
-    if (json === null)
-        return;
-    var attentionListElement = document.querySelector("#attention-list");
-    var questionListElement = document.querySelector("#question-list");
-    var attentionList;
-    var questionList;
-    var newEl = undefined;
-    for (var i = 0; i < json.length; i++) {
-        attentionList = json[i].attentionList.replace("[", "").replace("]", "").replace(", ", ",").split(",");
-        for (var j = 0; j < attentionList.length; j++) {
-        	if(attentionList[j] === "")
-        		continue;
-            newEl = document.createElement("li");
-            newEl.setAttribute("class", "mark-list");
-            newEl.setAttribute("value", json[i].note.noteId);
-            newEl.innerHTML = attentionList[j];
-            attentionListElement.appendChild(newEl);
-        }
-        questionList = json[i].questionList.replace("[", "").replace("]", "").replace(", ", ",").split(",");
-        for (var j = 0; j < questionList.length; j++) {
-        	if(questionList[j] === "")
-        		continue;
-            newEl = document.createElement("li");
-            newEl.setAttribute("class", "mark-list");
-            newEl.setAttribute("value", json[i].note.noteId);
-            newEl.innerHTML = questionList[j];
-            questionListElement.appendChild(newEl);
-        }
-    }
+var timestampNomalize = function (timestamp) {
+	var date = new Date(timestamp);
+	return date.getFullYear()+"-"+date.getMonth()+"-"+date.getDay();
 }
 
 function appendNoteList(json) {
-    if (json === null)
+    if (json === null) {
         return;
-    if (json.length !== 0) {
+    }
+    
+    var length = json.length;
+    if (length !== 0) {
     	var el = document.querySelector("#empty-message");
     	el.style.visibility = "hidden";
     }
@@ -41,12 +17,10 @@ function appendNoteList(json) {
     var obj = undefined;
     var out = "";
 
-    var length = json.length;
+    
     for (var i = 0; i < length; i++) {
         obj = json[i];
-        var createDate = obj.note.noteTargetDate;
-        createDate = createDate.split(" ");
-        createDate = createDate[0];
+        var createDate = timestampNomalize(obj.noteTargetDate);
         el = document.querySelector("#day-" + createDate); // #day-2015-05-21
 
         if (el == undefined) {
@@ -60,46 +34,38 @@ function appendNoteList(json) {
             document.querySelector('#note-list-container').appendChild(el);
         }
 
-        var attention = obj.attentionList.replace("[", "").replace("]", "").replace(", ", ",").split(",");
-        var question = obj.questionList.replace("[", "").replace("]", "").replace(", ", ",").split(",");
-
 		newEl = document.createElement("a");
-		newEl.setAttribute("id", obj.note.noteId);
+		newEl.setAttribute("id", obj.noteId);
 		newEl.setAttribute("href", "#");
         newEl.setAttribute("class", "preview-note");
-        newEl.setAttribute("data-id", obj.user.userId);
-        if(onOffMemberList[obj.user.userId] === "off" && onOffMemberList[obj.user.userId] !== undefined) {
+        newEl.setAttribute("data-id", obj.user.id);
+        if(onOffMemberList[obj.user.id] === "off" && onOffMemberList[obj.user.id] !== undefined) {
             newEl.setAttribute("style", "display: none");
         }
 		out = "";
 		out += "<li><img class='avatar' class='avatar' src='/img/profile/"
-				+ obj.user.userImage + "'>";
+				+ obj.user.image + "'>";
 
         var userId = document.getElementById("sessionUserId").value;
-        if (userId === obj.user.userId) {
+        if (userId === obj.user.id) {
             out += "<div class='note-util'><div><div><span>수정</span><i class='fa fa-pencil'></i></div><span>삭제</span><i class='fa fa-trash'></i></div></div>";
         }
         out += "<div class='content-container'>";
-        out += "<div><span class='userName'>" + obj.user.userName
-            + "</span><span class='userId'>" + obj.user.userId + "</span></div>";
-        out += "<div><span class='note-date'>" + (obj.note.noteTargetDate).substring(0,19)
+        out += "<div><span class='userName'>" + obj.user.name
+            + "</span><span class='userId'>" + obj.user.id + "</span></div>";
+        out += "<div><span class='note-date'>" + timestampNomalize(obj.noteTargetDate).substring(0,19)
             + "</span></div>";
-        if (attention.length) {
-            out += "<span class='attention'>" + attention + "</span><br />";
-        }
-        if (question.length) {
-            out += "<span class='question'>" + question + "</span><br />";
-        }
-        out += "<div class='comment-div'><i class='fa fa-comments'></i><span>"+obj.note.commentCount+"</span></div></div></li>";
+        out += "<p>"+ obj.noteText +"</p>"
+        out += "<div class='comment-div'><i class='fa fa-comments'></i><span>"+obj.commentCount+"</span></div></div></li>";
         
         newEl.innerHTML = out;
         el.appendChild(newEl);
         
-        if(obj.note.commentCount === 0){
-        	document.getElementById(obj.note.noteId).querySelector(".comment-div").style.display="none";
+        if(obj.commentCount === 0){
+        	document.getElementById(obj.noteId).querySelector(".comment-div").style.display="none";
         }
         
-        document.getElementById(obj.note.noteId).addEventListener(
+        document.getElementById(obj.noteId).addEventListener(
             "click",
             function (e) {
                 if (e.target.className === "fa fa-trash") {
@@ -160,8 +126,8 @@ function readNoteContents(noteId) {
 				var result = JSON.parse(res);
 				showNoteModal(result);
 	            document.body.scrollTop = currScrollTop;
-	            pComment.createPopupPCommentBtn();
-	        	setPopupPCommentBtn();
+	           // pComment.createPopupPCommentBtn();
+	        	// setPopupPCommentBtn();
   			}
         }
 	});
@@ -193,12 +159,12 @@ function showNoteModal(obj) {
     var noteContent = document.querySelector('.note-content');
     var viewContent = document.createElement('DIV');
     viewContent.innerHTML = obj.noteText;
-    pComment.countByP(obj.noteId);
+    // pComment.countByP(obj.noteId);
     
     document.querySelector('.note-content').innerHTML = viewContent.innerHTML;
-    pComment.refresh();
+    // pComment.refresh();
     viewContent.remove();
-    document.querySelector('.hiddenUserId').value = obj.user.userId;
+    document.querySelector('.hiddenUserId').value = obj.user.id;
     document.querySelector('.hiddenNoteId').value = obj.noteId;
     document.querySelector('#commentForm').addEventListener('submit',
         function (e) {
@@ -210,15 +176,17 @@ function showNoteModal(obj) {
 
 function readComments(obj) {
     var noteId = obj.noteId;
-    guinness.ajax({
+    guinness.restAjax({
         method: "get",
         url: "/comments/" + noteId,
-        success: function (req) {
-            var result = JSON.parse(req.responseText);
-            if (result.success !== true)
-                return;
-            appendComment(result.mapValues, noteId);
-            guinness.util.setModalPosition();
+        statusCode: {
+        	200 : function (res) {
+        		var result = JSON.parse(res);
+        		if (result.length > 0) {
+        			appendComment(result, noteId);
+        		}
+        		guinness.util.setModalPosition();
+        	}
         }
     });
 }
@@ -239,15 +207,15 @@ function appendComment(json, noteId) {
         commentList.appendChild(commentTemplate);
         var commentEl = commentList.querySelector('li:last-child');
         commentEl.setAttribute('id', 'cmt-' + obj.commentId);
-        commentEl.querySelector('.comment-user').innerHTML = obj.userName;
+        commentEl.querySelector('.comment-user').innerHTML = obj.user.name;
         commentEl.querySelector('.comment-date').innerHTML = guinness.util
             .koreaDate(obj.commentCreateDate);
         commentEl.querySelector('.comment-date').id = obj.commentCreateDate;
         commentEl.querySelector('.comment').innerHTML = (obj.commentText).replace(/\n/g, '\n<br/>');
         commentEl.querySelector('.avatar').setAttribute("src",
-            "/img/profile/" + obj.userImage);
-        if (userId === obj.userId) {
-            commentEl.querySelector('.comment-util').innerHTML = "<div class='default-utils'><a href='#' onclick='showEditInputBox("+obj.commentId+")'>수정</a><a href='#' onclick='deleteComment("+obj.commentId+", "+noteId+")'>삭제</a></div>"
+            "/img/profile/" + obj.user.image);
+        if (userId === obj.user.id) {
+            commentEl.querySelector('.comment-util').innerHTML = "<div class='default-utils'><a href='#' onclick='showEditInputBox("+obj.commentId+")'>수정</a><a href='#' onclick='deleteComment("+obj.commentId+", "+obj.note.noteId+")'>삭제</a></div>"
         }
     }
 
@@ -260,39 +228,43 @@ function appendComment(json, noteId) {
 }
 
 function updateComment(commentId, commentText) {
-    guinness
-        .ajax({
-            method: "put",
-            url: "/comments/" + commentId,
-            param: "commentText=" + commentText,
-            success: function (req) {
-                var result = JSON.parse(req.responseText);
-                if (result.success !== true)
+    guinness.restAjax({
+    	method: "put",
+    	url: "/comments/" + commentId,
+    	param: "commentText=" + commentText,
+    	statusCode : {
+    		200 : function (res) {
+    			var result = JSON.parse(res);
+                if (result.length > 0) {
                     return;
-                var json = result.object;
+                }
                 var el = document.querySelector("#cmt-" + commentId);
-                el.querySelector('.comment').innerHTML = json.commentText.replace(/\n/g, '<br/>');
-                el.querySelector('.comment-date').innerHTML = json.commentCreateDate;
-                el.querySelector('.comment-date').id = Number(new Date(json.commentCreateDate));
+                el.querySelector('.comment').innerHTML = result.commentText.replace(/\n/g, '<br/>');
+                el.querySelector('.comment-date').innerHTML = result.commentCreateDate;
+                el.querySelector('.comment-date').id = Number(new Date(result.commentCreateDate));
                 el.querySelector('.comment').setAttribute(
                     'contentEditable', false);
                 el.querySelectorAll('.comment-update').remove();
                 el.querySelector('.default-utils').show();
             }
-        });
+        }
+    });
 }
 
 function deleteComment(commentId, noteId) {
     guinness.ajax({
         method: "delete",
         url: "/comments/" + commentId,
-        success: function (req) {
-            if (JSON.parse(req.responseText).success === true) {
-            	document.querySelector('#cmt-' + commentId).remove();
-            	var noteEl = document.getElementById(noteId);
-            	if(noteEl === null)
-            		return;
-            }
+        200: function (res) {
+        	var result = JSON.parse(res);
+        	if (result.length == 0) {
+        		return;
+        	}
+        	document.querySelector('#cmt-' + commentId).remove();
+        	var noteEl = document.getElementById(noteId);
+        	if(noteEl === null) {
+        		return;
+        	}
         }
     });
 }
@@ -356,20 +328,22 @@ function createComment(obj) {
     if (commentText !== "") {
         var userId = document.getElementById("sessionUserId").value;
         var noteId = obj.noteId;
-        guinness.ajax({
+        guinness.restAjax({
             method: "post",
             url: "/comments/",
             param: "commentText=" + commentText + "&noteId=" + noteId,
-            success: function (req) {
-                var result = JSON.parse(req.responseText);
-                if (result.success !== true) {
-                    document.querySelector('#commentText').value = result.message;
-                    return;
-                }
-                appendComment(result.mapValues, noteId);
-                document.querySelector('#commentText').value = "";
-                if(document.getElementById(noteId) !== null){
-                }
+            statusCode : {
+            	200 : function (res) {
+            		var result = JSON.parse(res);
+            		appendComment(result, noteId);
+            		document.querySelector('#commentText').value = "";
+            		if(document.getElementById(noteId) !== null){
+            			//TODO
+            		}
+            	},
+            	400 : function (res) {
+            		//TODO
+            	}
             }
         });
     }
@@ -377,10 +351,9 @@ function createComment(obj) {
 
 function isJoinedUser(member) {
     var sessionUserId = document.getElementById("sessionUserId").value;
-
     var length = member.length;
     for (var i = 0; i < length; i++) {
-        if (member[i].userId === sessionUserId) {
+        if (member[i].id === sessionUserId) {
             return true;
         }
     }
@@ -396,7 +369,6 @@ function isJoinedUser(member) {
 }
 
 function addMember() {
-	var sessionUserId = document.getElementById("sessionUserId").value;
 	var userId = document.querySelector('#addMemberForm input[name="userId"]').value;
     var alert = document.querySelector(".addMemberAlert");
     alert.style.visibility = "hidden";
@@ -409,20 +381,20 @@ function addMember() {
     }
 
     if(!bJoinedUser){
-    	var url = "/groups/members/join";
+    	var url = "/party/"+partyId +"/members/join";
     	var message = "가입 요청을 보냈습니다.";
     }
     else{
-    	var url = "/groups/members/invite";
+    	var url = "/party/"+partyId +"/members/invite";
     	var message = "초대 요청을 보냈습니다.";
     }
     
     guinness.restAjax({
         method: "post",
         url: url,
-        param: "userId=" + userId + "&groupId=" + groupId + "&sessionUserId=" + sessionUserId,
+        param: "userId=" + userId,
         statusCode: {
-  			406: function(res) {	// 멤버 추가 실패 
+  			406: function(res) {	// 멤버 추가 실패
   				alert.style.visibility = "visible";
                 alert.style.color = "#ff5a5a";
                 alert.style.fontSize = "11px";
@@ -432,7 +404,7 @@ function addMember() {
                 }
                 return;
   			}, 
-  			200: function(res) {	// 멤버 추가 성공  
+  			200: function(res) {	// 멤버 추가 성공
   				alert.style.visibility = "visible";
                 alert.style.color = "#86E57F";
                 alert.style.fontSize = "11px";
@@ -450,9 +422,9 @@ function addMember() {
 function readMember(groupId) {
     guinness.restAjax({
         method: "get",
-        url: "/groups/members/" + groupId,
+        url: "/party/members/" + groupId,
         statusCode: {
-  			200: function(res) {	// 멤버 추가 실패 
+  			200: function(res) {	// 멤버 추가 실패
   				var member = JSON.parse(res);
                 bJoinedUser = isJoinedUser(member);
                 appendMembers(member);
@@ -462,34 +434,36 @@ function readMember(groupId) {
 }
 
 var onOffMemberList = [];
+
 function appendMember(obj) {
 	var userId = document.getElementById("sessionUserId").value;
 	var memberTemplate = memberTemplate = document.querySelector("#member-template").content;
 	var newMember = document.importNode(memberTemplate, true);
+	var groupCaptainUserId = document.querySelector("#adminId").value;
 	if(userId === groupCaptainUserId){
 		newMember.querySelector(".member-delete").style.visibility = "visible";
 	}
-	newMember.querySelector(".member-info").setAttribute("id", obj.userId);
-	newMember.querySelector(".memberChk").value = obj.userId;
-	newMember.querySelector(".member-name").innerHTML = obj.userName;
-	newMember.querySelector(".member-id").innerHTML = obj.userId;
-	newMember.querySelector(".fa-eye").setAttribute("data-id", obj.userId);
+	newMember.querySelector(".member-info").setAttribute("id", obj.id);
+	newMember.querySelector(".memberChk").value = obj.id;
+	newMember.querySelector(".member-name").innerHTML = obj.name;
+	newMember.querySelector(".member-id").innerHTML = obj.id;
+	newMember.querySelector(".fa-eye").setAttribute("data-id", obj.id);
     newMember.querySelector(".fa-eye").addEventListener("click", 
         function(e) {
             if(e.target.className === "fa fa-eye") {
                 e.target.setAttribute("class", "fa fa-eye-slash");
-                onOffMemberNotes("off", obj.userId);
-                onOffMemberList[obj.userId] = "off";
+                onOffMemberNotes("off", obj.id);
+                onOffMemberList[obj.id] = "off";
             } else {
                 e.target.setAttribute("class", "fa fa-eye");
-                onOffMemberNotes("on", obj.userId);
-                onOffMemberList[obj.userId] = "on";
+                onOffMemberNotes("on", obj.id);
+                onOffMemberList[obj.id] = "on";
             }
         }, false);
     newMember.querySelector(".fa-times").addEventListener("click",
 			function(e) {
 				e.preventDefault();
-				guinness.confirmDeleteUser(obj.userId, obj.userName);
+				guinness.confirmDeleteUser(obj.id, obj.name);
 			}, false);
 	document.querySelector("#group-member").appendChild(newMember);
 }
@@ -534,7 +508,7 @@ function readNoteList(noteTargetDate) {
 		 method: "get",
 		 url: '/notes/reload/?groupId=' + groupId + '&noteTargetDate=' + noteTargetDate,
 	        statusCode: {
-	  			200: function(res) {	// 멤버 추가 실패 
+	  			200: function(res) {	// 멤버 추가 실패
 	  				var result = JSON.parse(res);
 	  				if (result.length !== 0) {
 	  					deleteNoteList();
@@ -570,9 +544,9 @@ var reloadWithoutDeleteNoteList = function (noteTargetDate) {
     var objs = document.querySelectorAll(".memberChk");
     guinness.restAjax({
 		 method: "get",
-		 url: '/notes/reload/?groupId=' + groupId + '&noteTargetDate=' + noteTargetDate,
+		 url: '/notes/reload/?groupId=' + partyId + '&noteTargetDate=' + noteTargetDate,
 	        statusCode: {
-	  			200: function(res) {	// 멤버 추가 실패 
+	  			200: function(res) {	// 멤버 추가 실패
 	  				var result = JSON.parse(res);
 	  				if (result.length !== 0) {
 	  	                appendNoteList(result);
