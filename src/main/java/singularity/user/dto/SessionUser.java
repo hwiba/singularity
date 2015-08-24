@@ -21,4 +21,7 @@ public class SessionUser {
 		this.profileImage = user.getProfileImage();
 	}
 
+	public boolean isEqualId(User user) {
+		return user.getId() == this.id;
+	}
 }

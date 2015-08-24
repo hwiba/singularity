@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -22,6 +20,7 @@ import singularity.notification.repository.NotificationRepository;
 import singularity.party.domain.Party;
 import singularity.party.repository.PartyRepository;
 import singularity.user.domain.User;
+import singularity.user.dto.SessionUser;
 import singularity.user.repository.UserRepository;
 
 @Service
@@ -59,12 +58,12 @@ public class PartyService {
 		party.close();
 	}
 
-	public void inviteMember(Long sessionUserId, Long userId, Long partyId)
+	public void inviteMember(SessionUser sessionUser, Long userId, Long partyId)
 			throws UnpermittedAccessGroupException, FailedAddingGroupMemberException {
 		Party party = partyRepository.findOne(partyId);
 		User user = userRepository.findOne(userId);
-		User sessionUser = userRepository.findOne(sessionUserId);
-		if (!party.hasMember(sessionUser)) {
+		User loginedUser = userRepository.findOne(sessionUser.getId());
+		if (!party.hasMember(loginedUser)) {
 			throw new UnpermittedAccessGroupException("회원을 초대할 권한이 없습니다!");
 		}
 		if (null == user) {
@@ -74,13 +73,13 @@ public class PartyService {
 			throw new FailedAddingGroupMemberException("이미 가입되어 있습니다!");
 		}
 		notificationRepository
-				.save(new Notification(new Date(), sessionUser, user, party, Notification.Pattern.INVITE));
+				.save(new Notification(new Date(), loginedUser, user, party, Notification.Pattern.INVITE));
 	}
 
 	// TODO 메서드가 비대함. 간략화 할 것.
-	public void joinMember(Long sessionUserId, Long partyId) {
+	public void joinMember(SessionUser sessionUser, Long partyId) {
 		Party party = partyRepository.findOne(partyId);
-		User writer = userRepository.findOne(sessionUserId);
+		User writer = userRepository.findOne(sessionUser.getId());
 		if (party.isClose()) {
 			throw new UnpermittedAccessGroupException();
 		}
@@ -94,8 +93,11 @@ public class PartyService {
 		notificationRepository.save(new Notification(new Date(), writer, party.getAdmin(), party, Notification.Pattern.REQUEST));
 	}
 
-	public void addMember(Long userId, Long partyId) {
+	public void addMember(Long userId, Long partyId, SessionUser sessionUser) {
 		User user = userRepository.findOne(userId);
+		if (!sessionUser.isEqualId(user)) {
+			return;
+		}
 		Party party = partyRepository.findOne(partyId);
 		party.addMember(user);
 	}
@@ -112,13 +114,13 @@ public class PartyService {
 		party.deleteMember(user);
 	}
 
-	public void deleteMember(Long sessionUserId, Long userId, Long partyId) throws PartyLeaveFailedException {
+	public void deleteMember(SessionUser sessionUser, Long userId, Long partyId) throws PartyLeaveFailedException {
 		Party party = partyRepository.findOne(partyId);
-		Long adminUserId = party.getAdmin().getId();
-		if (!adminUserId.equals(sessionUserId)) {
+		User adminUser = party.getAdmin();
+		if (!sessionUser.isEqualId(adminUser)) {
 			throw new PartyLeaveFailedException("그룹장만이 추방이 가능합니다.");
 		}
-		if (userId.equals(adminUserId)) {
+		if (adminUser.getId() == userId) {
 			throw new PartyLeaveFailedException("그룹장은 탈퇴가 불가능합니다.");
 		}
 		party.deleteMember(userRepository.findOne(userId));
@@ -133,17 +135,17 @@ public class PartyService {
 	}
 
 	// TODO 메서드가 비대하므로 분리할 것.
-	public void update(Long sessionUserId, Party party, String rootPath, MultipartFile partyImage) {
+	public void update(SessionUser sessionUser, Party party, String rootPath, MultipartFile partyImage) {
 		Party dbParty = this.findOne(party.getId());
-		User user = userRepository.findOne(sessionUserId);
+		User user = userRepository.findOne(sessionUser.getId());
 
 		if (!dbParty.isAdmin(user)) {
 			throw new FailedUpdatePartyException("그룹장만이 그룹설정이 가능합니다.");
 		}
-		if (userRepository.findOne(party.getAdmin().getId()) == null) {
+		if (null == userRepository.findOne(party.getAdmin().getId())) {
 			throw new FailedUpdatePartyException("존재하지 않는 사용자입니다.");
 		}
-		if (!dbParty.hasMember(userRepository.findOne(sessionUserId))) {
+		if (!dbParty.hasMember(user)) {
 			throw new FailedUpdatePartyException("그룹멤버가 아닙니다.");
 		}
 		boolean isDefaultImage = "background-default.png".equals(party.getBackgroundImage());
