@@ -11,7 +11,7 @@ import java.util.Date;
 @Entity
 public class Notification {
 	
-	private enum Pattern {
+	public enum Pattern {
 		REQUEST, INVITE, REPLY, NEW_POST
 	}
 	
@@ -43,6 +43,19 @@ public class Notification {
 
     @Column
 	private Status status;
+    
+    public Notification(Date createDate, User writer, User reader, Party party, Pattern pattern) {
+    	this.createDate = createDate;
+    	this.writer = writer;
+    	this.reader = reader;
+    	this.party = party;
+    	this.pattern = pattern;
+    	this.status = Status.ON;
+    }
+    
+    public boolean isRequest() {
+    	return (this.pattern.equals(Pattern.REQUEST) && this.status.equals(Status.ON)); 
+    }
 	
 	
 }

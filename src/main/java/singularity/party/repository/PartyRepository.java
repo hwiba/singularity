@@ -1,8 +1,14 @@
 package singularity.party.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import singularity.party.domain.Party;
+import java.util.List;
 
-public interface PartyRepository extends JpaRepository<Party, String>{
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import singularity.party.domain.Party;
+import singularity.user.domain.User;
+
+public interface PartyRepository extends JpaRepository<Party, Long>{
+	
+	List<Party> findAllByMembers(User user);
 	
 }

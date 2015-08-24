@@ -15,54 +15,62 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Party {
-	
-	private enum Openness {
-		PUBLIC, PARTY, PRIVATE, CLOSE
+
+	public enum Openness {
+		EVERYONE, COMMUNITY, SECRET, CLOSE
 	}
 
-    @Id
-    @GeneratedValue
+	@Id
+	@GeneratedValue
 	private Long id;
 
-    @Temporal(TemporalType.TIMESTAMP)
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDate;
 
-    @Size(min = 1, max = 50)
-    @Column(name = "name", length = 25, nullable = false)
+	@Size(min = 1, max = 50)
+	@Column(name = "name", length = 25, nullable = false)
 	private String name;
 
-    @Column(name = "image", length = 200, nullable = true)
+	@Column(name = "image", length = 200, nullable = true)
 	private String backgroundImage;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER)
 	private User admin;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER)
 	private List<User> members;
 
-    @Column(name = "openness", nullable = false)
+	@Column(name = "openness", nullable = false)
 	private Openness openness;
+
+	public Party(Date createDate, String name, String backgroundImage, User admin, Openness openness) {
+		this.createDate = createDate;
+		this.name = name;
+		this.backgroundImage = backgroundImage;
+		this.admin = admin;
+		this.openness = openness;
+	}
 
 	public void changeName(String name) {
 		this.name = name;
 	}
-	
+
 	public void changeBackgroundImage(String backgroundImage) {
 		this.backgroundImage = backgroundImage;
 	}
 
 	public void addMember(User user) {
 		this.members.add(user);
-		
-	}
-	
-	public void deleteMember(User user) {
-		this.members.remove(user);
-		
+
 	}
 
-	public void hasMember(User user) {
-		this.members.contains(user);
+	public void deleteMember(User user) {
+		this.members.remove(user);
+
+	}
+
+	public boolean hasMember(User user) {
+		return this.members.contains(user);
 	}
 
 	public boolean isAdmin(User user) {
@@ -73,35 +81,35 @@ public class Party {
 		this.admin = user;
 	}
 
-	public boolean isPrivateClass() {
-		return this.openness.equals(Openness.PRIVATE);
+	public boolean isSecret() {
+		return this.openness.equals(Openness.SECRET);
 	}
 
-	public boolean isPartyClass() {
-		return this.openness.equals(Openness.PARTY);
+	public boolean isCommunity() {
+		return this.openness.equals(Openness.COMMUNITY);
 	}
 
-	public boolean isPublicClass() {
-		return this.openness.equals(Openness.PUBLIC);
+	public boolean isEveryone() {
+		return this.openness.equals(Openness.EVERYONE);
 	}
 
-	public boolean isCloseClass() {
+	public boolean isClose() {
 		return this.openness.equals(Openness.CLOSE);
 	}
 
-	public void classSetPublic() {
-		this.openness = Openness.PUBLIC;
+	public void everyone() {
+		this.openness = Openness.EVERYONE;
 	}
 
-	public void classSetParty() {
-		this.openness = Openness.PARTY;
+	public void community() {
+		this.openness = Openness.COMMUNITY;
 	}
 
-	public void classSetPrivate() {
-		this.openness = Openness.PRIVATE;
+	public void secret() {
+		this.openness = Openness.SECRET;
 	}
 
-	public void classSetClose() {
+	public void close() {
 		this.openness = Openness.CLOSE;
 	}
 
