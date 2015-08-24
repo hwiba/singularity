@@ -49,6 +49,15 @@ public class User {
 	@Column
 	private MembershipClass membershipClass;
 
+    public User(String email, String password, Date createDate, String name, String profileImage) {
+        this.email = email;
+        this.password = password;
+        this.createDate = createDate;
+        this.name = name;
+        this.profileImage = profileImage;
+        this.membershipClass = MembershipClass.READY;
+    }
+
 	public MembershipClass getMembershipClass() {
 		return this.membershipClass;
 	}
@@ -80,6 +89,14 @@ public class User {
 	public boolean isAccept() {
 		return this.membershipClass.equals(MembershipClass.ACCEPT);
 	}
+
+    public boolean isDelete() {
+        return this.membershipClass.equals(MembershipClass.DELETE);
+    }
+
+    public boolean isReady() {
+        return this.membershipClass.equals(MembershipClass.READY);
+    }
 
 	public void setId(Long id) {
 		this.id = id;

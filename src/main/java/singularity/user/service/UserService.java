@@ -2,7 +2,6 @@ package singularity.user.service;
 
 import org.springframework.stereotype.Service;
 import singularity.exception.ExistedUserException;
-import singularity.exception.FailedLoginException;
 import singularity.exception.SessionUserMismatchException;
 import singularity.user.domain.User;
 import singularity.user.dto.SessionUser;
@@ -38,15 +37,22 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User signingUp(User user) {
-        user.accept();
-        return userRepository.save(user);
+    public void accept(User user) {
+        User dbUser = userRepository.findOneByEmail(user.getEmail());
+        if (null == dbUser) {
+            throw new IllegalArgumentException("가입하지 않은 유저입니다.");
+        }
+        if (!dbUser.isReady()) {
+            throw new IllegalArgumentException("승인 대상이 아닌 유저입니다.");
+        }
+        dbUser.accept();
     }
 
     public User findOne(Long userId) {
         return userRepository.findOne(userId);
     }
 
+    //TODO session 관련 처리는 컨트롤러로 이전할 것.
     public void update(User user, HttpSession session) throws SessionUserMismatchException {
         if (!checkSessionUser(session, user.getId())) {
             throw new SessionUserMismatchException("권한이 없는 요청입니다.");
@@ -61,13 +67,13 @@ public class UserService {
         dbUser.delete();
     }
 
-    public User findForLogin(User user) throws FailedLoginException {
+    public User findForLogin(User user) throws IllegalArgumentException {
         User dbUser = userRepository.findOne(user.getId());
         if (null == dbUser) {
-            throw new FailedLoginException("가입하지 않은 메일 주소입니다.");
+            throw new IllegalArgumentException("가입하지 않은 메일 주소입니다.");
         }
         if (!dbUser.getPassword().equals(user.getPassword())) {
-            throw new FailedLoginException("잘못된 비밀번호입니다.");
+            throw new IllegalArgumentException("잘못된 비밀번호입니다.");
         }
         return dbUser;
     }

@@ -71,7 +71,7 @@ public class UserController {
         // TODO 서비스 레이어로 내리기
 		Confirm confirm = confirmService.findOneByIdentificationKey(signingKey);
         if (null != confirm) {
-			userService.signingUp(confirm.getUser());
+			userService.accept(confirm.getUser());
 		}
 		return loginForm(model, session);
 	}

@@ -43,7 +43,7 @@ function appendNoteList(json) {
             newEl.setAttribute("style", "display: none");
         }
 		out = "";
-		out += "<li><img class='avatar' class='avatar' src='/img/profile/"
+		out += "<li><img class='avatar' class='avatar' src='/img/profile"
 				+ obj.user.image + "'>";
 
         var userId = document.getElementById("sessionUserId").value;
