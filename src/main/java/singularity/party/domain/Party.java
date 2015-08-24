@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
@@ -45,6 +46,7 @@ public class Party {
 	private String backgroundImage;
 
 	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "user_FK")
 	private User admin;
 
 	@ManyToMany(fetch = FetchType.EAGER)

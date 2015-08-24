@@ -43,6 +43,10 @@ public class PartyService {
 	public User findAdmin(Long partyId) {
 		return partyRepository.findOne(partyId).getAdmin();
 	}
+	
+	public Party findOneByAdmin(User admin) {
+		return partyRepository.findOneByAdmin(admin);
+	}
 
 	public Party create(String partyName, Long adminUserId, Party.Openness openness) {
 		User admin = userRepository.findOne(adminUserId);

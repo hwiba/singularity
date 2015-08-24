@@ -1,6 +1,7 @@
 package singularity.party.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 
@@ -18,6 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import singularity.SingularityApplication;
+import singularity.exception.ExistedUserException;
 import singularity.party.domain.Party;
 import singularity.party.repository.PartyRepository;
 import singularity.user.domain.User;
@@ -47,13 +49,52 @@ public class PartyServiceTest {
     private final User user = new User(testEmail, "1234qwer", new Date(), "testName", "nullImage");
 
     @Test
-    public void create와_findByUserId가_정상동작하는지() {
+    public void findByUserId가_정상동작하는지() {
     	User dbUser = userService.create(this.user);
     	partyService.create("testParty1", dbUser.getId(), Party.Openness.COMMUNITY);
     	partyService.create("testParty2", dbUser.getId(), Party.Openness.COMMUNITY);
     	partyService.create("testParty3", dbUser.getId(), Party.Openness.COMMUNITY);
     	
     	assertEquals(3, partyService.findAllByUserId(dbUser.getId()).size());
-    	
     }
+    
+    @Test
+    public void create_시에_각_멤버들이_정상적으로_갖춰지는지() {
+    	User dbUser = userService.create(this.user);
+    	Party party = partyService.create("testParty1", dbUser.getId(), Party.Openness.COMMUNITY);
+    	assertTrue(party.isCommunity());
+    	assertTrue(party.hasMember(dbUser));
+    	assertTrue(party.isAdmin(dbUser));
+    	
+    	Party secretParty = partyService.create("testParty2", dbUser.getId(), Party.Openness.SECRET);
+    	assertTrue(secretParty.isSecret());
+    }
+    
+    @Test
+    public void delete가_정상_수행_될_때() {
+    	User dbUser = userService.create(this.user);
+    	Party party = partyService.create("testParty1", dbUser.getId(), Party.Openness.COMMUNITY);
+    	partyService.delete(party.getId(), dbUser.getId());
+    	Party closeParty = partyService.findOneByAdmin(dbUser);
+    	assertEquals(Party.Openness.CLOSE, closeParty.getOpenness());
+    }
+    
+    @Test
+    public void 그룹이_존재하지_않을_때_delete_요청 () throws Exception {
+        expectedExcetption.expect(IllegalArgumentException.class);
+        expectedExcetption.expectMessage("그룹이 존재하지 않습니다.");
+        User dbUser = userService.create(this.user);
+        partyService.delete((long) -1, dbUser.getId());
+    }
+    
+    @Test
+    public void 그룹장이_아닐_때_delete_요청 () throws Exception {
+        expectedExcetption.expect(IllegalArgumentException.class);
+        expectedExcetption.expectMessage("그룹장만 그룹을 삭제할 수 있습니다.");
+        User dbUser = userService.create(this.user);
+        User dbUser2 = userService.create(new User("test2@email.com", "1234qwer", new Date(), "testName", "nullImage"));
+        Party party = partyService.create("testParty1", dbUser.getId(), Party.Openness.COMMUNITY);
+        partyService.delete(party.getId(), dbUser2.getId());
+    }
+    
 }
