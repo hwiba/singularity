@@ -1,6 +1,13 @@
 package singularity.user.service;
 
-import jdk.nashorn.internal.objects.annotations.Setter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Date;
+
+import javax.annotation.Resource;
+import javax.transaction.Transactional;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -8,17 +15,11 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+
 import singularity.SingularityApplication;
 import singularity.exception.ExistedUserException;
 import singularity.user.domain.User;
 import singularity.user.repository.UserRepository;
-
-import javax.annotation.Resource;
-import javax.transaction.Transactional;
-
-import java.util.Date;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by scala on 2015. 8. 24..
@@ -79,6 +80,5 @@ public class UserServiceTest {
         User cloneUser = this.user;
         userService.accept(cloneUser);
     }
-
 
 }

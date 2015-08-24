@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import singularity.exception.ExistedUserException;
-import singularity.exception.FailedLoginException;
 import singularity.exception.FailedSendingEmailException;
 import singularity.exception.SessionUserMismatchException;
 import singularity.user.domain.Confirm;
@@ -52,7 +51,7 @@ public class UserController {
 			SessionUser sessionUser = new SessionUser(userService.findForLogin(user));
 			session.setAttribute("sessionUser", sessionUser);
 			model.addAttribute("user", sessionUser);
-		} catch (FailedLoginException e) {
+		} catch (IllegalArgumentException e) {
 			model.addAttribute("loginFailedError", e.getMessage());
 			model.addAttribute("user", user);
 			return "login";
