@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -34,7 +36,8 @@ public class PartyService {
 	private NotificationRepository notificationRepository;
 
 	public List<Party> findAllByUserId(Long userId) {
-		return partyRepository.findAllByMembers(userRepository.findOne(userId));
+		User user = userRepository.findOne(userId);
+		return partyRepository.findAll().stream().filter(p -> p.hasMember(user)).collect(Collectors.toList());
 	}
 
 	public User findAdmin(Long partyId) {
@@ -76,7 +79,6 @@ public class PartyService {
 				.save(new Notification(new Date(), loginedUser, user, party, Notification.Pattern.INVITE));
 	}
 
-	// TODO 메서드가 비대함. 간략화 할 것.
 	public void joinMember(SessionUser sessionUser, Long partyId) {
 		Party party = partyRepository.findOne(partyId);
 		User writer = userRepository.findOne(sessionUser.getId());
@@ -86,11 +88,16 @@ public class PartyService {
 		if (party.hasMember(writer)) {
 			throw new FailedAddingGroupMemberException("이미 가입한 유저입니다!");
 		}
-		if (null != notificationRepository.findOneByPartyAndWriterAndReader(party, writer, party.getAdmin()).stream()
-				.filter(n -> n.isRequest()).findFirst()) {
+		if (null != findByRequest(party, writer)) {
 			throw new FailedAddingGroupMemberException("가입 승인 대기중 입니다!");
 		}
-		notificationRepository.save(new Notification(new Date(), writer, party.getAdmin(), party, Notification.Pattern.REQUEST));
+		notificationRepository
+				.save(new Notification(new Date(), writer, party.getAdmin(), party, Notification.Pattern.REQUEST));
+	}
+
+	private Optional<Notification> findByRequest(Party party, User writer) {
+		return notificationRepository.findOneByPartyAndWriterAndReader(party, writer, party.getAdmin()).stream()
+				.filter(n -> n.isRequest()).findFirst();
 	}
 
 	public void addMember(Long userId, Long partyId, SessionUser sessionUser) {
