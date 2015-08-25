@@ -18,6 +18,7 @@ import singularity.exception.FailedUpdatePartyException;
 import singularity.exception.PartyLeaveFailedException;
 import singularity.exception.UnpermittedAccessGroupException;
 import singularity.notification.domain.Notification;
+import singularity.notification.domain.Notification.Pattern;
 import singularity.notification.repository.NotificationRepository;
 import singularity.party.domain.Party;
 import singularity.party.repository.PartyRepository;
@@ -80,7 +81,7 @@ public class PartyService {
 			throw new FailedAddingGroupMemberException("이미 가입되어 있습니다!");
 		}
 		notificationRepository
-				.save(new Notification(new Date(), loginedUser, user, party, Notification.Pattern.INVITE));
+				.save(new Notification(new Date(), loginedUser, user, party, Pattern.INVITE));
 	}
 
 	public void joinMember(SessionUser sessionUser, Long partyId) {
@@ -96,7 +97,7 @@ public class PartyService {
 			throw new FailedAddingGroupMemberException("가입 승인 대기중 입니다!");
 		}
 		notificationRepository
-				.save(new Notification(new Date(), writer, party.getAdmin(), party, Notification.Pattern.REQUEST));
+				.save(new Notification(new Date(), writer, party.getAdmin(), party, Pattern.REQUEST));
 	}
 
 	private Optional<Notification> findByRequest(Party party, User writer) {

@@ -12,14 +12,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import singularity.SingularityApplication;
-import singularity.exception.ExistedUserException;
 import singularity.party.domain.Party;
 import singularity.party.repository.PartyRepository;
 import singularity.user.domain.User;
@@ -33,8 +30,7 @@ import singularity.user.service.UserService;
 @WebAppConfiguration
 @Transactional
 public class PartyServiceTest {
-	private static final Logger logger = LoggerFactory.getLogger(PartyServiceTest.class);
-	
+
 	@Resource
 	private PartyRepository partyRepository;
 	@Resource
