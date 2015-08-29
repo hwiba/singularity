@@ -36,37 +36,31 @@ public class PartyService {
 	@Resource
 	private NotificationRepository notificationRepository;
 
-	public List<Party> findAllByUserId(Long userId) {
+	public List<Party> findAllByUserId(final Long userId) {
 		User user = userRepository.findOne(userId);
 		return partyRepository.findAll().stream().filter(p -> p.hasMember(user)).collect(Collectors.toList());
 	}
 
-	public User findAdmin(Long partyId) {
-		return partyRepository.findOne(partyId).getAdmin();
-	}
-	
-	public Party findOneByAdmin(User admin) {
+	public Party findOneByAdmin(final User admin) {
 		return partyRepository.findOneByAdmin(admin);
 	}
 
-	public Party create(String partyName, Long adminUserId, Party.Openness openness) {
-		User admin = userRepository.findOne(adminUserId);
-		return partyRepository.save(new Party(new Date(), partyName, null, admin, openness));
+	public Party create(final String partyName, final Long adminUserId, final Party.Openness openness) {
+		return partyRepository.save(new Party(new Date(), partyName, null, userRepository.findOne(adminUserId), openness));
 	}
 
-	public void delete(Long partyId, Long userId) throws IllegalArgumentException {
-		User user = userRepository.findOne(userId);
+	public void delete(final Long partyId, final Long sessionUserId) throws IllegalArgumentException {
 		if (!partyRepository.exists(partyId)) {
 			throw new IllegalArgumentException("그룹이 존재하지 않습니다.");
 		}
-		Party party = partyRepository.findOne(partyId);
-		if (!party.isAdmin(user)) {
-			throw new IllegalArgumentException("그룹장만 그룹을 삭제할 수 있습니다.");
+        final Party party = partyRepository.findOne(partyId);
+		if (!party.isAdmin(userRepository.findOne(sessionUserId))) {
+			throw new IllegalArgumentException("그룹을 삭제할 권한이 없습니다.");
 		}
 		party.close();
 	}
 
-	public void inviteMember(SessionUser sessionUser, Long userId, Long partyId)
+	public void inviteMember(final SessionUser sessionUser, final Long userId, final Long partyId)
 			throws UnpermittedAccessGroupException, FailedAddingGroupMemberException {
 		Party party = partyRepository.findOne(partyId);
 		User user = userRepository.findOne(userId);
@@ -84,7 +78,7 @@ public class PartyService {
 				.save(new Notification(new Date(), loginedUser, user, party, Pattern.INVITE));
 	}
 
-	public void joinMember(SessionUser sessionUser, Long partyId) {
+	public void joinMember(final SessionUser sessionUser, final Long partyId) {
 		Party party = partyRepository.findOne(partyId);
 		User writer = userRepository.findOne(sessionUser.getId());
 		if (party.isClose()) {
@@ -100,21 +94,20 @@ public class PartyService {
 				.save(new Notification(new Date(), writer, party.getAdmin(), party, Pattern.REQUEST));
 	}
 
-	private Optional<Notification> findByRequest(Party party, User writer) {
+	private Optional<Notification> findByRequest(final Party party, final User writer) {
 		return notificationRepository.findOneByPartyAndWriterAndReader(party, writer, party.getAdmin()).stream()
 				.filter(n -> n.isRequest()).findFirst();
 	}
 
-	public void addMember(Long userId, Long partyId, SessionUser sessionUser) {
+	public void addMember(final Long userId, final Long partyId, final SessionUser sessionUser) {
 		User user = userRepository.findOne(userId);
 		if (!sessionUser.isEqualId(user)) {
-			return;
+			throw new IllegalArgumentException("자기 자신을 멤버로 추가할 수 없습니다.");
 		}
-		Party party = partyRepository.findOne(partyId);
-		party.addMember(user);
+		partyRepository.findOne(partyId).addMember(user);
 	}
 
-	public void leaveParty(Long userId, Long partyId) {
+	public void leaveParty(final Long userId, final Long partyId) {
 		Party party = partyRepository.findOne(partyId);
 		User user = userRepository.findOne(userId);
 		if (!party.hasMember(user)) {
@@ -126,7 +119,7 @@ public class PartyService {
 		party.deleteMember(user);
 	}
 
-	public void deleteMember(SessionUser sessionUser, Long userId, Long partyId) throws PartyLeaveFailedException {
+	public void deleteMember(final SessionUser sessionUser, final Long userId, final Long partyId) throws PartyLeaveFailedException {
 		Party party = partyRepository.findOne(partyId);
 		User adminUser = party.getAdmin();
 		if (!sessionUser.isEqualId(adminUser)) {
@@ -138,19 +131,18 @@ public class PartyService {
 		party.deleteMember(userRepository.findOne(userId));
 	}
 
-	public List<User> readMembers(Long partyId) {
+	public List<User> readMembers(final Long partyId) {
 		return partyRepository.findOne(partyId).getMembers();
 	}
 
-	public Party findOne(Long partyId) {
+	public Party findOne(final Long partyId) {
 		return partyRepository.findOne(partyId);
 	}
 
 	// TODO 메서드가 비대하므로 분리할 것.
-	public void update(SessionUser sessionUser, Party party, String rootPath, MultipartFile partyImage) {
+	public void update(final SessionUser sessionUser, final Party party, final String rootPath, final MultipartFile partyImage) {
 		Party dbParty = this.findOne(party.getId());
 		User user = userRepository.findOne(sessionUser.getId());
-
 		if (!dbParty.isAdmin(user)) {
 			throw new FailedUpdatePartyException("그룹장만이 그룹설정이 가능합니다.");
 		}

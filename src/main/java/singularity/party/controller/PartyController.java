@@ -21,77 +21,54 @@ import singularity.exception.FailedAddingGroupMemberException;
 import singularity.exception.FailedUpdatePartyException;
 import singularity.exception.PartyLeaveFailedException;
 import singularity.exception.UnpermittedAccessGroupException;
-import singularity.note.service.NoteService;
 import singularity.party.domain.Party;
 import singularity.party.service.PartyService;
 import singularity.user.domain.User;
-import singularity.user.dto.SessionUser;
 
 @Controller
 @RequestMapping("/party")
 public class PartyController {
 	@Resource
 	private PartyService partyService;
-	@Resource
-	private NoteService noteService;
 
 	@RequestMapping("/form")
-	public String list() {
+	public String show() {
 		return "party";
 	}
 
-	@RequestMapping(value = "{partyId}")
-	protected String loadParty(@PathVariable Long partyId, HttpSession session, Model model) {
+	@RequestMapping(value = "/{partyId}")
+	protected String getParty(@PathVariable final Long partyId, Model model) {
 		model.addAttribute("party", partyService.findOne(partyId));
-		model.addAttribute("admin", new SessionUser(partyService.findAdmin(partyId)));
 		return "notes";
 	}
 
-	// TODO 노트 서비스 수정 후 재 수정.
-//	@RequestMapping(value = "{partyId}/note/", method = RequestMethod.GET)
-//	protected ResponseEntity<Object> loadNotes(@PathVariable Long partyId, HttpSession session) throws Throwable {
-//		SessionUser sessionUser = RequestUtil.getSessionUser(session);
-//		if (null == sessionUser) {
-//			return ResponseUtil.getJSON("", HttpStatus.NOT_ACCEPTABLE);
-//		}
-//		Party party = partyService.findOne(partyId);
-//		List<Note> notes = noteService.readByGroupPage(party);
-//		for (Note note : notes) {
-//			try {
-//				note.setNoteText((String) new NashornEngine().markdownToHtml(note.getNoteText()));
-//			} catch (IOException e) {
-//				return ResponseUtil.getJSON("", HttpStatus.INTERNAL_SERVER_ERROR);
-//			}
-//		}
-//		// TODO repository에서 가져올 때 노트의 순서를 역순으로 수정하기.
-//		Collections.reverse(notes);
-//
-//		// TODO comment count 를 가진 dto를 만들 것인가 note가 카운트를 가지게 할 것인가 결정하기.
-//		return ResponseUtil.getJSON(notes, HttpStatus.OK);
-//	}
-
 	@RequestMapping(value = "", method = RequestMethod.GET)
-	protected ResponseEntity<Object> list(HttpSession session) {
+	protected ResponseEntity<Object> getAccessPartys(HttpSession session) {
 		Long userId = RequestUtil.getSessionUser(session).getId();
-		return ResponseUtil.getJSON(partyService.findAllByUserId(userId), HttpStatus.OK);
+		return ResponseUtil.JSON(partyService.findAllByUserId(userId), HttpStatus.OK);
 	}
 
+    //TODO party 생성 시 DTO로 받기.
 	@RequestMapping(value = "", method = RequestMethod.POST)
-	protected ResponseEntity<Object> create(@RequestParam String status, @RequestParam String partyName,
+	protected ResponseEntity<Object> create(@RequestParam final String status, @RequestParam final String partyName,
 			HttpSession session, Model model) {
 		if (partyName.length() > 15) {
-			return ResponseUtil.getJSON("그룹명은 15자 이내로 가능합니다", HttpStatus.PRECONDITION_FAILED);
+			return ResponseUtil.JSON("그룹명은 15자 이내로 가능합니다", HttpStatus.PRECONDITION_FAILED);
 		}
-		Long adminId = RequestUtil.getSessionUser(session).getId();
-		Party.Openness openness = "F" == status ? Party.Openness.COMMUNITY : Party.Openness.EVERYONE;
-		Party party = partyService.create(partyName, adminId, openness);
-		return ResponseUtil.getJSON(party, HttpStatus.CREATED);
+		final Long adminId = RequestUtil.getSessionUser(session).getId();
+		final Party.Openness openness = "F" == status ? Party.Openness.COMMUNITY : Party.Openness.EVERYONE;
+		final Party party = partyService.create(partyName, adminId, openness);
+		return ResponseUtil.JSON(party, HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/{partyId}", method = RequestMethod.DELETE)
-	protected ResponseEntity<Object> delete(@PathVariable Long partyId, HttpSession session, Model model) {
-		partyService.delete(partyId, RequestUtil.getSessionUser(session).getId());
-		return ResponseUtil.getJSON("", HttpStatus.OK);
+	protected ResponseEntity<Object> delete(@PathVariable final Long partyId, HttpSession session, Model model) {
+        try {
+            partyService.delete(partyId, RequestUtil.getSessionUser(session).getId());
+        } catch (IllegalArgumentException e) {
+            return ResponseUtil.JSON(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+		return ResponseUtil.JSON("", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{partyId}/members/invite", method = RequestMethod.POST)
@@ -100,22 +77,22 @@ public class PartyController {
 		try {
 			partyService.inviteMember(RequestUtil.getSessionUser(session), userId, partyId);
 		} catch (UnpermittedAccessGroupException | FailedAddingGroupMemberException e) {
-			return ResponseUtil.getJSON(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return ResponseUtil.JSON(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
-		return ResponseUtil.getJSON("", HttpStatus.OK);
+		return ResponseUtil.JSON("", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{partyId}/members/join", method = RequestMethod.POST)
 	protected ResponseEntity<Object> joinGroupMember(@PathVariable Long partyId, HttpSession session) {
 		partyService.joinMember(RequestUtil.getSessionUser(session), partyId);
-		return ResponseUtil.getJSON("", HttpStatus.OK);
+		return ResponseUtil.JSON("", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{partyId}/members/accept", method = RequestMethod.POST)
 	protected ResponseEntity<Object> acceptGroupMember(@RequestParam Long userId, @PathVariable Long partyId,
 			HttpSession session) {
 		partyService.addMember(userId, partyId, RequestUtil.getSessionUser(session));
-		return ResponseUtil.getJSON(null, HttpStatus.ACCEPTED);
+		return ResponseUtil.JSON(null, HttpStatus.ACCEPTED);
 	}
 
 	@RequestMapping(value = "/{parytId}/members/{sessionUserId}/leave", method = RequestMethod.PUT)
@@ -123,22 +100,22 @@ public class PartyController {
 		try {
 			partyService.leaveParty(sessionUserId, parytId);
 		} catch (PartyLeaveFailedException e) {
-			return ResponseUtil.getJSON(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+			return ResponseUtil.JSON(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
 		}
-		return ResponseUtil.getJSON("", HttpStatus.OK);
+		return ResponseUtil.JSON("", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/members/delete", method = RequestMethod.POST)
 	protected ResponseEntity<Object> delete(HttpSession session, @RequestParam Long userId,
 			@RequestParam Long partyId) {
 		partyService.deleteMember(RequestUtil.getSessionUser(session), userId, partyId);
-		return ResponseUtil.getJSON("", HttpStatus.OK);
+		return ResponseUtil.JSON("", HttpStatus.OK);
 	}
 
 	@RequestMapping("/members/{partyId}")
 	protected ResponseEntity<Object> listGroupMember(@PathVariable Long partyId) {
 		List<User> members = partyService.readMembers(partyId);
-		return ResponseUtil.getJSON(members, HttpStatus.OK);
+		return ResponseUtil.JSON(members, HttpStatus.OK);
 	}
 
 	@RequestMapping("/update/form/{partyId}")

@@ -16,16 +16,16 @@ public class PCommentController {
 //	protected ResponseEntity<Object> create(HttpSession session, PComment pComment, @RequestParam long noteId)
 //			throws IOException {
 //		if (pComment.getPCommentText().equals("")) {
-//			return ResponseUtil.getJSON("잘못된 요청입니다.", HttpStatus.PRECONDITION_FAILED);
+//			return ResponseUtil.JSON("잘못된 요청입니다.", HttpStatus.PRECONDITION_FAILED);
 //		}
 //		pComment = pCommentService.create(pComment, noteId, (SessionUser) session.getAttribute("sessionUser"));
-//		return ResponseUtil.getJSON(pComment, HttpStatus.CREATED);
+//		return ResponseUtil.JSON(pComment, HttpStatus.CREATED);
 //	}
 //
 //	@RequestMapping(value = "", method = RequestMethod.GET)
 //	protected ResponseEntity<Object> read(@RequestParam String pId, @RequestParam long noteId) {
 //		int paragraphId = Integer.parseInt(pId.replace("pId-", ""));
-//		return ResponseUtil.getJSON(pCommentService.findAllByPId(paragraphId, noteId), HttpStatus.OK);
+//		return ResponseUtil.JSON(pCommentService.findAllByPId(paragraphId, noteId), HttpStatus.OK);
 //	}
 //
 //	@RequestMapping(value = "/{pCommentId}", method = RequestMethod.PUT)
@@ -34,9 +34,9 @@ public class PCommentController {
 //		SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
 //		try {
 //			PComment pComment = pCommentService.update(pCommentId, commentText, sessionUser);
-//			return ResponseUtil.getJSON(pComment, HttpStatus.CREATED);
+//			return ResponseUtil.JSON(pComment, HttpStatus.CREATED);
 //		} catch (UnpermittedAccessPCommentException e) {
-//			return ResponseUtil.getJSON("수정할 권한이 없습니다.", HttpStatus.PRECONDITION_FAILED);
+//			return ResponseUtil.JSON("수정할 권한이 없습니다.", HttpStatus.PRECONDITION_FAILED);
 //		}
 //	}
 //
@@ -45,9 +45,9 @@ public class PCommentController {
 //		SessionUser sessionUser = (SessionUser) session.getAttribute("sessionUser");
 //		try {
 //			pCommentService.delete(pCommentId, sessionUser);
-//			return ResponseUtil.getJSON("코멘트가 삭제되었습니다.", HttpStatus.NO_CONTENT);
+//			return ResponseUtil.JSON("코멘트가 삭제되었습니다.", HttpStatus.NO_CONTENT);
 //		} catch (UnpermittedAccessPCommentException e) {
-//			return ResponseUtil.getJSON(e.getMessage(), HttpStatus.PRECONDITION_FAILED);
+//			return ResponseUtil.JSON(e.getMessage(), HttpStatus.PRECONDITION_FAILED);
 //		}
 //	}
 //
@@ -55,6 +55,6 @@ public class PCommentController {
 //	protected ResponseEntity<Object> readCountByP(@RequestParam long noteId) {
 //		//XXX pc 카운트 쿼리 만들기
 //		//pCommentService.countAllByNoteByP(noteId);
-//		return ResponseUtil.getJSON("{pId-1:1}", HttpStatus.OK);
+//		return ResponseUtil.JSON("{pId-1:1}", HttpStatus.OK);
 //	}
 }

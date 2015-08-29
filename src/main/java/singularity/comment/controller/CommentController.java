@@ -20,33 +20,33 @@ public class CommentController {
 //		Note note = new Note();
 //		note.setNoteId(noteId);
 //		if (commentText.equals("")) {
-//			return ResponseUtil.getJSON("", HttpStatus.BAD_REQUEST);
+//			return ResponseUtil.JSON("", HttpStatus.BAD_REQUEST);
 //		}
 //		Comment comment = new Comment();
 //		comment.setCommentText(commentText);
 //		try {
-//			return ResponseUtil.getJSON(commentService.create(sessionUser, note, comment), HttpStatus.OK);
+//			return ResponseUtil.JSON(commentService.create(sessionUser, note, comment), HttpStatus.OK);
 //		} catch (UnpermittedAccessGroupException e) {
-//			return ResponseUtil.getJSON("", HttpStatus.BAD_REQUEST);
+//			return ResponseUtil.JSON("", HttpStatus.BAD_REQUEST);
 //		}
 //	}
 //
 //	@ResponseBody
 //	@RequestMapping("/{noteId}")
 //	protected ResponseEntity<Object> findAll(@PathVariable long noteId) {
-//		return ResponseUtil.getJSON(commentService.findAll(noteId), HttpStatus.OK);
+//		return ResponseUtil.JSON(commentService.findAll(noteId), HttpStatus.OK);
 //	}
 //
 //	@ResponseBody
 //	@RequestMapping(value = "/{commentId}", method = RequestMethod.PUT)
 //	protected ResponseEntity<Object> update(@PathVariable long commentId, @RequestParam String commentText) {
-//		return ResponseUtil.getJSON(commentService.update(commentId, commentText), HttpStatus.OK);
+//		return ResponseUtil.JSON(commentService.update(commentId, commentText), HttpStatus.OK);
 //	}
 //
 //	@ResponseBody
 //	@RequestMapping(value = "/{commentId}", method = RequestMethod.DELETE)
 //	protected ResponseEntity<Object> delete(@PathVariable long commentId) {
 //		commentService.delete(commentId);
-//		return ResponseUtil.getJSON("", HttpStatus.OK);
+//		return ResponseUtil.JSON("", HttpStatus.OK);
 //	}
 }

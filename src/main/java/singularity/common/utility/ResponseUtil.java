@@ -11,7 +11,7 @@ public class ResponseUtil {
      * @param obj
      * @return
      */
-    public static ResponseEntity<Object> getJSON(Object obj, HttpStatus status){
+    public static ResponseEntity<Object> JSON(Object obj, HttpStatus status){
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add("Content-Type", "application/json; charset=UTF-8");
         return new ResponseEntity<Object>(obj, responseHeaders, status);

@@ -55,7 +55,7 @@ public class Party {
 	@Column(name = "openness", nullable = false)
 	private Openness openness;
 
-	public Party(Date createDate, String name, String backgroundImage, User admin, Openness openness) {
+	public Party(final Date createDate, final String name, final String backgroundImage, final User admin, final Openness openness) {
 		this.createDate = createDate;
 		this.name = name;
 		this.backgroundImage = backgroundImage;
@@ -65,33 +65,27 @@ public class Party {
 		this.addMember(admin);
 	}
 
-	public void changeName(String name) {
+	public void changeName(final String name) {
 		this.name = name;
 	}
 
-	public void changeBackgroundImage(String backgroundImage) {
+	public void changeBackgroundImage(final String backgroundImage) {
 		this.backgroundImage = backgroundImage;
 	}
 
-	public void addMember(User user) {
-		this.members.add(user);
+	public void addMember(final User user) { this.members.add(user);}
 
-	}
+	public void deleteMember(final User user) { this.members.remove(user); }
 
-	public void deleteMember(User user) {
-		this.members.remove(user);
-
-	}
-
-	public boolean hasMember(User user) {
+	public boolean hasMember(final User user) {
 		return this.members.contains(user);
 	}
 
-	public boolean isAdmin(User user) {
+	public boolean isAdmin(final User user) {
 		return this.admin.equals(user);
 	}
 
-	public void changeAdmin(User user) {
+	public void changeAdmin(final User user) {
 		this.admin = user;
 	}
 

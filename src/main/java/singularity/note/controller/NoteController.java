@@ -15,7 +15,30 @@ public class NoteController {
 //	protected ResponseEntity<Object> show(@PathVariable long noteId) throws IOException, Throwable {
 //		Note note = noteService.findOne(noteId);
 //		note.setNoteText((String) new NashornEngine().markdownToHtml(note.getNoteText()));
-//		return ResponseUtil.getJSON(note, HttpStatus.OK);
+//		return ResponseUtil.JSON(note, HttpStatus.OK);
+//	}
+
+    // TODO 노트 서비스 수정 후 재 수정.
+//	@RequestMapping(value = "{partyId}/note/", method = RequestMethod.GET)
+//	protected ResponseEntity<Object> loadNotes(@PathVariable Long partyId, HttpSession session) throws Throwable {
+//		SessionUser sessionUser = RequestUtil.getSessionUser(session);
+//		if (null == sessionUser) {
+//			return ResponseUtil.JSON("", HttpStatus.NOT_ACCEPTABLE);
+//		}
+//		Party party = partyService.findOne(partyId);
+//		List<Note> notes = noteService.readByGroupPage(party);
+//		for (Note note : notes) {
+//			try {
+//				note.setNoteText((String) new NashornEngine().markdownToHtml(note.getNoteText()));
+//			} catch (IOException e) {
+//				return ResponseUtil.JSON("", HttpStatus.INTERNAL_SERVER_ERROR);
+//			}
+//		}
+//		// TODO repository에서 가져올 때 노트의 순서를 역순으로 수정하기.
+//		Collections.reverse(notes);
+//
+//		// TODO comment count 를 가진 dto를 만들 것인가 note가 카운트를 가지게 할 것인가 결정하기.
+//		return ResponseUtil.JSON(notes, HttpStatus.OK);
 //	}
 //
 //	@RequestMapping(value = "/notes", method = RequestMethod.POST)
@@ -44,10 +67,10 @@ public class NoteController {
 //	@RequestMapping(value = "/notes/{noteId}", method = RequestMethod.DELETE)
 //	protected ResponseEntity<Object> delete(@PathVariable long noteId) {
 //		if (null == noteService.findOne(noteId)) {
-//			return ResponseUtil.getJSON("", HttpStatus.BAD_REQUEST);
+//			return ResponseUtil.JSON("", HttpStatus.BAD_REQUEST);
 //		}
 //		noteService.delete(noteId);
-//		return ResponseUtil.getJSON("", HttpStatus.OK);
+//		return ResponseUtil.JSON("", HttpStatus.OK);
 //	}
 //
 //	@RequestMapping("/notes/editor/groups/{partyId}")

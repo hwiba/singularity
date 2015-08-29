@@ -32,7 +32,7 @@ import singularity.user.service.UserService;
 public class PartyServiceTest {
 
 	@Resource
-	private PartyRepository partyRepository;
+    private PartyRepository partyRepository;
 	@Resource
 	private PartyService partyService;
 	@Resource
@@ -86,11 +86,17 @@ public class PartyServiceTest {
     @Test
     public void 그룹장이_아닐_때_delete_요청 () throws Exception {
         expectedExcetption.expect(IllegalArgumentException.class);
-        expectedExcetption.expectMessage("그룹장만 그룹을 삭제할 수 있습니다.");
+        expectedExcetption.expectMessage("그룹을 삭제할 권한이 없습니다.");
         User dbUser = userService.create(this.user);
         User dbUser2 = userService.create(new User("test2@email.com", "1234qwer", new Date(), "testName", "nullImage"));
         Party party = partyService.create("testParty1", dbUser.getId(), Party.Openness.COMMUNITY);
         partyService.delete(party.getId(), dbUser2.getId());
+    }
+
+    @Test
+    public void 정상적으로_파티_정보를_업데이트_할_때 () {
+        //partyService.update();
+        assertTrue(true);
     }
     
 }
