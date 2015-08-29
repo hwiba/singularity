@@ -1,4 +1,4 @@
-package singularity.exception;
+package singularity.party.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

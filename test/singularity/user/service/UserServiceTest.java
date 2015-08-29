@@ -8,8 +8,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import singularity.SingularityApplication;
-import singularity.exception.ExistedUserException;
 import singularity.user.domain.User;
+import singularity.user.exception.ExistedUserException;
 import singularity.user.repository.UserRepository;
 
 import javax.annotation.Resource;

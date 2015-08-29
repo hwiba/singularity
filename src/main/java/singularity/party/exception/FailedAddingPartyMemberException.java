@@ -1,4 +1,4 @@
-package singularity.exception;
+package singularity.party.exception;
 
 public class FailedAddingPartyMemberException extends RuntimeException {
 	private static final long serialVersionUID = 1L;

@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import singularity.common.utility.RequestUtil;
 import singularity.common.utility.ResponseUtil;
-import singularity.exception.FailedAddingPartyMemberException;
-import singularity.exception.PartyLeaveFailedException;
-import singularity.exception.UnpermittedAccessException;
 import singularity.party.domain.Party;
+import singularity.party.exception.FailedAddingPartyMemberException;
+import singularity.party.exception.PartyLeaveFailedException;
+import singularity.party.exception.UnpermittedAccessException;
 import singularity.party.service.PartyService;
 import singularity.user.domain.User;
 

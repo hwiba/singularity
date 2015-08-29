@@ -2,13 +2,13 @@ package singularity.party.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import singularity.exception.FailedAddingPartyMemberException;
-import singularity.exception.PartyLeaveFailedException;
-import singularity.exception.UnpermittedAccessException;
 import singularity.notification.domain.Notification;
 import singularity.notification.domain.Notification.Pattern;
 import singularity.notification.repository.NotificationRepository;
 import singularity.party.domain.Party;
+import singularity.party.exception.FailedAddingPartyMemberException;
+import singularity.party.exception.PartyLeaveFailedException;
+import singularity.party.exception.UnpermittedAccessException;
 import singularity.party.repository.PartyRepository;
 import singularity.user.domain.User;
 import singularity.user.repository.UserRepository;
@@ -149,7 +149,7 @@ public class PartyService {
         }
         try {
             String fileName = party.getBackgroundImage();
-            partyImage.transferTo(new File(path + "img/group/" + fileName));
+            partyImage.transferTo(new File(path + "img/party/" + fileName));
             party.setBackgroundImage(fileName);
         } catch (IOException e) {
             throw new IOException("잘못된 형식입니다.");

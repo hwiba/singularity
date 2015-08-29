@@ -1,8 +1,8 @@
 package singularity.user.service;
 
 import org.springframework.stereotype.Service;
-import singularity.exception.ExistedUserException;
 import singularity.user.domain.User;
+import singularity.user.exception.ExistedUserException;
 import singularity.user.repository.UserRepository;
 
 import javax.annotation.Resource;
