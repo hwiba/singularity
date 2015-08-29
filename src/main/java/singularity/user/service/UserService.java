@@ -1,15 +1,13 @@
 package singularity.user.service;
 
-import org.springframework.stereotype.Service;
-import singularity.exception.ExistedUserException;
-import singularity.exception.SessionUserMismatchException;
-import singularity.user.domain.User;
-import singularity.user.dto.SessionUser;
-import singularity.user.repository.UserRepository;
-
 import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
+
+import org.springframework.stereotype.Service;
+
+import singularity.exception.ExistedUserException;
+import singularity.user.domain.User;
+import singularity.user.repository.UserRepository;
 
 @Service
 @Transactional
@@ -17,18 +15,6 @@ public class UserService {
 
     @Resource
     private UserRepository userRepository;
-
-    public SessionUser getSessionUser(HttpSession session) {
-        return (SessionUser) session.getAttribute("sessionUser");
-
-    }
-
-    public boolean checkSessionUser(HttpSession session, Long userId) {
-        if (this.getSessionUser(session).equals(userId)) {
-            return true;
-        }
-        return false;
-    }
 
     public User create(User user) throws ExistedUserException {
         if (null != userRepository.findOneByEmail(user.getEmail())) {
@@ -52,11 +38,7 @@ public class UserService {
         return userRepository.findOne(userId);
     }
 
-    //TODO session 관련 처리는 컨트롤러로 이전할 것.
-    public void update(User user, HttpSession session) throws SessionUserMismatchException {
-        if (!checkSessionUser(session, user.getId())) {
-            throw new SessionUserMismatchException("권한이 없는 요청입니다.");
-        }
+    public void update(User user) {
         User dbUser = userRepository.findOne(user.getId());
         dbUser.changeEmail(user.getEmail());
         dbUser.changeProfileImage(user.getProfileImage());

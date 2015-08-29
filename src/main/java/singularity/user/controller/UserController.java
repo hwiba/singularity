@@ -26,16 +26,16 @@ public class UserController {
 	@Resource
 	UserService userService;
 	@Resource
-    ConfirmService confirmService;
-	
+	ConfirmService confirmService;
+
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	String create(Model model, @Validated User user, BindingResult result) {
 		if (result.hasErrors()) {
 			return "join";
 		}
 		try {
-            // TODO service로 내리기.
-            User dbUser = userService.create(user);
+			// TODO service로 내리기.
+			User dbUser = userService.create(user);
 			confirmService.sendMailforSignUp(confirmService.create(dbUser));
 		} catch (ExistedUserException | FailedSendingEmailException e) {
 			model.addAttribute("existedUserError", e.getMessage());
@@ -48,9 +48,7 @@ public class UserController {
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	String login(Model model, User user, HttpSession session) {
 		try {
-			SessionUser sessionUser = new SessionUser(userService.findForLogin(user));
-			session.setAttribute("sessionUser", sessionUser);
-			model.addAttribute("user", sessionUser);
+			session.setAttribute("sessionId", userService.findForLogin(user).getId());
 		} catch (IllegalArgumentException e) {
 			model.addAttribute("loginFailedError", e.getMessage());
 			model.addAttribute("user", user);
@@ -58,18 +56,18 @@ public class UserController {
 		}
 		return "party";
 	}
-	
+
 	@RequestMapping("/logout")
-    String logout(HttpSession session) {
+	String logout(HttpSession session) {
 		session.invalidate();
 		return "redirect:/";
 	}
-	
-	@RequestMapping(value="/confirm/{signingKey}", method=RequestMethod.GET)
+
+	@RequestMapping(value = "/confirm/{signingKey}", method = RequestMethod.GET)
 	String confirm(Model model, @PathVariable String signingKey, HttpSession session) {
-        // TODO 서비스 레이어로 내리기
+		// TODO 서비스 레이어로 내리기
 		Confirm confirm = confirmService.findOneByIdentificationKey(signingKey);
-        if (null != confirm) {
+		if (null != confirm) {
 			userService.accept(confirm.getUser());
 		}
 		return loginForm(model, session);
@@ -77,14 +75,19 @@ public class UserController {
 
 	@RequestMapping(value = "", method = RequestMethod.PUT)
 	String update(Model model, User user, HttpSession session) {
-		try {
-			userService.update(user, session);
-		} catch (SessionUserMismatchException e) {
-			model.addAttribute("errorCode", e.getCause());
-			model.addAttribute("errorMessage", e.getMessage());
+		if (!compareSessionId(session, user.getId())) {
+			model.addAttribute("errorMessage", "권한이 없는 요청입니다.");
 			return "exception";
 		}
+		userService.update(user);
 		return "user";
+	}
+
+	private boolean compareSessionId(HttpSession session, Long userId) {
+		if (((Long) session.getAttribute("sessionId")).equals(userId)) {
+			return true;
+		}
+		return false;
 	}
 
 	/*
@@ -92,7 +95,7 @@ public class UserController {
 	 */
 	@RequestMapping(value = "/loginForm", method = RequestMethod.GET)
 	public String loginForm(Model model, HttpSession session) {
-		if (this.sessionedUser(session)) {
+		if (this.isLogined(session)) {
 			return "party";
 		}
 		model.addAttribute("user", new User());
@@ -101,15 +104,15 @@ public class UserController {
 
 	@RequestMapping(value = "/joinForm", method = RequestMethod.GET)
 	String joinForm(Model model, HttpSession session) {
-		if (this.sessionedUser(session)) {
+		if (this.isLogined(session)) {
 			return "party";
 		}
 		model.addAttribute("user", new User());
 		return "join";
 	}
-	
-	private boolean sessionedUser(HttpSession session) {
-		if (null != userService.getSessionUser(session)) {
+
+	private boolean isLogined(HttpSession session) {
+		if (null != session.getAttribute("sessionId")) {
 			return true;
 		}
 		return false;
