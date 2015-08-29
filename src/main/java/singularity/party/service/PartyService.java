@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import singularity.exception.FailedAddingGroupMemberException;
 import singularity.exception.FailedUpdatePartyException;
 import singularity.exception.PartyLeaveFailedException;
-import singularity.exception.UnpermittedAccessGroupException;
+import singularity.exception.UnpermittedAccessException;
 import singularity.notification.domain.Notification;
 import singularity.notification.domain.Notification.Pattern;
 import singularity.notification.repository.NotificationRepository;
@@ -45,28 +45,29 @@ public class PartyService {
 		return partyRepository.findOneByAdmin(admin);
 	}
 
-	public Party create(final String partyName, final Long adminUserId, final Party.Openness openness) {
-		return partyRepository.save(new Party(new Date(), partyName, null, userRepository.findOne(adminUserId), openness));
+	public Party create(final String name, final Long adminId, final Party.Openness openness) {
+		final Party party = new Party(new Date(), name, "defaultImage", userRepository.findOne(adminId), openness);
+		return partyRepository.save(party);
 	}
 
 	public void delete(final Long partyId, final Long sessionUserId) throws IllegalArgumentException {
 		if (!partyRepository.exists(partyId)) {
 			throw new IllegalArgumentException("그룹이 존재하지 않습니다.");
 		}
-        final Party party = partyRepository.findOne(partyId);
+		final Party party = partyRepository.findOne(partyId);
 		if (!party.isAdmin(userRepository.findOne(sessionUserId))) {
 			throw new IllegalArgumentException("그룹을 삭제할 권한이 없습니다.");
 		}
 		party.close();
 	}
 
-	public void inviteMember(final SessionUser sessionUser, final Long userId, final Long partyId)
-			throws UnpermittedAccessGroupException, FailedAddingGroupMemberException {
+	public void inviteMember(final Long sessionId, final Long userId, final Long partyId)
+			throws UnpermittedAccessException, FailedAddingGroupMemberException {
 		Party party = partyRepository.findOne(partyId);
 		User user = userRepository.findOne(userId);
-		User loginedUser = userRepository.findOne(sessionUser.getId());
+		User loginedUser = userRepository.findOne(sessionId);
 		if (!party.hasMember(loginedUser)) {
-			throw new UnpermittedAccessGroupException("회원을 초대할 권한이 없습니다!");
+			throw new UnpermittedAccessException("회원을 초대할 권한이 없습니다!");
 		}
 		if (null == user) {
 			throw new FailedAddingGroupMemberException("사용자를 찾을 수 없습니다!");
@@ -74,15 +75,14 @@ public class PartyService {
 		if (party.hasMember(user)) {
 			throw new FailedAddingGroupMemberException("이미 가입되어 있습니다!");
 		}
-		notificationRepository
-				.save(new Notification(new Date(), loginedUser, user, party, Pattern.INVITE));
+		notificationRepository.save(new Notification(new Date(), loginedUser, user, party, Pattern.INVITE));
 	}
 
-	public void joinMember(final SessionUser sessionUser, final Long partyId) {
+	public void joinMember(final Long sessionId, final Long partyId) {
 		Party party = partyRepository.findOne(partyId);
-		User writer = userRepository.findOne(sessionUser.getId());
+		User writer = userRepository.findOne(sessionId);
 		if (party.isClose()) {
-			throw new UnpermittedAccessGroupException();
+			throw new UnpermittedAccessException();
 		}
 		if (party.hasMember(writer)) {
 			throw new FailedAddingGroupMemberException("이미 가입한 유저입니다!");
@@ -90,8 +90,7 @@ public class PartyService {
 		if (null != findByRequest(party, writer)) {
 			throw new FailedAddingGroupMemberException("가입 승인 대기중 입니다!");
 		}
-		notificationRepository
-				.save(new Notification(new Date(), writer, party.getAdmin(), party, Pattern.REQUEST));
+		notificationRepository.save(new Notification(new Date(), writer, party.getAdmin(), party, Pattern.REQUEST));
 	}
 
 	private Optional<Notification> findByRequest(final Party party, final User writer) {
@@ -99,9 +98,9 @@ public class PartyService {
 				.filter(n -> n.isRequest()).findFirst();
 	}
 
-	public void addMember(final Long userId, final Long partyId, final SessionUser sessionUser) {
+	public void addMember(final Long userId, final Long partyId, final Long sessionId) {
 		User user = userRepository.findOne(userId);
-		if (!sessionUser.isEqualId(user)) {
+		if (!sessionId.equals(user.getId())) {
 			throw new IllegalArgumentException("자기 자신을 멤버로 추가할 수 없습니다.");
 		}
 		partyRepository.findOne(partyId).addMember(user);
@@ -119,10 +118,11 @@ public class PartyService {
 		party.deleteMember(user);
 	}
 
-	public void deleteMember(final SessionUser sessionUser, final Long userId, final Long partyId) throws PartyLeaveFailedException {
+	public void deleteMember(final Long sessionId, final Long userId, final Long partyId)
+			throws PartyLeaveFailedException {
 		Party party = partyRepository.findOne(partyId);
 		User adminUser = party.getAdmin();
-		if (!sessionUser.isEqualId(adminUser)) {
+		if (!adminUser.getId().equals(sessionId)) {
 			throw new PartyLeaveFailedException("그룹장만이 추방이 가능합니다.");
 		}
 		if (adminUser.getId() == userId) {
@@ -140,9 +140,10 @@ public class PartyService {
 	}
 
 	// TODO 메서드가 비대하므로 분리할 것.
-	public void update(final SessionUser sessionUser, final Party party, final String rootPath, final MultipartFile partyImage) {
+	public void update(final Long sessionId, final Party party, final String rootPath,
+			final MultipartFile partyImage) {
 		Party dbParty = this.findOne(party.getId());
-		User user = userRepository.findOne(sessionUser.getId());
+		User user = userRepository.findOne(sessionId);
 		if (!dbParty.isAdmin(user)) {
 			throw new FailedUpdatePartyException("그룹장만이 그룹설정이 가능합니다.");
 		}

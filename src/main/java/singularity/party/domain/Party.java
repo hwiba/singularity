@@ -61,7 +61,7 @@ public class Party {
 		this.backgroundImage = backgroundImage;
 		this.admin = admin;
 		this.openness = openness;
-		this.members = new ArrayList();
+		this.members = new ArrayList<>();
 		this.addMember(admin);
 	}
 

@@ -20,7 +20,7 @@ import singularity.common.utility.ResponseUtil;
 import singularity.exception.FailedAddingGroupMemberException;
 import singularity.exception.FailedUpdatePartyException;
 import singularity.exception.PartyLeaveFailedException;
-import singularity.exception.UnpermittedAccessGroupException;
+import singularity.exception.UnpermittedAccessException;
 import singularity.party.domain.Party;
 import singularity.party.service.PartyService;
 import singularity.user.domain.User;
@@ -44,7 +44,7 @@ public class PartyController {
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	protected ResponseEntity<Object> getAccessPartys(HttpSession session) {
-		Long userId = RequestUtil.getSessionUser(session).getId();
+		Long userId = RequestUtil.getSessionId(session);
 		return ResponseUtil.JSON(partyService.findAllByUserId(userId), HttpStatus.OK);
 	}
 
@@ -55,7 +55,7 @@ public class PartyController {
 		if (partyName.length() > 15) {
 			return ResponseUtil.JSON("그룹명은 15자 이내로 가능합니다", HttpStatus.PRECONDITION_FAILED);
 		}
-		final Long adminId = RequestUtil.getSessionUser(session).getId();
+		final Long adminId = RequestUtil.getSessionId(session);
 		final Party.Openness openness = "F" == status ? Party.Openness.COMMUNITY : Party.Openness.EVERYONE;
 		final Party party = partyService.create(partyName, adminId, openness);
 		return ResponseUtil.JSON(party, HttpStatus.CREATED);
@@ -64,7 +64,7 @@ public class PartyController {
 	@RequestMapping(value = "/{partyId}", method = RequestMethod.DELETE)
 	protected ResponseEntity<Object> delete(@PathVariable final Long partyId, HttpSession session, Model model) {
         try {
-            partyService.delete(partyId, RequestUtil.getSessionUser(session).getId());
+            partyService.delete(partyId, RequestUtil.getSessionId(session));
         } catch (IllegalArgumentException e) {
             return ResponseUtil.JSON(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -75,8 +75,8 @@ public class PartyController {
 	protected ResponseEntity<Object> inviteGroupMember(@PathVariable Long partyId, @RequestParam Long userId,
 			HttpSession session) {
 		try {
-			partyService.inviteMember(RequestUtil.getSessionUser(session), userId, partyId);
-		} catch (UnpermittedAccessGroupException | FailedAddingGroupMemberException e) {
+			partyService.inviteMember(RequestUtil.getSessionId(session), userId, partyId);
+		} catch (UnpermittedAccessException | FailedAddingGroupMemberException e) {
 			return ResponseUtil.JSON(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 		return ResponseUtil.JSON("", HttpStatus.OK);
@@ -84,14 +84,14 @@ public class PartyController {
 
 	@RequestMapping(value = "/{partyId}/members/join", method = RequestMethod.POST)
 	protected ResponseEntity<Object> joinGroupMember(@PathVariable Long partyId, HttpSession session) {
-		partyService.joinMember(RequestUtil.getSessionUser(session), partyId);
+		partyService.joinMember(RequestUtil.getSessionId(session), partyId);
 		return ResponseUtil.JSON("", HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/{partyId}/members/accept", method = RequestMethod.POST)
 	protected ResponseEntity<Object> acceptGroupMember(@RequestParam Long userId, @PathVariable Long partyId,
 			HttpSession session) {
-		partyService.addMember(userId, partyId, RequestUtil.getSessionUser(session));
+		partyService.addMember(userId, partyId, RequestUtil.getSessionId(session));
 		return ResponseUtil.JSON(null, HttpStatus.ACCEPTED);
 	}
 
@@ -108,7 +108,7 @@ public class PartyController {
 	@RequestMapping(value = "/members/delete", method = RequestMethod.POST)
 	protected ResponseEntity<Object> delete(HttpSession session, @RequestParam Long userId,
 			@RequestParam Long partyId) {
-		partyService.deleteMember(RequestUtil.getSessionUser(session), userId, partyId);
+		partyService.deleteMember(RequestUtil.getSessionId(session), userId, partyId);
 		return ResponseUtil.JSON("", HttpStatus.OK);
 	}
 
@@ -121,7 +121,7 @@ public class PartyController {
 	@RequestMapping("/update/form/{partyId}")
 	protected String updateForm(@PathVariable Long partyId, Model model, HttpSession session) {
 		Party party = partyService.findOne(partyId);
-		Long sessionUserId = RequestUtil.getSessionUser(session).getId();
+		Long sessionUserId = RequestUtil.getSessionId(session);
 		if (!sessionUserId.equals(party.getAdmin().getId())) {
 			throw new FailedUpdatePartyException("그룹장만이 그룹설정이 가능합니다.");
 		}
@@ -132,11 +132,12 @@ public class PartyController {
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
 	protected String updateUser(@RequestParam MultipartFile backgroundImage, HttpSession session, Party party) {
+		//TODO valid 사용하기
 		if (party.getName().equals("")) {
-			throw new FailedUpdatePartyException("그룹명이 공백입니다.");
+			throw new FailedUpdatePartyException("그룹명이 공백일 수 없습니다.");
 		}
 		String rootPath = session.getServletContext().getRealPath("/");
-		partyService.update(RequestUtil.getSessionUser(session), party, rootPath, backgroundImage);
+		partyService.update(RequestUtil.getSessionId(session), party, rootPath, backgroundImage);
 		return "redirect:/g/" + party.getId().toString();
 	}
 }

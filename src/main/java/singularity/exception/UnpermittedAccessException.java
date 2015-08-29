@@ -4,15 +4,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value=HttpStatus.NOT_ACCEPTABLE)
-public class UnpermittedAccessGroupException extends RuntimeException{
+public class UnpermittedAccessException extends RuntimeException{
 	private static final long serialVersionUID = 1L;
-	public UnpermittedAccessGroupException() {
+	public UnpermittedAccessException() {
 		super();
 	}
-	public UnpermittedAccessGroupException(Throwable cause) {
+	public UnpermittedAccessException(Throwable cause) {
 		super(cause);
 	}
-	public UnpermittedAccessGroupException(String message) {
+	public UnpermittedAccessException(String message) {
 		super(message);
 	}
 }
