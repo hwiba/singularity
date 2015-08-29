@@ -1,13 +1,12 @@
 package singularity.user.service;
 
-import javax.annotation.Resource;
-import javax.transaction.Transactional;
-
 import org.springframework.stereotype.Service;
-
 import singularity.exception.ExistedUserException;
 import singularity.user.domain.User;
 import singularity.user.repository.UserRepository;
+
+import javax.annotation.Resource;
+import javax.transaction.Transactional;
 
 @Service
 @Transactional

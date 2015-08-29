@@ -1,29 +1,29 @@
 package singularity.party.controller;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
 import singularity.common.utility.RequestUtil;
 import singularity.common.utility.ResponseUtil;
-import singularity.exception.FailedAddingGroupMemberException;
-import singularity.exception.FailedUpdatePartyException;
+import singularity.exception.FailedAddingPartyMemberException;
 import singularity.exception.PartyLeaveFailedException;
 import singularity.exception.UnpermittedAccessException;
 import singularity.party.domain.Party;
 import singularity.party.service.PartyService;
 import singularity.user.domain.User;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.List;
 
 @Controller
 @RequestMapping("/party")
@@ -48,7 +48,6 @@ public class PartyController {
 		return ResponseUtil.JSON(partyService.findAllByUserId(userId), HttpStatus.OK);
 	}
 
-    //TODO party 생성 시 DTO로 받기.
 	@RequestMapping(value = "", method = RequestMethod.POST)
 	protected ResponseEntity<Object> create(@RequestParam final String status, @RequestParam final String partyName,
 			HttpSession session, Model model) {
@@ -76,7 +75,7 @@ public class PartyController {
 			HttpSession session) {
 		try {
 			partyService.inviteMember(RequestUtil.getSessionId(session), userId, partyId);
-		} catch (UnpermittedAccessException | FailedAddingGroupMemberException e) {
+		} catch (UnpermittedAccessException | FailedAddingPartyMemberException e) {
 			return ResponseUtil.JSON(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 		return ResponseUtil.JSON("", HttpStatus.OK);
@@ -89,7 +88,7 @@ public class PartyController {
 	}
 
 	@RequestMapping(value = "/{partyId}/members/accept", method = RequestMethod.POST)
-	protected ResponseEntity<Object> acceptGroupMember(@RequestParam Long userId, @PathVariable Long partyId,
+	protected ResponseEntity<Object> acceptMember(@RequestParam Long userId, @PathVariable Long partyId,
 			HttpSession session) {
 		partyService.addMember(userId, partyId, RequestUtil.getSessionId(session));
 		return ResponseUtil.JSON(null, HttpStatus.ACCEPTED);
@@ -106,15 +105,15 @@ public class PartyController {
 	}
 
 	@RequestMapping(value = "/members/delete", method = RequestMethod.POST)
-	protected ResponseEntity<Object> delete(HttpSession session, @RequestParam Long userId,
+	protected ResponseEntity<Object> deleteMember(HttpSession session, @RequestParam Long userId,
 			@RequestParam Long partyId) {
 		partyService.deleteMember(RequestUtil.getSessionId(session), userId, partyId);
 		return ResponseUtil.JSON("", HttpStatus.OK);
 	}
 
 	@RequestMapping("/members/{partyId}")
-	protected ResponseEntity<Object> listGroupMember(@PathVariable Long partyId) {
-		List<User> members = partyService.readMembers(partyId);
+	protected ResponseEntity<Object> getMembers(@PathVariable Long partyId) {
+		List<User> members = partyService.getMembers(partyId);
 		return ResponseUtil.JSON(members, HttpStatus.OK);
 	}
 
@@ -123,21 +122,24 @@ public class PartyController {
 		Party party = partyService.findOne(partyId);
 		Long sessionUserId = RequestUtil.getSessionId(session);
 		if (!sessionUserId.equals(party.getAdmin().getId())) {
-			throw new FailedUpdatePartyException("그룹장만이 그룹설정이 가능합니다.");
+			return "redirect:/";
 		}
 		model.addAttribute("party", party);
-		model.addAttribute("members", partyService.readMembers(partyId));
-		return "updateGroup";
+		model.addAttribute("members", partyService.getMembers(partyId));
+		return "updateParty";
 	}
 
 	@RequestMapping(value = "/update", method = RequestMethod.POST)
-	protected String updateUser(@RequestParam MultipartFile backgroundImage, HttpSession session, Party party) {
-		//TODO valid 사용하기
-		if (party.getName().equals("")) {
-			throw new FailedUpdatePartyException("그룹명이 공백일 수 없습니다.");
-		}
-		String rootPath = session.getServletContext().getRealPath("/");
-		partyService.update(RequestUtil.getSessionId(session), party, rootPath, backgroundImage);
-		return "redirect:/g/" + party.getId().toString();
+	protected String update(@Validated Party party, BindingResult result, @RequestParam MultipartFile backgroundImage, HttpSession session) {
+        if (result.hasErrors()) {
+            return "/update/form"+String.valueOf(party.getId());
+        }
+		String path = session.getServletContext().getRealPath("/");
+        try {
+            partyService.update(RequestUtil.getSessionId(session), party, path, backgroundImage);
+        } catch (IOException e) {
+            return "/update/form"+String.valueOf(party.getId());
+        }
+        return "redirect:/g/" + String.valueOf(party.getId());
 	}
 }

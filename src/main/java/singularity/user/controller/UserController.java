@@ -9,10 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import singularity.exception.ExistedUserException;
 import singularity.exception.FailedSendingEmailException;
-import singularity.exception.SessionUserMismatchException;
 import singularity.user.domain.Confirm;
 import singularity.user.domain.User;
-import singularity.user.dto.SessionUser;
 import singularity.user.service.ConfirmService;
 import singularity.user.service.UserService;
 
