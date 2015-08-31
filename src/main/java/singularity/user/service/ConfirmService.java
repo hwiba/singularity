@@ -4,7 +4,7 @@ import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import singularity.common.utility.RandomFactory;
+import singularity.app.utility.RandomFactory;
 import singularity.user.domain.Confirm;
 import singularity.user.domain.User;
 import singularity.user.exception.FailedSendingEmailException;

@@ -1,4 +1,4 @@
-package singularity.common.utility;
+package singularity.app.utility;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;

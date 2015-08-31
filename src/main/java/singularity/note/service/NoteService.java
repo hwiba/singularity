@@ -2,7 +2,7 @@ package singularity.note.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import singularity.comment.repository.PCommentRepository;
+import singularity.comment.repository.CommentRepository;
 import singularity.note.domain.Note;
 import singularity.note.repository.NoteRepository;
 import singularity.notification.domain.Notification;
@@ -26,7 +26,7 @@ public class NoteService {
 	@Resource
 	private UserRepository userRepository;
 	@Resource
-	private PCommentRepository pCommentRepository;
+	private CommentRepository commentRepository;
     @Resource
     private NotificationRepository notificationRepository;
 

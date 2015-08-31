@@ -1,4 +1,4 @@
-package singularity.common.utility;
+package singularity.app.utility;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

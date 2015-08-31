@@ -1,4 +1,4 @@
-package singularity.common.utility;
+package singularity.app.utility;
 
 public interface NashornMarkdown {
 	String toHtml(String markdown);

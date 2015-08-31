@@ -2,7 +2,8 @@ package singularity.comment.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import singularity.note.domain.Note;
 import singularity.user.domain.User;
 
 import javax.persistence.*;
@@ -10,45 +11,61 @@ import java.util.Date;
 
 @Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class Comment {
-	
-	private enum Status {
-		ON, OFF
-	}
 
-	@Id
-	@GeneratedValue
-	private Long id;
+    private enum Status {
+        ON, OFF
+    }
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date createDate;
+    @Id
+    @GeneratedValue
+    private Long id;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createDate;
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_FK")
-	private User writer;
+    private User writer;
 
-	@Lob
-	@Column(nullable=false)
-	private String text;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "note_FK")
+    private Note note;
 
-	@Column(nullable = false)
-	private Status status;
+    @Lob
+    @Column(nullable=false)
+    private String text;
 
-	public boolean isWriter(User user) {
-		return this.writer.equals(user);
-	}
+    @Column(nullable = false)
+    private Status status;
 
-	public void rewrite(String text) {
-		if (null == text) {
-			return;
-		}
-		this.text = text;
-	}
+	@Column
+	private Integer pageId;
 
-	public void delete() {
-		this.status = Status.OFF;
-	}
+	@Column
+	private Integer totalSameText;
+
+	@Column
+	private Integer sameTextIndex;
+
+    @Lob
+	@Column
+	private String targetText;
+
+    public boolean isWriter(User user) {
+        return this.writer.equals(user);
+    }
+
+    public void rewrite(String text) {
+        if (null == text) {
+            return;
+        }
+        this.text = text;
+    }
+
+    public void delete() {
+        this.status = Status.OFF;
+    }
 	
 }

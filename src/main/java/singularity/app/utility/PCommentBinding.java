@@ -1,9 +1,9 @@
-package singularity.common.utility;
+package singularity.app.utility;
 
 public class PCommentBinding {
 
-//	public static List<PComment> UpdatePId(String[] originParagraph, String[] editedParagraph,
-//			List<PComment> pComments) {
+//	public static List<Comment> UpdatePId(String[] originParagraph, String[] editedParagraph,
+//			List<Comment> pComments) {
 //
 //		double minSimilarity = ApplicationCofigure.PCOMMENT_MIN_SIMILARITY_RATE;
 //		List<String> wordDic = makeDic(originParagraph, editedParagraph, pComments);
@@ -21,7 +21,7 @@ public class PCommentBinding {
 //			editedParagraphWrodVector[i] = getVector(wordDic, editedWords);
 //		}
 //
-//		for (PComment pComment : pComments) {
+//		for (Comment pComment : pComments) {
 //			Map<Integer, Double> score = new HashMap<Integer, Double>();
 //			int pId = (int) pComment.getPId();
 //			if(pId == -1){
@@ -59,7 +59,7 @@ public class PCommentBinding {
 //	}
 //
 //	private static List<String> makeDic(String[] originParagraph, String[] editedParagraph,
-//			List<PComment> pComments) {
+//			List<Comment> pComments) {
 //		Set<String> wordSet = new TreeSet<String>();
 //
 //		String allSentence = "";
@@ -69,7 +69,7 @@ public class PCommentBinding {
 //		for (String sen : editedParagraph) {
 //			allSentence += sen + " ";
 //		}
-//		for (PComment pComment : pComments) {
+//		for (Comment pComment : pComments) {
 //			allSentence += pComment.getPCommentText() + " ";
 //		}
 //
