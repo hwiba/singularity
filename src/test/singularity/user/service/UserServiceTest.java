@@ -11,6 +11,7 @@ import singularity.SingularityApplication;
 import singularity.user.domain.User;
 import singularity.user.exception.ExistedUserException;
 import singularity.user.repository.UserRepository;
+import singularity.user.service.UserService;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -19,9 +20,6 @@ import java.util.Date;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by scala on 2015. 8. 24..
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SingularityApplication.class)
 @WebAppConfiguration

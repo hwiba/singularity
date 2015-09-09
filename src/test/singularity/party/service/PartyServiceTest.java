@@ -10,6 +10,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import singularity.SingularityApplication;
 import singularity.party.domain.Party;
 import singularity.party.repository.PartyRepository;
+import singularity.party.service.PartyService;
 import singularity.user.domain.User;
 import singularity.user.service.UserService;
 
@@ -20,9 +21,6 @@ import java.util.Date;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by scala on 2015. 8. 24..
- */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SingularityApplication.class)
 @WebAppConfiguration
