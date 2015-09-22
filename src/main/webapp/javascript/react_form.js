@@ -1,7 +1,6 @@
-/**
- * 
+/*
+ * test 목적.
  */
-
 var Spinbox = React.createClass({
     getInitialState : function(){
         return {
@@ -12,7 +11,7 @@ var Spinbox = React.createClass({
         return (
                 <div>
                     <input type="text" value={ this.state.value }></input>
-                    <button onClick={ this.decrease } >▼</button>
+                    <button onClick={ this.decrease } ></button>
                     <button onClick={ this.increase } >▲</button>
                 </div>
             );
@@ -29,3 +28,4 @@ var Spinbox = React.createClass({
     <Spinbox value="300" />,
     document.getElementById('example')
   );
+

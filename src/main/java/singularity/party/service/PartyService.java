@@ -1,7 +1,18 @@
 package singularity.party.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+import javax.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import singularity.notification.domain.Notification;
 import singularity.notification.domain.Notification.Pattern;
 import singularity.notification.repository.NotificationRepository;
@@ -12,15 +23,6 @@ import singularity.party.exception.UnpermittedAccessException;
 import singularity.party.repository.PartyRepository;
 import singularity.user.domain.User;
 import singularity.user.repository.UserRepository;
-
-import javax.annotation.Resource;
-import javax.transaction.Transactional;
-import java.io.File;
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -34,6 +36,7 @@ public class PartyService {
 
     public List<Party> findAllByUserId(final Long userId) {
         User user = userRepository.findOne(userId);
+        // TODO partyAndUser table 만들어서 빼기.
         return partyRepository.findAll().stream().filter(p -> p.hasMember(user)).collect(Collectors.toList());
     }
 

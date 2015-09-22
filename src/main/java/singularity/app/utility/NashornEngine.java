@@ -1,9 +1,10 @@
 package singularity.app.utility;
 
+import java.io.FileReader;
+
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import java.io.FileReader;
 
 public class NashornEngine {
 

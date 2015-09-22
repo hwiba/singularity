@@ -1,7 +1,12 @@
 package singularity.comment.service;
 
+import java.util.List;
+
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import singularity.comment.domain.Comment;
 import singularity.comment.repository.CommentRepository;
 import singularity.note.domain.Note;
@@ -9,9 +14,6 @@ import singularity.note.repository.NoteRepository;
 import singularity.party.domain.Party;
 import singularity.user.domain.User;
 import singularity.user.repository.UserRepository;
-
-import javax.annotation.Resource;
-import java.util.List;
 
 
 @Service

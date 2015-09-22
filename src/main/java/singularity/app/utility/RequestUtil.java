@@ -1,8 +1,8 @@
 package singularity.app.utility;
 
-import singularity.user.dto.SessionUser;
-
 import javax.servlet.http.HttpSession;
+
+import singularity.user.dto.SessionUser;
 
 public class RequestUtil {
 

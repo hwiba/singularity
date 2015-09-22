@@ -1,20 +1,22 @@
 package singularity.user.service;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Date;
+
+import javax.annotation.Resource;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
 import singularity.app.utility.RandomFactory;
 import singularity.user.domain.Confirm;
 import singularity.user.domain.User;
 import singularity.user.exception.FailedSendingEmailException;
 import singularity.user.repository.ConfirmRepository;
-
-import javax.annotation.Resource;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
 
 @Service
 public class ConfirmService {

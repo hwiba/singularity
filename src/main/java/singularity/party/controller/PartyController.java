@@ -1,5 +1,11 @@
 package singularity.party.controller;
 
+import java.io.IOException;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
 import singularity.app.utility.RequestUtil;
 import singularity.app.utility.ResponseUtil;
 import singularity.party.domain.Party;
@@ -19,11 +26,6 @@ import singularity.party.exception.PartyLeaveFailedException;
 import singularity.party.exception.UnpermittedAccessException;
 import singularity.party.service.PartyService;
 import singularity.user.domain.User;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.List;
 
 @Controller
 @RequestMapping("/party")
