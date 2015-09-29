@@ -28,11 +28,27 @@ def rsync() :
 	local("mv "+git_clone_dir+"/singularity-0.0.1-SNAPSHOT "+git_clone_dir+"/ROOT")
 	local("rsync -avr --delete "+git_clone_dir+"/ROOT "+tomcat_dir)
 
+def tempPageShow() :
+	local("mv /etc/nginx/sites-enabled/webadv.com /etc/nginx/sites-available/")
+	local("mv /etc/nginx/sites-available/testPage /etc/nginx/sites-enabled/")
+	local("cd /etc/nginx/sites-enabled/")
+	local("mv testPage webadv.com")
+
+def tempPageOut() :
+	local("cd /etc/nginx/sites-enabled/")
+	local("mv webadv.com testPage")
+	local("mv /etc/nginx/sites-enabled/testPage /etc/nginx/sites-available/")
+	local("mv /etc/nginx/sites-available/webadv.com /etc/nginx/sites-enabled/")
+
 def deploy() :
 	#git clone 및 패키징은 종료된 상태.
 	execute(backup)
+	execute(tempPageShow)
+	execute(nginxRestart)
+	# 임시 페이지로 전환 완료
 	execute(tomcatStop)
 	execute(rsync)
 	execute(tomcatStart)
+	execute(tempPageOut)
 	execute(nginxRestart)
 
