@@ -3,14 +3,14 @@
 	xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8" />
-<title>stagway</title>
+<title>singularity</title>
 <link rel="stylesheet" href="/css/mainStyle.css" />
 </head>
 <body>
 	<div id="jumbotron-container">
 		<div class="content wrap">
 			<div id="jumbotron">
-				<img src="/img/welcome/png"></img>
+				<img src="/img/welcome.png"></img>
 				<h1>로그인하기</h1>
 				<form action="#" th:object="${user}" th:action="@{/user/login}" th:method="post">
 					<div class="error-messages" th:if="${loginFailedError}" th:text="${loginFailedError}">잘못된 메일 주소 혹은 비밀번호를 입력하셨습니다.</div>
