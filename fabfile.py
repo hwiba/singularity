@@ -31,12 +31,8 @@ def rsync() :
 def tempPageShow() :
 	local("mv /etc/nginx/sites-enabled/webadv.com /etc/nginx/sites-available/")
 	local("mv /etc/nginx/sites-available/testPage /etc/nginx/sites-enabled/")
-	local("cd /etc/nginx/sites-enabled/")
-	local("mv testPage webadv.com")
 
 def tempPageOut() :
-	local("cd /etc/nginx/sites-enabled/")
-	local("mv webadv.com testPage")
 	local("mv /etc/nginx/sites-enabled/testPage /etc/nginx/sites-available/")
 	local("mv /etc/nginx/sites-available/webadv.com /etc/nginx/sites-enabled/")
 
