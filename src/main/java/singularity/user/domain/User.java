@@ -70,12 +70,19 @@ public class User {
 		return this.membershipClass;
 	}
 	
-	public void changeName(String name) {
+	public User changeName(String name) {
 		this.name = name;
+		return this;
 	}
 
-	public void changeProfileImage(String profileImage) {
+	public User changeProfileImage(String profileImage) {
 		this.profileImage = profileImage;
+		return this;
+	}
+	
+	public User changeEmail(String email) {
+		this.email = email;
+		return this;
 	}
 
 	public void delete() {
@@ -90,10 +97,6 @@ public class User {
 		this.membershipClass = MembershipClass.READY;
 	}
 
-	public void changeEmail(String email) {
-		this.email = email;
-	}
-
 	public boolean isAccept() {
 		return this.membershipClass.equals(MembershipClass.ACCEPT);
 	}
@@ -105,9 +108,9 @@ public class User {
     public boolean isReady() {
         return this.membershipClass.equals(MembershipClass.READY);
     }
-
-	public void setId(Long id) {
-		this.id = id;
-	}
+    
+    public boolean isValidatedPassword(String password) {
+    	return this.password.equals(password);
+    }
 
 }

@@ -16,6 +16,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import lombok.val;
 import singularity.SingularityApplication;
 import singularity.user.domain.User;
 import singularity.user.exception.ExistedUserException;
@@ -55,7 +56,7 @@ public class UserServiceTest {
 
     @Test
     public void testAccept_가입한_유저가_승인을_요청할_때_승인() {
-        User dbUser = userService.create(user);
+        val dbUser = userService.create(user);
         userService.accept(dbUser);
         assertTrue(dbUser.isAccept());
     }
@@ -64,18 +65,25 @@ public class UserServiceTest {
     public void testAccept_가입하지_않은_유저가_가입승인을_요청할_때() {
         expectedExcetption.expect(IllegalArgumentException.class);
         expectedExcetption.expectMessage("가입하지 않은 유저입니다.");
-        User cloneUser = this.user;
+        val cloneUser = this.user;
         userService.accept(cloneUser);
     }
 
     @Test
     public void testAccept_승인되었거나_탈퇴한_회원이_승인을_요청할_때() {
-        User dbUser = userService.create(user);
+        val dbUser = userService.create(user);
         userService.accept(dbUser);
         expectedExcetption.expect(IllegalArgumentException.class);
         expectedExcetption.expectMessage("승인 대상이 아닌 유저입니다.");
-        User cloneUser = this.user;
+        val cloneUser = this.user;
         userService.accept(cloneUser);
+    }
+    
+    @Test
+    public void testFindOne_가입하지_않은_유저를_불러오길_요청할_떄 () {
+    	expectedExcetption.expect(NullPointerException.class);
+    	expectedExcetption.expectMessage("회원 가입이 되어 있지 않습니다.");
+    	userService.findOne(-1L);
     }
 
 }
