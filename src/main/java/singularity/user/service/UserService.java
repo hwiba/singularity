@@ -5,6 +5,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import lombok.val;
 import singularity.user.domain.User;
 import singularity.user.exception.ExistedUserException;
 import singularity.user.repository.UserRepository;
@@ -24,7 +25,7 @@ public class UserService {
     }
 
     public void accept(User user) {
-        User dbUser = userRepository.findOneByEmail(user.getEmail());
+        val dbUser = userRepository.findOneByEmail(user.getEmail());
         if (null == dbUser) {
             throw new IllegalArgumentException("가입하지 않은 유저입니다.");
         }
@@ -39,18 +40,18 @@ public class UserService {
     }
 
     public void update(User user) {
-        User dbUser = userRepository.findOne(user.getId());
+        val dbUser = userRepository.findOne(user.getId());
         dbUser.changeEmail(user.getEmail());
         dbUser.changeProfileImage(user.getProfileImage());
     }
 
     public void delete(User user) {
-        User dbUser = userRepository.findOne(user.getId());
+        val dbUser = userRepository.findOne(user.getId());
         dbUser.delete();
     }
 
     public User findForLogin(User user) throws IllegalArgumentException {
-        User dbUser = userRepository.findOne(user.getId());
+        val dbUser = userRepository.findOne(user.getId());
         if (null == dbUser) {
             throw new IllegalArgumentException("가입하지 않은 메일 주소입니다.");
         }
