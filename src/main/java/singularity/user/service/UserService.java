@@ -27,14 +27,16 @@ public class UserService {
 	}
 
 	public void accept(User user) {
-		val dbUser = userRepository.findOneByEmail(user.getEmail());
-		if (null == dbUser) {
-			throw new IllegalArgumentException("가입하지 않은 유저입니다.");
-		}
+		val dbUser = this.findOneByEmail(user.getEmail());
 		if (!dbUser.isReady()) {
 			throw new IllegalArgumentException("승인 대상이 아닌 유저입니다.");
 		}
 		dbUser.accept();
+	}
+
+	private User findOneByEmail(String email) {
+		return Objects.requireNonNull(userRepository.findOneByEmail(email),
+				() -> "회원 가입이 되어 있지 않습니다.");
 	}
 
 	public User findOne(long userId) {
@@ -43,8 +45,7 @@ public class UserService {
 	}
 
 	public void update(User requestUser) {
-		this.findOne(requestUser.getId())
-				.changeEmail(requestUser.getEmail())
+		this.findOne(requestUser.getId()).changeEmail(requestUser.getEmail())
 				.changeProfileImage(requestUser.getProfileImage());
 	}
 

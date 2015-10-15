@@ -63,8 +63,8 @@ public class UserServiceTest {
 
     @Test
     public void testAccept_가입하지_않은_유저가_가입승인을_요청할_때() {
-        expectedExcetption.expect(IllegalArgumentException.class);
-        expectedExcetption.expectMessage("가입하지 않은 유저입니다.");
+        expectedExcetption.expect(NullPointerException.class);
+        expectedExcetption.expectMessage("회원 가입이 되어 있지 않습니다.");
         val cloneUser = this.user;
         userService.accept(cloneUser);
     }
