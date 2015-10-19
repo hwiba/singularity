@@ -850,16 +850,24 @@ div#calendar {
 	width:100%;
 	height:100%;
 	background-size:cover;
-	background-color: gray;
+    background: rgb(254,255,255); /* Old browsers */
+    background: -moz-linear-gradient(top, rgba(254,255,255,1) 0%, rgba(221,241,249,1) 35%, rgba(160,216,239,1) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(254,255,255,1)), color-stop(35%,rgba(221,241,249,1)), color-stop(100%,rgba(160,216,239,1))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, rgba(254,255,255,1) 0%,rgba(221,241,249,1) 35%,rgba(160,216,239,1) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, rgba(254,255,255,1) 0%,rgba(221,241,249,1) 35%,rgba(160,216,239,1) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, rgba(254,255,255,1) 0%,rgba(221,241,249,1) 35%,rgba(160,216,239,1) 100%); /* IE10+ */
+    background: linear-gradient(to bottom, rgba(254,255,255,1) 0%,rgba(221,241,249,1) 35%,rgba(160,216,239,1) 100%); /* W3C */
 	background-repeat:no-repeat;
 }
 
 #jumbotron {
+    font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
 	position:relative;
 	margin: 0 auto;
 	width:360px;
-	margin-top: 20px;
+	margin-top: 40px;
 	padding:50px;
+    padding-bottom:96px;
 	background-color:rgba(45, 45, 45, .4);
 	border-radius:2px;
 	color:#fff;
@@ -868,7 +876,7 @@ div#calendar {
 #jumbotron h1 {
 	padding:0;
 	margin:0;
-	margin-bottom: 2px;
+	margin-bottom: 30px;
 }
 
 #jumbotron > h1 > img {
@@ -883,7 +891,7 @@ div#calendar {
 #jumbotron>form>input {
 	width:350px;
 	height:26px;
-	margin-bottom:6px;
+	margin-bottom:19px;
 	font-size:14px;
 	border-radius:2px;
 }
@@ -902,6 +910,11 @@ div#calendar {
 .btn-pm {
 	background-color:red;
 	float:right;
+    width:200px;
+}
+
+.btn-pm:hover {
+    background-color: mediumspringgreen;
 }
 
 .btn-pm-cancle {
@@ -922,16 +935,21 @@ textarea#commentText {
 }
 
 .swith-form {
-	margin-top:15px;
-	font-size:12px;
-	cursor:pointer;
-	padding:5px;
-	color:#fff;
-	text-decoration:underline;
+    position: relative;
+    padding: 11px;
+    padding-left: 40px;
+    padding-right: 40px;
+    border: 0;
+    color: #fff;
+    font-size: 15px;
+    margin: 15px 5px;
+    cursor: pointer;
+    background-color: gold;
+    top: 25px;
 }
 
 .swith-form:hover {
-	color:red;
+	background-color:mediumspringgreen;
 }
 
 .group-list {

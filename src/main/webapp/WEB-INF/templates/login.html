@@ -10,19 +10,18 @@
 	<div id="jumbotron-container">
 		<div class="content wrap">
 			<div id="jumbotron">
-				<img src="/img/welcome.png"></img>
-				<h1>로그인하기</h1>
+				<h1>Sign in</h1>
 				<form action="#" th:object="${user}" th:action="@{/user/login}" th:method="post">
 					<div class="error-messages" th:if="${loginFailedError}" th:text="${loginFailedError}">잘못된 메일 주소 혹은 비밀번호를 입력하셨습니다.</div>
 					<label for="id">E-mail</label>
 					<input id="id" name="id" th:field="*{id}" required="required" th:value="${user.id}" />
 					
-					<label for="password">비밀번호</label>
+					<label for="password">Password</label>
 					<input id="password" type="password" name="password" th:field="*{password}" required="required" th:value="${user.password}"/>
 					
-					<button class="btn btn-pm" type="submit">로그인</button>
+					<button class="btn btn-pm" type="submit">Sign in</button>
 				</form>
-				<a class="swith-form" href="/user/joinForm">회원가입</a>
+				<a class="swith-form" href="/user/joinForm">Sign up</a>
 			</div>
 		</div>
 	</div>
