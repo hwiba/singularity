@@ -48,6 +48,7 @@ public class User {
         this.name = name;
         this.password = password;
         this.createDate = createDate;
+        this.state = State.READY;
     }
 
     public User changeName (final String name) {
