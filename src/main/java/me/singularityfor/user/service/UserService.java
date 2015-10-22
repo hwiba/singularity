@@ -14,21 +14,17 @@ import java.util.Objects;
 @Service
 @Transactional
 public class UserService {
-
     @Resource
     UserRepository userRepository;
 
-    private User findOne(long userId) {
-        return Objects.requireNonNull(userRepository.findOne(userId), () -> "해당 유저가 존재하지 않습니다.");
+    public User findOne(long userId) {
+        return Objects.requireNonNull(userRepository.findOne(userId), () -> "회원가입이 되어 있지 않습니다");
     }
 
     public User create(User requestUser) {
         //TODO 가입 상태 체크하기.
         return userRepository.save(requestUser);
     }
-
-
-
 
 
 }

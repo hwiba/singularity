@@ -6,8 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 /**
  * Created by Order on 2015. 10. 22..
  */
-public interface UserRepository  extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    User findOneByEmail(String email);
 
 }
