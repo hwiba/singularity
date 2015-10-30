@@ -1,17 +1,17 @@
-package me.singularityfor.controller;
+package me.singularityfor.Controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 /**
- * Created by Order on 2015. 10. 22..
+ * Created by Order on 2015. 10. 30..
  */
 @Controller
 public class MainController {
 
     @RequestMapping("/")
-    public String index() {
+    public String home() {
         return "home";
     }
+
 }
