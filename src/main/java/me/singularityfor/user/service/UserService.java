@@ -1,5 +1,6 @@
 package me.singularityfor.user.service;
 
+import lombok.val;
 import me.singularityfor.user.domain.User;
 import me.singularityfor.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import java.util.Objects;
 @Service
 @Transactional
 public class UserService {
+
     @Resource
     UserRepository userRepository;
 
@@ -26,5 +28,8 @@ public class UserService {
         return userRepository.save(requestUser);
     }
 
-
+    public void delete(User requestUser) {
+        val repositoryUser = this.findOne(requestUser.getId());
+        repositoryUser.delete();
+    }
 }

@@ -1032,7 +1032,7 @@ $__System.register('1f', ['2', '6', '13', '20', '1e'], function (_export) {
                         return React.createElement(
                             'h1',
                             null,
-                            'LoginPage'
+                            'LoginPage 2'
                         );
                     }
                 }]);

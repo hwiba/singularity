@@ -8,6 +8,5 @@ import ReactDOM from 'react-dom';
 import LoginPage from "./LoginPage";
 
 ReactDOM.render(
-    <LoginPage />,
-    document.querySelector('.background')
+    <LoginPage />, document.body
 )

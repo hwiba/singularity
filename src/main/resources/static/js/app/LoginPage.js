@@ -8,6 +8,17 @@ import React from 'react';
 export default class LoginPage extends React.Component {
 
     render() {
-        return <h1>LoginPage</h1>
+        return (
+            <div>
+                <h1>LoginPage Test</h1>
+                <form>
+                    <label>id</label>
+                    <input type="text" />
+                    <label>pw</label>
+                    <input type="text" />
+                    <button type="submit" >button</button>
+                </form>
+            </div>
+        )
     }
 }
