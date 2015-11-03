@@ -1,5 +1,6 @@
 package me.singularityfor.user.service;
 
+import lombok.val;
 import me.singularityfor.SingularityApplication;
 import me.singularityfor.user.domain.User;
 import org.junit.Rule;
@@ -20,10 +21,10 @@ import static org.junit.Assert.*;
 /**
  * Created by Order on 2015. 10. 22..
  */
-@Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SingularityApplication.class)
 @WebAppConfiguration
+@Transactional
 public class UserServiceTest {
 
     @Resource
@@ -32,7 +33,7 @@ public class UserServiceTest {
     @Rule
     public ExpectedException expectedExcetption = ExpectedException.none();
 
-    private final User user = new User("testName", "1234qwer", new Date());
+    private final User user = new User("test@test.com", "testName", "1234qwer", new Date());
 
     @Test
     public void testFindOne_회원_가입이_되어_있지_않을_때 () throws Exception {
@@ -42,7 +43,9 @@ public class UserServiceTest {
     }
 
     @Test
-    public void testCreate() throws Exception {
-        assertTrue(true);
+    public void testCreate_password가_암호화_되는_지 () throws Exception {
+        String pw = user.getPassword();
+        val hashedPasswordUser = userService.create(user);
+        assertNotEquals(hashedPasswordUser.getPassword(), pw);
     }
 }

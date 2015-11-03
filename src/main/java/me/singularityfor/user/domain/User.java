@@ -4,11 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Email;
+import org.springframework.security.crypto.keygen.KeyGenerators;
 
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.function.Function;
+
+import static org.springframework.security.crypto.util.EncodingUtils.subArray;
 
 /**
  * Created by Order on 2015. 10. 22..
@@ -28,10 +33,19 @@ public class User {
     private long id;
 
     @JsonIgnore
-    @Pattern(regexp = "([a-zA-Z].*[0-9])|([0-9].*[a-zA-Z])")
-    @Size(min = 8, max = 25)
-    @Column(name = "password", length=20, nullable = false)
+    @Lob
+    @Column(name = "password", length=512, nullable = false)
     private String password;
+
+    @Column(name="email")
+    @Email(message = "이메일 주소가 유효하지 않습니다.")
+    @Size(max = 50, message = "이메일은 50 글자 이하만 사용 가능합니다.")
+    private String email;
+
+    @JsonIgnore
+    @Lob
+    @Column(name="salt", length = 512, nullable = false)
+    private String salt;
 
     @Pattern(regexp = "([a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣].*)")
     @Size(min=2, max=25)
@@ -44,11 +58,17 @@ public class User {
     @Enumerated(EnumType.STRING)
     private State state;
 
-    public User (String name, String password, Date createDate) {
-        this.name = name;
+    public User (String email, String name, String password, Date createDate) {
         this.password = password;
+        this.email = email;
+        this.name = name;
         this.createDate = createDate;
         this.state = State.READY;
+    }
+
+    public void hashingPassword(Function<String, Object> hasher) {
+        this.salt = KeyGenerators.string().generateKey();
+        this.password = (String) hasher.apply(this.password + this.salt);
     }
 
     public User changeName (final String name) {

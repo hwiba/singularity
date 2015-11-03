@@ -8,5 +8,5 @@ import ReactDOM from 'react-dom';
 import LoginPage from "./LoginPage";
 
 ReactDOM.render(
-    <LoginPage />, document.body
+    <LoginPage className="" />, document.body
 )

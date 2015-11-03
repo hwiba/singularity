@@ -4,7 +4,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * Created by Order on 2015. 10. 30..
+ * Created by Order on 2015. 11. 3..
  */
 @Controller
 public class HomeController {
@@ -13,5 +13,4 @@ public class HomeController {
     public String home() {
         return "home";
     }
-
 }
