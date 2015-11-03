@@ -71,6 +71,10 @@ public class User {
         this.password = (String) hasher.apply(this.password + this.salt);
     }
 
+    public User clone() {
+        return new User(this.id, this.password, this.salt, this.email, this.name, this.createDate, this.state);
+    }
+
     public User changeName (final String name) {
         this.name = name;
         return this;
