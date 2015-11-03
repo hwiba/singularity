@@ -35,6 +35,11 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile("org.springframework.boot:spring-boot-starter-security")
 
+    compile "org.springframework.social:spring-social-config:1.1.1.BUILD-SNAPSHOT"
+    compile "org.springframework.social:spring-social-core:1.1.1.BUILD-SNAPSHOT"
+    compile "org.springframework.social:spring-social-web:1.1.1.BUILD-SNAPSHOT"
+    compile "org.springframework.social:spring-social-facebook:2.0.1.RELEASE"
+
     runtime('mysql:mysql-connector-java')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 
@@ -43,6 +48,17 @@ dependencies {
     compile("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:1.2.9")
     compile('org.projectlombok:lombok:1.16.6')
 
+
+
+}
+
+repositories {
+    mavenLocal()
+    maven { url 'http://maven.springframework.org/release' }
+    maven { url 'http://maven.springframework.org/milestone' }
+    maven { url 'http://maven.springframework.org/snapshot' }
+    maven { url 'http://download.java.net/maven/2' }
+    mavenCentral()
 }
 
 eclipse {
