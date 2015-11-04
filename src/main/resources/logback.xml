@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+       <include resource="org/springframework/boot/logging/logback/base.xml" /> <!-- springboot 기본 설정 상속 -->
+       <logger name="jdbc" level="OFF" /> <!-- log4jdbc가 sql 로그만을 출력하도록 설정 -->
+       <logger name="jdbc.sqltiming" level="DEBUG" /> <!-- sql 문을 sql문+실행시간 형식으로 출력하도록 설정 -->
+
+       <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+              <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+              <encoder>
+                     <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n
+                     </pattern>
+              </encoder>
+       </appender>
+
+       <logger name="singularity" level="DEBUG" />
+
+       <root level="WARN">
+              <appender-ref ref="STDOUT" />
+       </root>
+</configuration>
