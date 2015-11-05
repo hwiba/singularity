@@ -19,6 +19,7 @@ System.config({
     "bootstrap": "github:twbs/bootstrap@3.3.5",
     "core-js": "npm:core-js@1.2.3",
     "css": "github:systemjs/plugin-css@0.1.19",
+    "micromarkdown": "npm:micromarkdown@0.3.4-a",
     "react": "npm:react@0.14.1",
     "react-dom": "npm:react-dom@0.14.1",
     "github:jspm/nodelibs-assert@0.1.0": {
