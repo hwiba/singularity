@@ -22,6 +22,7 @@ import static org.springframework.security.crypto.util.EncodingUtils.subArray;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "_USER_")
 public class User {
 
     private enum State {

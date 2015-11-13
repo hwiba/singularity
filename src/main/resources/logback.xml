@@ -5,16 +5,14 @@
        <logger name="jdbc.sqltiming" level="DEBUG" /> <!-- sql 문을 sql문+실행시간 형식으로 출력하도록 설정 -->
 
        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-              <!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
               <encoder>
-                     <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n
-                     </pattern>
+                     <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n</pattern>
               </encoder>
        </appender>
 
        <logger name="singularity" level="DEBUG" />
 
-       <root level="WARN">
+       <root level="INFO">
               <appender-ref ref="STDOUT" />
        </root>
 </configuration>

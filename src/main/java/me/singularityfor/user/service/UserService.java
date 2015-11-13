@@ -32,9 +32,8 @@ public class UserService {
     public User create(User requestUser) throws Exception {
         if (null != findOneByEmail(requestUser.getEmail()))
             throw new Exception("error");
-        System.out.println(requestUser);
+        System.out.println(requestUser.getName());
         requestUser.hashingPassword(bCryptPasswordEncoder::encode);
-        System.out.println(requestUser);
         return userRepository.save(requestUser);
     }
 
@@ -46,4 +45,6 @@ public class UserService {
         val repositoryUser = this.findOne(requestUser.getId());
         repositoryUser.delete();
     }
+
+
 }
