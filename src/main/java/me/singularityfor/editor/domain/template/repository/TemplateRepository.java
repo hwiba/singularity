@@ -7,9 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 /**
- * Created by Order on 2015. 11. 14..
+ * Created by hyva on 2015. 11. 14..
  */
 public interface TemplateRepository extends JpaRepository<Template, Long> {
+
     Optional<Template> findOneByNameAndGroup(String name, Group group);
 
 }
