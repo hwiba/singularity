@@ -15,6 +15,7 @@ import java.util.*;
 @Getter @Setter @ToString(exclude = {"members"})
 @EqualsAndHashCode(exclude = {"members"})
 @Table(name = "_GROUP_")
+@NoArgsConstructor
 public class Group {
 
     private enum State {

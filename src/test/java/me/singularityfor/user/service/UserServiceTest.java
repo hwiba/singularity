@@ -43,7 +43,7 @@ public class UserServiceTest {
     @Test
     public void testCreate_password가_암호화_되는_지 () throws Exception {
         String pw = user.getPassword();
-        val hashedPasswordUser = userService.create(user.clone());
+        val hashedPasswordUser = userService.create(user.copy());
         assertNotEquals(hashedPasswordUser.getPassword(), pw);
     }
 }

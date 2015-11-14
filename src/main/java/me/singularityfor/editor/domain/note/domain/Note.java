@@ -11,9 +11,10 @@ import javax.validation.constraints.NotNull;
  * Created by hyva on 2015. 11. 13..
  */
 @Entity
-@Getter @Setter
-@ToString(exclude = {}) @EqualsAndHashCode(exclude = {})
+@Getter @Setter @ToString(exclude = {})
+@EqualsAndHashCode(exclude = {})
 @Table(name = "_NOTE_")
+@NoArgsConstructor
 public class Note {
 
     private enum State {
@@ -36,8 +37,6 @@ public class Note {
 
     @Enumerated(value = EnumType.STRING)
     private State state;
-
-    private Note() {};
 
     public Note(User author, Group group, String text) {
         this.author = author;

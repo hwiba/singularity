@@ -55,6 +55,11 @@ public class NoteServiceTest {
     }
 
     @Test
+    public void create() {
+        assertEquals(note, noteService.findOne(note.getId()));
+    }
+
+    @Test
     public void create_권한이_없는_요청 () throws Exception {
         expectedExcetption.expect(IllegalAccessException.class);
         expectedExcetption.expectMessage("권한이 없는 요청");

@@ -1,7 +1,6 @@
 package me.singularityfor.editor.domain.note.service;
 
 import lombok.NonNull;
-import lombok.val;
 import me.singularityfor.editor.domain.note.domain.Note;
 import me.singularityfor.editor.domain.note.repository.NoteRepository;
 import me.singularityfor.group.domain.Group;
@@ -31,5 +30,9 @@ public class NoteService {
 
     private boolean isGroupMember(Group group, User... users) {
         return groupRepository.findOne(group.getId()).hasMember(users);
+    }
+
+    public Note findOne(long id) {
+        return noteRepository.findOne(id);
     }
 }

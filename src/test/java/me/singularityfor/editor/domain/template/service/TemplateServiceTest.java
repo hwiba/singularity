@@ -51,7 +51,7 @@ public class TemplateServiceTest {
 
     @Test
     public void testCreate_같은_명칭의_템플릿이_그룹에_존재하지_않을_때 () throws Exception {
-        val repositoryTemplate = templateService.createTemplate(template);
+        val repositoryTemplate = templateService.create(template);
         assertEquals(template.getAuthor(), repositoryTemplate.getAuthor());
         assertEquals(template.getGroup(), repositoryTemplate.getGroup());
         assertEquals(template.getForm(), repositoryTemplate.getForm());
@@ -63,11 +63,11 @@ public class TemplateServiceTest {
         val template1 = this.template.copyAddSuffix("_1");
         val template2 = this.template.copyAddSuffix("_2");
         val template3 = this.template.copyAddSuffix("_3");
-        templateService.createTemplate(this.template);
-        templateService.createTemplate(template1);
-        templateService.createTemplate(template2);
-        templateService.createTemplate(template3);
-        val repositoryTemplate = templateService.createTemplate(this.template);
+        templateService.create(this.template);
+        templateService.create(template1);
+        templateService.create(template2);
+        templateService.create(template3);
+        val repositoryTemplate = templateService.create(this.template);
         assertEquals("testTemplate_4", repositoryTemplate.getName());
     }
 }

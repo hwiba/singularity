@@ -20,22 +20,20 @@ import static org.springframework.security.crypto.util.EncodingUtils.subArray;
  */
 @Data
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "_USER_")
+@NoArgsConstructor
 public class User {
 
     private enum State {
         READY, ACCEPT, DELETE
     }
 
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue
     private long id;
 
     @JsonIgnore
-    @Lob
-    @Column(name = "password", length=512, nullable = false)
+    @Lob @Column(name = "password", length=512)
     private String password;
 
     @Column(name="email")
@@ -45,12 +43,12 @@ public class User {
 
     @JsonIgnore
     @Lob
-    @Column(name="salt", length = 512, nullable = false)
+    @Column(name="salt", length = 512)
     private String salt;
 
     @Pattern(regexp = "([a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣].*)")
     @Size(min=2, max=25)
-    @Column(name = "name", length=25, nullable = false)
+    @Column(name = "name", length=25)
     private String name;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -72,7 +70,7 @@ public class User {
         this.password = (String) hasher.apply(this.password + this.salt);
     }
 
-    public User clone() {
+    public User copy() {
         return new User(this.id, this.password, this.salt, this.email, this.name, this.createDate, this.state);
     }
 

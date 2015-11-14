@@ -1,48 +1,39 @@
 package me.singularityfor.editor.controller;
 
-import me.singularityfor.note.domain.Note;
-import me.singularityfor.editor.domain.Template;
-import me.singularityfor.note.service.NoteService;
-import me.singularityfor.editor.service.TemplateService;
-import me.singularityfor.group.domain.Group;
-import me.singularityfor.user.domain.User;
+import me.singularityfor.editor.domain.note.service.NoteService;
+import me.singularityfor.editor.domain.template.domain.Template;
+import me.singularityfor.editor.domain.template.service.TemplateService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
+import javax.validation.Valid;
 
 /**
- * Created by Order on 2015. 11. 13..
+ * Created by hyva on 2015. 11. 13..
  */
 @RestController
 @RequestMapping(value = "/editor")
 public class EditorController {
 
-    @Resource private TemplateService templateService;
+    private static final Logger logger = LoggerFactory.getLogger(EditorController.class);
 
+    @Resource private TemplateService templateService;
     @Resource private NoteService noteService;
 
-    @RequestMapping(value = "/template/{author}", method = RequestMethod.POST)
-    public boolean createTemplate (@PathVariable Long authorId, @RequestParam String form) {
-        User author = new User();
-        author.setId(authorId);
-        return templateService.createTemplate(new Template(author, form));
+    @RequestMapping(value = "/template", method = RequestMethod.POST)
+    public Template createTemplate (@Valid @RequestBody Template template) {
+        return templateService.create(template);
     }
 
-    @RequestMapping(value = "/template/group", method = RequestMethod.GET)
-    public List<Template> readTemplates(Group group) {
-        return templateService.findAll(group);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public String handleException(MethodArgumentNotValidException exception) {
+        //TODO 에러 메시지 통합 관리
+        return exception.getMessage();
     }
-
-    @RequestMapping(value = "/template/author", method = RequestMethod.GET)
-    public List<Template> readTemplates(User author) {
-        return templateService.findAll(author);
-    }
-
-    @RequestMapping(value = "/note", method = RequestMethod.POST)
-    public boolean createNote (Note note) {
-        return noteService.createNote(note);
-    }
-
 
 }

@@ -16,20 +16,21 @@ import javax.validation.constraints.Size;
 @Getter @Setter @ToString(exclude = {})
 @EqualsAndHashCode(exclude = {})
 @Table(name="_TEMPLATE_")
+@NoArgsConstructor
 public class Template {
 
     @Id @GeneratedValue
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "author_FK", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_FK") @NotNull
     private User author;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "group_FK")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_FK") @NotNull
     private Group group;
 
-    @Pattern(regexp = "([a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣].*)")
+    @Pattern(regexp = "([a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣].*)") @NotNull
     @Size(min=2, max=25) @Column(name = "name", length=25, nullable = false)
     private String name;
 
