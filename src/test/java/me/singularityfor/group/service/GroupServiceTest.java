@@ -45,7 +45,7 @@ public class GroupServiceTest {
 
     @Test
     public void createGroup() throws Exception {
-        val repositoryGroup = groupService.createGroup(group);
+        val repositoryGroup = groupService.create(group);
         logger.warn("{}", repositoryGroup);
         assertEquals(group.getName(), repositoryGroup.getName());
         assertEquals(user, repositoryGroup.getCaptain());

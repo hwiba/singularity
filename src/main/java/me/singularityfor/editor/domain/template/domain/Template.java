@@ -21,9 +21,8 @@ public class Template {
     @Id @GeneratedValue
     private long id;
 
-    @NotNull
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "author_FK")
+    @JoinColumn(name = "author_FK", nullable = false)
     private User author;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)

@@ -18,7 +18,7 @@ public class GroupService {
 
     @Resource private GroupRepository groupRepository;
 
-    public Group createGroup(@NonNull Group group) {
+    public Group create(@NonNull Group group) {
         return groupRepository.save(group);
     }
 }

@@ -6,8 +6,7 @@ import me.singularityfor.user.domain.User;
 import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by hyva on 2015. 11. 13..
@@ -17,6 +16,10 @@ import java.util.List;
 @EqualsAndHashCode(exclude = {"members"})
 @Table(name = "_GROUP_")
 public class Group {
+
+    private enum State {
+        PUBLIC, SECRET, DELETE
+    }
 
     @Id @GeneratedValue
     private long id;
@@ -33,18 +36,29 @@ public class Group {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createDate;
 
+    @Enumerated(value = EnumType.STRING)
+    private State state;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_FK")
-    private List<User> members;
+    private Collection<User> members = new ArrayList<>();
 
     public Group(final String name, final User captain, final Date createDate) {
         this.name = name;
         this.captain = captain;
         this.createDate = createDate;
+        this.state = State.SECRET;
     }
 
     public boolean isCaptain(final User user) {
         return this.captain.equals(user);
     }
 
+    public boolean hasMember(final User... users) {
+        return this.members.containsAll(Arrays.asList(users)) || (isCaptain(users[0]) && users.length==1);
+    }
+
+    public void addMember(final User... users) {
+        this.members.addAll(Arrays.asList(users));
+    }
 }

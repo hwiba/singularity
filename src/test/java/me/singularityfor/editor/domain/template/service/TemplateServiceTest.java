@@ -45,7 +45,7 @@ public class TemplateServiceTest {
     @Before
     public void setUp() throws Exception {
         user = userService.create(new User("test@test.com", "testUserName", "test1234", new Date()));
-        group = groupService.createGroup(new Group("testGroup", this.user, new Date()));
+        group = groupService.create(new Group("testGroup", this.user, new Date()));
         template = new Template(user, group, "testTemplate", "#공지사항");
     }
 
