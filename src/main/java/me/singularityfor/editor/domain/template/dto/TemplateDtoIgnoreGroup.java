@@ -1,11 +1,10 @@
 package me.singularityfor.editor.domain.template.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import me.singularityfor.editor.domain.template.domain.Template;
 import me.singularityfor.group.domain.Group;
-import me.singularityfor.user.domain.User;
 
 /**
  * Created by hyva on 2015. 11. 14..
