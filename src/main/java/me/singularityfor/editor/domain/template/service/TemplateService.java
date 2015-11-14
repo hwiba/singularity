@@ -2,6 +2,7 @@ package me.singularityfor.editor.domain.template.service;
 
 import lombok.NonNull;
 import me.singularityfor.editor.domain.template.domain.Template;
+import me.singularityfor.editor.domain.template.dto.TemplateDtoIgnoreGroup;
 import me.singularityfor.editor.domain.template.repository.TemplateRepository;
 import me.singularityfor.group.repository.GroupRepository;
 import me.singularityfor.user.repository.UserRepository;
