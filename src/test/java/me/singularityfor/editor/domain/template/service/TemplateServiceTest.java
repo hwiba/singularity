@@ -24,7 +24,7 @@ import java.util.Date;
 import static org.junit.Assert.*;
 
 /**
- * Created by Order on 2015. 11. 13..
+ * Created by hyva on 2015. 11. 13..
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SingularityApplication.class)

@@ -1,6 +1,6 @@
 package me.singularityfor.editor.domain.note.domain;
 
-import lombok.Data;
+import lombok.*;
 import me.singularityfor.group.domain.Group;
 import me.singularityfor.user.domain.User;
 
@@ -8,26 +8,41 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 /**
- * Created by Order on 2015. 11. 13..
+ * Created by hyva on 2015. 11. 13..
  */
 @Entity
-@Data
+@Getter @Setter
+@ToString(exclude = {}) @EqualsAndHashCode(exclude = {})
 @Table(name = "_NOTE_")
 public class Note {
+
+    private enum State {
+        PUBLIC, DELETE
+    }
 
     @Id @GeneratedValue
     private long id;
 
-    @ManyToOne @JoinColumn(name = "user_key") @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "author_FK", nullable = false)
     private User author;
 
-    @OneToMany @JoinColumn(name = "group_key")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "group_FK")
     private Group group;
 
     @Lob @Column(name="text")
     private String text;
 
-    public void updateNote(String text) {
+    @Enumerated(value = EnumType.STRING)
+    private State state;
+
+    private Note() {};
+
+    public Note(User author, Group group, String text) {
+        this.author = author;
+        this.group = group;
         this.text = text;
+        this.state = State.PUBLIC;
     }
 }

@@ -27,11 +27,9 @@ import static org.junit.Assert.*;
 @WebAppConfiguration
 public class UserServiceTest {
 
-    @Resource
-    private UserService userService;
+    @Resource private UserService userService;
 
-    @Rule
-    public ExpectedException expectedExcetption = ExpectedException.none();
+    @Rule public ExpectedException expectedExcetption = ExpectedException.none();
 
     private final User user = new User("test@test.com", "testName", "1234qwer", new Date());
 
