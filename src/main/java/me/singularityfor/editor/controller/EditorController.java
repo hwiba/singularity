@@ -2,7 +2,6 @@ package me.singularityfor.editor.controller;
 
 import me.singularityfor.editor.domain.note.service.NoteService;
 import me.singularityfor.editor.domain.template.domain.Template;
-import me.singularityfor.editor.domain.template.dto.TemplateDtoIgnoreGroup;
 import me.singularityfor.editor.domain.template.service.TemplateService;
 import me.singularityfor.utility.handle.ExceptionHandler;
 import org.slf4j.Logger;
@@ -28,8 +27,8 @@ public class EditorController extends ExceptionHandler {
     @Resource private NoteService noteService;
 
     @RequestMapping(value = "/template", method = RequestMethod.POST)
-    public TemplateDtoIgnoreGroup createTemplate (@Valid @RequestBody Template template) {
-        return new TemplateDtoIgnoreGroup(templateService.create(template));
+    public Template createTemplate (@Valid @RequestBody Template template) {
+        return templateService.create(template);
     }
 
 }

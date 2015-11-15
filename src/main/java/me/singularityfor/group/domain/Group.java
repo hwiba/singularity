@@ -1,5 +1,6 @@
 package me.singularityfor.group.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import me.singularityfor.user.domain.User;
 
@@ -32,6 +33,7 @@ public class Group {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "captain_FK")
+    @JsonIgnore
     private User captain;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -42,6 +44,7 @@ public class Group {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_FK")
+    @JsonIgnore
     private Collection<User> members = new ArrayList<>();
 
     public Group(final String name, final User captain, final Date createDate) {
