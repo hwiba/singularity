@@ -3,6 +3,7 @@ package me.singularityfor.editor.domain.template.service;
 import lombok.val;
 import me.singularityfor.SingularityApplication;
 import me.singularityfor.editor.domain.template.domain.Template;
+import me.singularityfor.editor.domain.template.repository.TemplateRepository;
 import me.singularityfor.group.domain.Group;
 import me.singularityfor.group.service.GroupService;
 import me.singularityfor.user.domain.User;
@@ -13,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
@@ -51,11 +53,13 @@ public class TemplateServiceTest {
 
     @Test
     public void testCreate_같은_명칭의_템플릿이_그룹에_존재하지_않을_때 () throws Exception {
-        val repositoryTemplate = templateService.create(template);
-        assertEquals(template.getAuthor(), repositoryTemplate.getAuthor());
-        assertEquals(template.getGroup(), repositoryTemplate.getGroup());
-        assertEquals(template.getForm(), repositoryTemplate.getForm());
-        assertEquals(template.getName(), repositoryTemplate.getName());
+        Template testTemplate = template.copy();
+        testTemplate.setName(KeyGenerators.string().generateKey());
+        val repositoryTemplate = templateService.create(testTemplate);
+        assertEquals(testTemplate.getAuthor(), repositoryTemplate.getAuthor());
+        assertEquals(testTemplate.getGroup(), repositoryTemplate.getGroup());
+        assertEquals(testTemplate.getForm(), repositoryTemplate.getForm());
+        assertEquals(testTemplate.getName(), repositoryTemplate.getName());
     }
 
     @Test
