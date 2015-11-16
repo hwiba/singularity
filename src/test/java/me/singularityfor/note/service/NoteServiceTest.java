@@ -1,9 +1,8 @@
-package me.singularityfor.editor.domain.note.service;
+package me.singularityfor.note.service;
 
 import lombok.val;
 import me.singularityfor.SingularityApplication;
-import me.singularityfor.editor.domain.note.domain.Note;
-import me.singularityfor.editor.domain.template.domain.Template;
+import me.singularityfor.note.domain.Note;
 import me.singularityfor.group.domain.Group;
 import me.singularityfor.group.service.GroupService;
 import me.singularityfor.user.domain.User;

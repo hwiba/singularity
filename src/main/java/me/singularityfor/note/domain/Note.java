@@ -1,11 +1,10 @@
-package me.singularityfor.editor.domain.note.domain;
+package me.singularityfor.note.domain;
 
 import lombok.*;
 import me.singularityfor.group.domain.Group;
 import me.singularityfor.user.domain.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 /**
  * Created by hyva on 2015. 11. 13..

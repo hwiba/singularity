@@ -1,6 +1,5 @@
 package me.singularityfor.editor.domain.template.controller;
 
-import me.singularityfor.editor.domain.note.service.NoteService;
 import me.singularityfor.editor.domain.template.domain.Template;
 import me.singularityfor.editor.domain.template.service.TemplateService;
 import org.slf4j.Logger;

@@ -1,6 +1,6 @@
-package me.singularityfor.editor.domain.note.repository;
+package me.singularityfor.note.repository;
 
-import me.singularityfor.editor.domain.note.domain.Note;
+import me.singularityfor.note.domain.Note;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**

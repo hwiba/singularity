@@ -1,8 +1,8 @@
-package me.singularityfor.editor.domain.note.service;
+package me.singularityfor.note.service;
 
 import lombok.NonNull;
-import me.singularityfor.editor.domain.note.domain.Note;
-import me.singularityfor.editor.domain.note.repository.NoteRepository;
+import me.singularityfor.note.domain.Note;
+import me.singularityfor.note.repository.NoteRepository;
 import me.singularityfor.group.domain.Group;
 import me.singularityfor.group.repository.GroupRepository;
 import me.singularityfor.user.domain.User;
