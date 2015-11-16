@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by hyva on 2015. 11. 15..
  */
-@ControllerAdvice(annotations = RestController.class)
-public class GlobalRestControllerExceptionHandler {
+@ControllerAdvice
+public class GlobalControllerExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
