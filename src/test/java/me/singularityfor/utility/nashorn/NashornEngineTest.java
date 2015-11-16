@@ -10,7 +10,6 @@ import static org.junit.Assert.*;
 /**
  * Created by Order on 2015. 11. 4..
  */
-@Slf4j
 public class NashornEngineTest {
 
     NashornEngine ns = new NashornEngine();

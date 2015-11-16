@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
-import javax.validation.ConstraintViolationException;
+import java.util.Collection;
 
 /**
  * Created by hyva on 2015. 11. 13..
@@ -30,20 +30,26 @@ public class TemplateService {
     }
 
     private Template numbering(Template template) {
-        if (templateRepository.findOneByNameAndGroup(template.getName(), template.getGroup()).isPresent()) {
-            return this.numbering(template, 1);
-        }
+        templateRepository.findOneByNameAndGroup(template.getName(), template.getGroup()).ifPresent(
+                repositoryTemplate -> this.numbering(template, 1)
+        );
         return template;
     }
 
-    private Template numbering(Template template, Integer count) {
+    private void numbering(Template template, Integer count) {
         String name = String.join("_", template.getName(), count.toString());
         if (templateRepository.findOneByNameAndGroup(name, template.getGroup()).isPresent()) {
             this.numbering(template, count + 1);
         } else {
           template.setName(name);
         }
-        return template;
     }
 
+    public Template findOne(long id) {
+        return templateRepository.findOne(id);
+    }
+
+    public Collection<Template> findAllByGroup(long groupId) {
+        return templateRepository.findAllByGroup(groupRepository.findOne(groupId));
+    }
 }

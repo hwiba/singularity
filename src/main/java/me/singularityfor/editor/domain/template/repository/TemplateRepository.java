@@ -4,6 +4,7 @@ import me.singularityfor.editor.domain.template.domain.Template;
 import me.singularityfor.group.domain.Group;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -13,4 +14,5 @@ public interface TemplateRepository extends JpaRepository<Template, Long> {
 
     Optional<Template> findOneByNameAndGroup(String name, Group group);
 
+    Collection<Template> findAllByGroup(Group group);
 }
