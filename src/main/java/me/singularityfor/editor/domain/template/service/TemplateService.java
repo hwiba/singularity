@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolationException;
 
 /**
  * Created by hyva on 2015. 11. 13..
