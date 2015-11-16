@@ -1,12 +1,12 @@
 /**
- * Created by Order on 2015. 10. 30..
+ * Created by hyva on 2015. 10. 30..
  */
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import LoginPage from "./LoginPage";
+import LoginPage from "./component/LoginPage";
 
 ReactDOM.render(
-    <LoginPage className="" />, document.body
+    <LoginPage className="" />, document.getElementById("reactRenderingPoint")
 )
