@@ -1,17 +1,16 @@
-package me.singularityfor.utility.nashorn;
+package me.singularityfor.utility.nashorn.markdown;
 
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import java.io.File;
 import java.io.FileReader;
 
 /**
- * Created by Order on 2015. 11. 4..
+ * Created by hyva on 2015. 11. 4..
  */
-@Slf4j
+@Component
 public class NashornEngine {
 
     public Object markdownToHtml(String md) throws Throwable {
