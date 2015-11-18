@@ -19,8 +19,7 @@ public class TemplateController {
 
     private static final Logger logger = LoggerFactory.getLogger(TemplateController.class);
 
-    @Resource
-    private TemplateService templateService;
+    @Resource private TemplateService templateService;
 
     @RequestMapping(value = "", method = RequestMethod.POST)
     public Template create(@Valid @RequestBody Template template) {
