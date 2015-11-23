@@ -30,9 +30,9 @@ public class UserService {
     }
 
     public User create(User requestUser) throws Exception {
-        if (null != findOneByEmail(requestUser.getEmail()))
+        if (null != findOneByEmail(requestUser.getEmail())) {
             throw new Exception("error");
-        System.out.println(requestUser.getName());
+        }
         requestUser.hashingPassword(bCryptPasswordEncoder::encode);
         return userRepository.save(requestUser);
     }
